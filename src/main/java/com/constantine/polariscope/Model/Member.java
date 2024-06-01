@@ -1,21 +1,17 @@
 package com.constantine.polariscope.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor
 public class Member {
     @Id
     @GeneratedValue
@@ -30,12 +26,21 @@ public class Member {
     private String description;
     private Sex sex;
     private int ageMet;
-    private String placeMet; //todo: make this its own table
     private LocalDate birthday;
+
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
+
+    @OneToOne
+    private Place placeMet;
 
     @OneToMany(mappedBy = "member")
     List<Evaluation> timeline;
 
+    public Member(){
+        created = LocalDateTime.now();
+        lastModified = LocalDateTime.now();
+    }
     private enum Sex{
         Male,
         Female,
