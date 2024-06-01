@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -34,6 +34,9 @@ public class User implements UserDetails {
     private Role role;
     private boolean isEnabled;
     private LocalDateTime created;
+
+    @OneToMany(mappedBy = "author")
+    private List<Member> members;
 
     public User(){
         created = LocalDateTime.now();

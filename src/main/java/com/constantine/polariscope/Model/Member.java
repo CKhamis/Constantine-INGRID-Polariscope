@@ -31,6 +31,9 @@ public class Member {
     private LocalDateTime created;
     private LocalDateTime lastModified;
 
+    @ManyToOne
+    private User author;
+
     @OneToOne
     private Place placeMet;
 
