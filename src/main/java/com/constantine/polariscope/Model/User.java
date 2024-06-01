@@ -1,6 +1,9 @@
 package com.constantine.polariscope.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -8,15 +11,20 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-@Table
+@Entity
 public class User implements UserDetails {
+    @Id
+    @GeneratedValue
+    private UUID id;
+
     @NonNull
     private String username;
     @JsonIgnore
@@ -25,6 +33,11 @@ public class User implements UserDetails {
     @NonNull
     private Role role;
     private boolean isEnabled;
+    private LocalDateTime created;
+
+    public User(){
+        created = LocalDateTime.now();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

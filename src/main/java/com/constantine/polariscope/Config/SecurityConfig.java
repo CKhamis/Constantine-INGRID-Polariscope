@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Config;
 
+import com.constantine.polariscope.Service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
