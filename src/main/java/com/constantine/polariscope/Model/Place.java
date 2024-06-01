@@ -3,6 +3,7 @@ package com.constantine.polariscope.Model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +21,9 @@ public class Place {
     private String name;
     private LocalDateTime created;
     private LocalDateTime lastModified;
+
+    @ManyToOne
+    private User author;
 
     public Place(){
         created = LocalDateTime.now();

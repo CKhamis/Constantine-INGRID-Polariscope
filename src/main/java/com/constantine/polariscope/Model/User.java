@@ -21,6 +21,7 @@ import java.util.UUID;
 @Setter
 @Entity
 public class User implements UserDetails {
+    //todo: profile icon?
     @Id
     @GeneratedValue
     private UUID id;
@@ -38,6 +39,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "author")
     private List<Member> members;
 
+    @OneToMany(mappedBy = "author")
+    private List<Place> places;
+
     public User(){
         created = LocalDateTime.now();
     }
@@ -49,12 +53,12 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
+    public @NonNull String getPassword() {
         return password;
     }
 
     @Override
-    public String getUsername() {
+    public @NonNull String getUsername() {
         return username;
     }
 
