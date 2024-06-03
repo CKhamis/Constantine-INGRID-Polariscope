@@ -2,12 +2,30 @@ package com.constantine.polariscope.Controller;
 
 import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
+import com.constantine.polariscope.Service.PlaceService;
+import com.constantine.polariscope.Service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.security.Principal;
+
 @Controller
+@AllArgsConstructor
 public class FrontEndController {
+    private final UserService userService;
+    private final PlaceService placeService;
+    private static final String VERSION = "0.0.2";
+
+    private User getCurrentUser(Principal principal){
+        if(principal == null){
+            return new User();
+        }
+        String username = principal.getName();;
+        return (User) userService.loadUserByUsername(username);
+    }
+
     @GetMapping("/")
     public String getHome() {
         return "pages/main/home";
@@ -23,10 +41,11 @@ public class FrontEndController {
     }
 
     @GetMapping("/interpersonal/new")
-    public String getNewMember(Model model) {
+    public String getNewMember(Model model, Principal principal) {
         model.addAttribute("relationshipTypes", Member.RelationshipType.values());
         model.addAttribute("sexualityTypes", Member.Sexuality.values());
         model.addAttribute("sexTypes", Member.Sex.values());
+        model.addAttribute("places", placeService.findAll(getCurrentUser(principal)));
         return "pages/interpersonal/newMember";
     }
 }

@@ -26,7 +26,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="relationf">Relationship Type</label>
-                    <select class="form-control" id="relationf" name="relationship" required>
+                    <select class="form-select" id="relationf" name="relationship" required>
                         <option value="" disabled="disabled">Select Relationship Type</option>
                         <th:block th:each="relationshipType : ${relationshipTypes}">
                             <option th:value="${relationshipType}" th:text="${relationshipType.toString().toLowerCase()}"></option>
@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="sexf">Sex</label>
-                    <select class="form-control" id="sexf" name="relationship">
+                    <select class="form-select" id="sexf" name="relationship">
                         <option value="">Decline to state</option>
                         <th:block th:each="SexType : ${sexTypes}">
                             <option th:value="${SexType}" th:text="${SexType.toString().toLowerCase()}"></option>
@@ -44,7 +44,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="sexualityf">Sexuality</label>
-                    <select class="form-control" id="sexualityf" name="sexuality">
+                    <select class="form-select" id="sexualityf" name="sexuality">
                         <option value="">Decline to state</option>
                         <th:block th:each="sexualityType : ${sexualityTypes}">
                             <option th:value="${sexualityType}" th:text="${sexualityType.toString().toLowerCase()}"></option>
@@ -60,19 +60,30 @@
                     <input type="text" class="form-control" id="fcf" name="favoriteColor" placeholder="Red">
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="amf">Age Met</label>
+                    <label for="amf">Year Met</label>
                     <input type="number" class="form-control" id="amf" name="ageMet" placeholder="2001" required>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="bdf">Birthday</label>
                     <input type="date" class="form-control" id="bdf" name="birthday" required>
                 </div>
-                <!-- todo: add place met here, which will require user information -->
+
+                <div class="col-md-4 mb-3">
+                    <label for="psf">Places</label>
+                    <select class="form-select" id="psf">
+                        <option value="">None</option>
+                        <th:block th:each="place : ${places}">
+                            <option th:value="${place}" th:text="${place.toString().toLowerCase()}"></option>
+                        </th:block>
+                    </select>
+                </div>
+
                 <div class="col-12 mb-3">
                     <label for="df">Description</label>
                     <input type="text" class="form-control" id="df" name="description" placeholder="Description of member">
                 </div>
             </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
 </div>
