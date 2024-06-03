@@ -16,4 +16,7 @@ public class MemberService {
     public List<Member> allMembers(User author) throws Exception{
         return memberRepository.findAllByAuthorOrderByLastModifiedDesc(author);
     }
+    public void save(Member member){
+        memberRepository.save(member);
+    }
 }
