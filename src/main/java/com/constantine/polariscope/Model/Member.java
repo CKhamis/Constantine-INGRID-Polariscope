@@ -58,6 +58,7 @@ public class Member {
         middleName = form.getMiddleName();
         lastName = form.getLastName();
         personality = form.getPersonality();
+        description = form.getDescription();
 
         if(form.getRelationship() != null && !form.getRelationship().isEmpty()){
             relationship = RelationshipType.valueOf(form.getRelationship().toUpperCase());
@@ -72,9 +73,9 @@ public class Member {
         author = user;
     }
     public enum Sex{
-        Male,
-        Female,
-        Other,
+        MALE,
+        FEMALE,
+        OTHER,
     }
     public enum Sexuality{
         HETEROSEXUAL,

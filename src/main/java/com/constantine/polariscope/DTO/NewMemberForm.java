@@ -19,6 +19,7 @@ public class NewMemberForm {
     private String lastName;
     private String middleName;
     private String personality;
+    private String description;
     private String relationship;
     private String sex;
     private String sexuality;
