@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Service;
 
+import com.constantine.polariscope.Model.User;
 import com.constantine.polariscope.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,5 +16,9 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username).orElseThrow();
+    }
+
+    public void save(User user){
+        userRepository.save(user);
     }
 }

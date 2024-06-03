@@ -82,7 +82,7 @@ public class User implements UserDetails {
         return isEnabled;
     }
 
-    private enum Role{
+    public enum Role{
         Owner,
         Observer
     }
