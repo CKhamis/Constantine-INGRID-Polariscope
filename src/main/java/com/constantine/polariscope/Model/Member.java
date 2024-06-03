@@ -44,12 +44,12 @@ public class Member {
         created = LocalDateTime.now();
         lastModified = LocalDateTime.now();
     }
-    private enum Sex{
+    public enum Sex{
         Male,
         Female,
         Other,
     }
-    private enum Sexuality{
+    public enum Sexuality{
         HETEROSEXUAL,
         PANSEXUAL,
         BISEXUAL,
@@ -57,7 +57,7 @@ public class Member {
         ASEXUAL,
     }
 
-    private enum RelationshipType{
+    public enum RelationshipType{
         FAMILY,
         COWORKER,
         FRIEND,
