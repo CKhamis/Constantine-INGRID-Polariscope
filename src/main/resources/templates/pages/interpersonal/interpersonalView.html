@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xml:th="https://www.thymeleaf.org">
+<head th:replace="~{components/Header :: head('Home')}"></head>
+<body class="bg-2 text-1" data-bs-theme="dark">
+<div th:replace="~{components/Navigation :: navigation}"></div>
+<main class="pt-3">
+<div class="container-fluid px-4">
+
+    <nav class="navbar d-flex justify-content-between align-items-center px-2">
+        <div>
+            <a href="/interpersonal">< Interpersonal Home</a>
+        </div>
+        <div>
+            <div class="input-group">
+                <select class="form-select" id="member-select">
+                    <option selected>Choose...</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                </select>
+                <button class="btn btn-primary" type="button">Change</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="row mt-3">
+        <div class="col-md-3 col-lg-2" id="left-pane">
+            <img class="square-image" th:src="@{/icons/Logo.svg}" alt="profile image" />
+            <h2 class="fw-bold text-center mt-3">Test Name</h2>
+            <div class="d-flex justify-content-between align-items-center mt-5">
+                <img class="square-image mx-2" th:src="@{/icons/Logo.svg}"/>
+                <img class="square-image mx-2" th:src="@{/icons/Logo.svg}"/>
+                <img class="square-image mx-2" th:src="@{/icons/Logo.svg}"/>
+            </div>
+        </div>
+        <div class="col-md-9 col-lg-10" id="right-pane">
+test
+        </div>
+    </div>
+</div>
+</main>
+<input type="hidden" th:value="${id}" />
+<div th:replace="~{components/External :: external}"></div>
+<script>
+    function refresh(){
+
+    }
+</script>
+</body>
+</html>
