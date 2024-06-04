@@ -1,3 +1,12 @@
+:root {
+    --bs-border-radius: 0 !important;
+    --bs-border-radius-sm: 0 !important;
+    --bs-border-radius-lg: 0 !important;
+    --bs-border-radius-xl: 0 !important;
+    --bs-border-radius-xxl: 0 !important;
+    --bs-border-radius-2xl: 0 !important;
+    --bs-border-radius-pill: 0 !important;
+}
 .square-image{
     object-fit: cover;
     aspect-ratio: 1 / 1;
