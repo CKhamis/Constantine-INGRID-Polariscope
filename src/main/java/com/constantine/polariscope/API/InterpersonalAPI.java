@@ -1,5 +1,6 @@
 package com.constantine.polariscope.API;
 
+import com.constantine.polariscope.DTO.MemberListItem;
 import com.constantine.polariscope.DTO.NewMemberForm;
 import com.constantine.polariscope.DTO.ResponseMessage;
 import com.constantine.polariscope.Model.Member;
@@ -59,7 +60,7 @@ public class InterpersonalAPI {
             User retrievedUser = getCurrentUser(principal);
 
             // Get all users from repository
-            List<Member> members = memberService.allMembers(retrievedUser);
+            List<MemberListItem> members = memberService.allMembers(retrievedUser);
             return ResponseEntity.ok(members);
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, e.getMessage()));

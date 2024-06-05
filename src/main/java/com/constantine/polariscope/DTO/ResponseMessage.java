@@ -6,12 +6,11 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 public class ResponseMessage {
-    private LocalDateTime timestamp;
-    private Severity severity;
-    private String message;
-    private String title;
+    private final LocalDateTime timestamp;
+    private final Severity severity;
+    private final String message;
+    private final String title;
 
     public ResponseMessage(String title, Severity severity, String message) {
         timestamp = LocalDateTime.now();

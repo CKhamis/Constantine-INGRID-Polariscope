@@ -1,5 +1,6 @@
 package com.constantine.polariscope.API;
 
+import com.constantine.polariscope.DTO.MemberListItem;
 import com.constantine.polariscope.DTO.NewMemberForm;
 import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
@@ -117,8 +118,8 @@ public class PolariscopeApplicationTests {
 	@Test
 	@WithMockUser(username = "test")
 	public void testAllMembers() throws Exception {
-		List<Member> members = new ArrayList<>();
-		members.add(perfectMember);
+		List<MemberListItem> members = new ArrayList<>();
+		members.add(new MemberListItem(perfectMember));
 		Mockito.when(userService.loadUserByUsername("test")).thenReturn(perfectUser);
 		Mockito.when(memberService.allMembers(perfectUser)).thenReturn(members);
 

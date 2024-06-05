@@ -1,11 +1,13 @@
 package com.constantine.polariscope.Service;
 
+import com.constantine.polariscope.DTO.MemberListItem;
 import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
 import com.constantine.polariscope.Repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,8 +16,16 @@ import java.util.UUID;
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    public List<Member> allMembers(User author) throws Exception{
-        return memberRepository.findAllByAuthorOrderByLastModifiedDesc(author);
+    public List<MemberListItem> allMembers(User author) throws Exception{
+        List<Member> members = memberRepository.findAllByAuthorOrderByLastModifiedDesc(author);
+        List<MemberListItem> memberListItems = new ArrayList<>();
+
+        for (Member member : members) {
+            MemberListItem listItem = new MemberListItem(member);
+            memberListItems.add(listItem);
+        }
+
+        return memberListItems;
     }
     public void save(Member member){
         memberRepository.save(member);
