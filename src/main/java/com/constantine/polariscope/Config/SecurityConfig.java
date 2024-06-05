@@ -21,7 +21,8 @@ public class SecurityConfig {
     SecurityFilterChain web(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "interpersonal", "/interpersonal/**").authenticated()
+                        .requestMatchers("/", "/interpersonal/**").authenticated()
+                        .requestMatchers("/api/interpersonal/**").hasAuthority(User.Role.Owner.toString())
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form

@@ -3,6 +3,7 @@ package com.constantine.polariscope.Model;
 import com.constantine.polariscope.DTO.NewMemberForm;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -15,11 +16,15 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
 public class Member {
     @Id
+    @NonNull
     @GeneratedValue
     private UUID id;
+    @NonNull
     private String firstName;
+    @NonNull
     private String lastName;
     private String middleName;
     private RelationshipType relationship;
@@ -28,10 +33,12 @@ public class Member {
     private String favoriteColor;
     private String description;
     private Sex sex;
-    private int ageMet;
+    private Integer ageMet;
     private LocalDate birthday;
 
+    @NonNull
     private LocalDateTime created;
+    @NonNull
     private LocalDateTime lastModified;
 
     @JsonIgnore

@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,11 @@ public class InterpersonalAPI {
             throw new Exception("No user found");
         }
         String username = principal.getName();;
-        return (User) userService.loadUserByUsername(username);
+        User user = (User) userService.loadUserByUsername(username);
+        if(user.getRole().equals(User.Role.Owner)){
+            return user;
+        }
+        throw new Exception("Invalid user");
     }
 
     @PostMapping("/member/new")
@@ -43,12 +48,13 @@ public class InterpersonalAPI {
             memberService.save(member);
             return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member saved to Polariscope"));
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error saving member"));
         }
     }
 
     @GetMapping("/member/all")
     public ResponseEntity<?> allMembers(Principal principal){
+        //todo: Create a DTO that contains less information about the members
         try{
             User retrievedUser = getCurrentUser(principal);
 
