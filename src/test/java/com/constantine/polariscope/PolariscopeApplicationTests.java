@@ -37,7 +37,7 @@ public class PolariscopeApplicationTests {
 	@MockBean
 	private UserService userService;
 
-	private User perfectUser, perfectObserver;
+	private User perfectUser, perfectUser2, perfectObserver;
 	private Member perfectMember, minimalMember;
 	private NewMemberForm perfectNewMemberForm;
 
@@ -47,6 +47,7 @@ public class PolariscopeApplicationTests {
 	@BeforeEach
 	public void setup() {
 		perfectUser = new User(UUID.randomUUID(), "test", "realPassword", User.Role.Owner, true, specificDateTime, null, null);
+		perfectUser2 = new User(UUID.randomUUID(), "chuck", "realPassword", User.Role.Owner, true, specificDateTime, null, null);
 		perfectObserver = new User(UUID.randomUUID(), "ak", "realPassword", User.Role.Observer, true, specificDateTime, null, null);
 
 		perfectMember = new Member(UUID.randomUUID(), "Terence", "Bird", "Angry", Member.RelationshipType.FRIEND, Member.Sexuality.HETEROSEXUAL, "INSP", "Dark Red", "Best bird", Member.Sex.MALE, 2001, specificDate, specificDateTime, specificDateTime, perfectUser, null, null);
@@ -86,7 +87,7 @@ public class PolariscopeApplicationTests {
 
 	@Test
 	@WithMockUser(username = "ak")
-	public void testObserverRestriction() throws Exception {
+	public void testNewMemberObserverRestriction() throws Exception {
 		Mockito.when(userService.loadUserByUsername("ak")).thenReturn(perfectObserver);
 
 		String jsonContent = "{" +
@@ -142,6 +143,32 @@ public class PolariscopeApplicationTests {
 	}
 
 	@Test
+	@WithMockUser(username = "ak")
+	public void testViewMemberObserverRestriction() throws Exception {
+		Mockito.when(userService.loadUserByUsername("ak")).thenReturn(perfectObserver);
+		Mockito.when(memberService.findMember(perfectMember.getId())).thenReturn(perfectMember);
+
+		mockMvc.perform(get("/api/interpersonal/member/view/" + perfectMember.getId()))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Invalid Account"));
+
+		Mockito.verify(memberService, Mockito.times(0)).findMember(perfectMember.getId());
+	}
+
+	@Test
+	@WithMockUser(username = "chuck")
+	public void testViewMemberWrongUser() throws Exception {
+		Mockito.when(userService.loadUserByUsername("chuck")).thenReturn(perfectUser2);
+		Mockito.when(memberService.findMember(perfectMember.getId())).thenReturn(perfectMember);
+
+		mockMvc.perform(get("/api/interpersonal/member/view/" + perfectMember.getId()))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Invalid Account"));
+
+		Mockito.verify(memberService, Mockito.times(1)).findMember(perfectMember.getId());
+	}
+
+	@Test
 	@WithMockUser(username = "test")
 	public void testViewMemberNotFound() throws Exception {
 		Mockito.when(userService.loadUserByUsername("test")).thenReturn(perfectUser);
@@ -149,8 +176,7 @@ public class PolariscopeApplicationTests {
 
 		mockMvc.perform(get("/api/interpersonal/member/view/" + perfectMember.getId()))
 				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.message").value("Error Retrieving Member"))
-				.andExpect(jsonPath("$.details").value("Member not found"));
+				.andExpect(jsonPath("$.message").value("Member not found"));
 
 		Mockito.verify(memberService, Mockito.times(1)).findMember(perfectMember.getId());
 	}

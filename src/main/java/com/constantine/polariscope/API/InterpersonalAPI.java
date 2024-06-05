@@ -71,16 +71,19 @@ public class InterpersonalAPI {
         try{
             User retrievedUser = getCurrentUser(principal);
 
-            // Retrieve member
-            Member member = memberService.findMember(id);
+            try{
+                Member member = memberService.findMember(id);
 
-            if(member.getAuthor().getId().equals(retrievedUser.getId())){
-                return ResponseEntity.ok(member);
-            }else{
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Member", ResponseMessage.Severity.LOW, "Invalid Account"));
+                if(member.getAuthor().getId().equals(retrievedUser.getId())){
+                    return ResponseEntity.ok(member);
+                }else{
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Member", ResponseMessage.Severity.LOW, "Invalid Account"));
+                }
+            }catch(Exception e){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Error Retrieving Member", ResponseMessage.Severity.LOW, "Member not found"));
             }
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Error Retrieving Member", ResponseMessage.Severity.LOW, "Member not found"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Member", ResponseMessage.Severity.LOW, "Invalid Account"));
         }
     }
 }
