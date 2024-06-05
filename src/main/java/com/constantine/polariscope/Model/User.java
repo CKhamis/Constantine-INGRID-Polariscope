@@ -36,9 +36,11 @@ public class User implements UserDetails {
     private boolean isEnabled;
     private LocalDateTime created;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "author")
     private List<Member> members;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "author")
     private List<Place> places;
 

@@ -13,12 +13,8 @@
         <div>
             <div class="input-group">
                 <select class="form-select" id="member-select">
-                    <option selected>Choose...</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
                 </select>
-                <button class="btn btn-primary" type="button">Change</button>
+                <button class="btn btn-primary" type="button" onclick="changeUser()">Change</button>
             </div>
         </div>
     </nav>
@@ -52,11 +48,55 @@
     </div>
 </div>
 </main>
-<input type="hidden" th:value="${id}" />
+<input type="hidden" th:value="${id}" id="id-form" />
 <div th:replace="~{components/External :: external}"></div>
 <script>
-    function refresh(){
+    let memberList;
+    let memberDetails;
 
+    refresh();
+
+    function refresh(){
+        let memberId = document.querySelector("#id-form").value;
+        const memberListFetch = fetch("/api/interpersonal/member/all", {});
+        const memberDetailFetch = fetch("/api/interpersonal/member/view/" + memberId, {});
+        Promise.all([memberListFetch, memberDetailFetch])
+            .then(responses => {
+                return Promise.all([responses[0], responses[1]]);
+            })
+            .then(data => {
+                return Promise.all([data[0].json(), data[1].json()]);
+            })
+            .then(data => {
+                memberList = data[0];
+                memberDetails = data[1];
+                renderMemberSelect(data[0]);
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                    });
+            })
+    }
+
+    function renderMemberSelect(members){
+        let HTMLContent = ``;
+        members.forEach((member) => {
+            HTMLContent += `
+                <option value="${member.id}">${member.firstName} ${member.lastName}</option>
+            `;
+        });
+        document.querySelector("#member-select").innerHTML = HTMLContent;
+    }
+
+    function changeUser(){
+        document.querySelector("#id-form").value = document.querySelector("#member-select").value;
+        refresh();
     }
 </script>
 </body>

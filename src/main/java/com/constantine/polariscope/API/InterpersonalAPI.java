@@ -12,11 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.UUID;
 
 @Controller
 @AllArgsConstructor
@@ -44,6 +44,37 @@ public class InterpersonalAPI {
             return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member saved to Polariscope"));
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, e.getMessage()));
+        }
+    }
+
+    @GetMapping("/member/all")
+    public ResponseEntity<?> allMembers(Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            // Get all users from repository
+            List<Member> members = memberService.allMembers(retrievedUser);
+            return ResponseEntity.ok(members);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, e.getMessage()));
+        }
+    }
+
+    @GetMapping("/member/view/{id}")
+    public ResponseEntity<?> viewMember(@PathVariable UUID id, Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            // Retrieve member
+            Member member = memberService.findMember(id);
+
+            if(member.getAuthor().getId().equals(retrievedUser.getId())){
+                return ResponseEntity.ok(member);
+            }else{
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Member", ResponseMessage.Severity.LOW, "Invalid Account"));
+            }
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Error Retrieving Member", ResponseMessage.Severity.LOW, "Member not found"));
         }
     }
 }

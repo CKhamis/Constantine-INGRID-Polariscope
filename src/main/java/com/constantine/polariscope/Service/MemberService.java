@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Service
@@ -18,5 +19,9 @@ public class MemberService {
     }
     public void save(Member member){
         memberRepository.save(member);
+    }
+
+    public Member findMember(UUID id){
+        return memberRepository.findById(id).orElseThrow();
     }
 }

@@ -1,6 +1,7 @@
 package com.constantine.polariscope.Model;
 
 import com.constantine.polariscope.DTO.NewMemberForm;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -33,6 +34,7 @@ public class Member {
     private LocalDateTime created;
     private LocalDateTime lastModified;
 
+    @JsonIgnore
     @NonNull
     @ManyToOne
     private User author;
@@ -92,5 +94,6 @@ public class Member {
         ACQUAINTANCE,
         ENEMY,
         PARTNER,
+        INACTIVE,
     }
 }

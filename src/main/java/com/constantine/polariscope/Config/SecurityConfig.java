@@ -21,7 +21,7 @@ public class SecurityConfig {
     SecurityFilterChain web(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "interpersonal", "/interpersonal/*").authenticated()
+                        .requestMatchers("/", "interpersonal", "/interpersonal/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
