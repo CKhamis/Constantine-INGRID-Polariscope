@@ -55,7 +55,6 @@ public class InterpersonalAPI {
 
     @GetMapping("/member/all")
     public ResponseEntity<?> allMembers(Principal principal){
-        //todo: Create a DTO that contains less information about the members
         try{
             User retrievedUser = getCurrentUser(principal);
 

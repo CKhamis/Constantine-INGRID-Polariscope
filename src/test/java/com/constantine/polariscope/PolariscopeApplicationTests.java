@@ -1,5 +1,6 @@
-package com.constantine.polariscope.API;
+package com.constantine.polariscope;
 
+import com.constantine.polariscope.API.InterpersonalAPI;
 import com.constantine.polariscope.DTO.MemberListItem;
 import com.constantine.polariscope.DTO.NewMemberForm;
 import com.constantine.polariscope.Model.Member;
@@ -128,6 +129,34 @@ public class PolariscopeApplicationTests {
 				.andExpect(jsonPath("$[0].id").value(perfectMember.getId().toString()));
 
 		Mockito.verify(memberService, Mockito.times(1)).allMembers(perfectUser);
+	}
+
+	@Test
+	@WithMockUser(username = "chuck")
+	public void testAllMembers2() throws Exception {
+		List<MemberListItem> members = new ArrayList<>();
+		Mockito.when(userService.loadUserByUsername("chuck")).thenReturn(perfectUser2);
+		Mockito.when(memberService.allMembers(perfectUser2)).thenReturn(members);
+
+		mockMvc.perform(get("/api/interpersonal/member/all"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$").isEmpty());
+
+		Mockito.verify(memberService, Mockito.times(1)).allMembers(perfectUser2);
+	}
+
+	@Test
+	@WithMockUser(username = "ak")
+	public void testAllMembersObserverRestriction() throws Exception {
+		List<MemberListItem> members = new ArrayList<>();
+		Mockito.when(userService.loadUserByUsername("ak")).thenReturn(perfectObserver);
+		Mockito.when(memberService.allMembers(perfectObserver)).thenReturn(members);
+
+		mockMvc.perform(get("/api/interpersonal/member/all"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Invalid user"));
+
+		Mockito.verify(memberService, Mockito.times(0)).allMembers(perfectObserver);
 	}
 
 	@Test

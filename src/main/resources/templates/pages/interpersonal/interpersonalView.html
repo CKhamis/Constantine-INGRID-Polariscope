@@ -22,27 +22,46 @@
     <div class="row mt-3">
         <div class="col-md-3 col-lg-2 mb-4" id="left-pane">
             <img class="square-image" th:src="@{/icons/Logo.svg}" alt="profile image" />
-            <h2 class="fw-bold text-center mt-3">Test Name</h2>
+            <h2 class="fw-bold text-center mt-3" id="member-name">Test Name</h2>
             <div class="d-flex justify-content-between align-items-center mt-5">
-                <img class="square-image mx-2" th:src="@{/icons/Logo.svg}"/>
-                <img class="square-image mx-2" th:src="@{/icons/Logo.svg}"/>
-                <img class="square-image mx-2" th:src="@{/icons/Logo.svg}"/>
+                <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="relation-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Relationship"/>
+                <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="sex-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sex"/>
+                <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="orientation-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sexuality"/>
+            </div>
+            <div class="mt-4 bg-light-subtle d-flex justify-content-center align-items-center py-4" role="button">
+                <p class="fs-4 fs-bold text-center m-0">+ Add Evaluation</p>
             </div>
         </div>
         <div class="col-md-9 col-lg-10 px-3" id="right-pane">
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Home</button>
-                    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Profile</button>
-                    <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</button>
-                    <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled" type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Disabled</button>
+                    <button class="nav-link active" id="nav-overview-tab" data-bs-toggle="tab" data-bs-target="#nav-overview" type="button" role="tab" aria-controls="nav-overview" aria-selected="true">Overview</button>
+                    <button class="nav-link" id="nav-info-tab" data-bs-toggle="tab" data-bs-target="#nav-info" type="button" role="tab" aria-controls="nav-info" aria-selected="false">Information</button>
+                    <button class="nav-link" id="nav-evaluation-tab" data-bs-toggle="tab" data-bs-target="#nav-evaluation" type="button" role="tab" aria-controls="nav-evaluation" aria-selected="false">Evaluations</button>
+                    <button class="nav-link" id="nav-settings-tab" data-bs-toggle="tab" data-bs-target="#nav-settings" type="button" role="tab" aria-controls="nav-settings" aria-selected="false">Settings</button>
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
-                <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" tabindex="0">...</div>
-                <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab" tabindex="0">...</div>
-                <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab" tabindex="0">...</div>
-                <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab" tabindex="0">...</div>
+                <div class="tab-pane fade show active" id="nav-overview" role="tabpanel" aria-labelledby="nav-overview-tab" tabindex="0">Home</div>
+                <div class="tab-pane fade" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab" tabindex="0">
+                    <h2 class="fw-bold mt-3">Member Information</h2>
+                    <div class="row">
+                        <div class="col-md-6 col-lg-4 col-xl-3 px-2 mb-2">
+                            <div class="p-4 bg-secondary-subtle h-100" id="info-relationship">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-8 col-xl-6 px-2 mb-2">
+                            <div class="p-4 bg-secondary-subtle h-100" id="info-description">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4 col-xl-3 px-2 mb-2">
+                            <div class="p-4 bg-secondary-subtle h-100" id="info-general">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-evaluation" role="tabpanel" aria-labelledby="nav-evaluation-tab" tabindex="0">Evals</div>
+                <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">Settings</div>
             </div>
         </div>
     </div>
@@ -50,6 +69,8 @@
 </main>
 <input type="hidden" th:value="${id}" id="id-form" />
 <div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/External :: tooltips}"></div>
+<div th:replace="~{components/Formatting :: date-formatting}"></div>
 <script>
     let memberList;
     let memberDetails;
@@ -71,6 +92,9 @@
                 memberList = data[0];
                 memberDetails = data[1];
                 renderMemberSelect(data[0]);
+                renderBadges();
+                document.querySelector("#member-name").textContent = memberDetails.firstName + " " + memberDetails.lastName;
+                renderInfoTab();
             })
             .catch((response) => {
                 console.log(response);
@@ -84,6 +108,28 @@
             })
     }
 
+    function renderInfoTab(){
+        document.querySelector("#info-relationship").innerHTML = `
+        <h3 class="fw-bold text-center">Relationship</h3>
+        <p>Type: ${memberDetails.relationship}</p>
+        <p>Year met: ${memberDetails.ageMet}</p>
+        <p>Place met: ${memberDetails.placeMet}</p>
+        `;
+
+        document.querySelector("#info-description").innerHTML = `
+        <h3 class="fw-bold">Description</h3>
+        <p>${memberDetails.description}</p>
+        `;
+
+        document.querySelector("#info-general").innerHTML = `
+        <h3 class="fw-bold text-center">General</h3>
+        <p>Birthday: ${formatDate(memberDetails.birthday)}</p>
+        <p>Favorite color: ${memberDetails.favoriteColor}</p>
+        <p>Sexuality: ${memberDetails.sexuality}</p>
+        <p>Personality: ${memberDetails.personality}</p>
+        `;
+    }
+
     function renderMemberSelect(members){
         let HTMLContent = ``;
         members.forEach((member) => {
@@ -92,6 +138,29 @@
             `;
         });
         document.querySelector("#member-select").innerHTML = HTMLContent;
+    }
+
+    function renderBadges(){
+        let relationshipIcon = document.querySelector("#relation-icon");
+        if(memberDetails.relationship.length > 0){
+            relationshipIcon.src = "/icons/relations/" + memberDetails.relationship + ".svg";
+        }else{
+            relationshipIcon.src = "/icons/Unknown.svg";
+        }
+
+        let sexIcon = document.querySelector("#sex-icon");
+        if(memberDetails.sex.length > 0){
+            sexIcon.src = "/icons/sex/" + memberDetails.sex + ".svg";
+        }else{
+            sexIcon.src = "/icons/Unknown.svg";
+        }
+
+        let sexualityIcon = document.querySelector("#orientation-icon");
+        if(memberDetails.sex.length > 0){
+            sexualityIcon.src = "/icons/sexuality/" + memberDetails.sexuality + ".svg";
+        }else{
+            sexualityIcon.src = "/icons/Unknown.svg";
+        }
     }
 
     function changeUser(){
