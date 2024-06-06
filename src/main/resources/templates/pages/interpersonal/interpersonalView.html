@@ -28,7 +28,7 @@
                 <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="sex-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sex"/>
                 <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="orientation-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sexuality"/>
             </div>
-            <div class="mt-4 bg-light-subtle d-flex justify-content-center align-items-center py-4" role="button" data-bs-toggle="modal" data-bs-target="#addEvalModal">
+            <div class="mt-4 bg-light-subtle d-flex justify-content-center align-items-center py-4" role="button" data-bs-toggle="modal" data-bs-target="#addEvalModal" onclick="updateModalTime()">
                 <p class="fs-4 fs-bold text-center m-0">+ Add Evaluation</p>
             </div>
         </div>
@@ -276,6 +276,16 @@
     function changeUser(){
         document.querySelector("#id-form").value = document.querySelector("#member-select").value;
         refresh();
+    }
+
+    function updateModalTime(){
+        const dateInput = document.getElementById('date-form-modal');
+
+        const currentDate = new Date();
+        const localDate = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000);
+        const formattedDate = localDate.toISOString().slice(0, 16); // Format as "YYYY-MM-DDTHH:MM"
+        dateInput.value = formattedDate;
+
     }
 </script>
 </body>
