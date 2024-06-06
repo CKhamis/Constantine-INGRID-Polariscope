@@ -148,8 +148,8 @@ public class InterpersonalAPI {
                                 existing.setNote(form.getNote());
                             }
 
-                            if(form.getCScore() != null){
-                                existing.setCScore(form.getCScore());
+                            if(form.getCscore() != null){
+                                existing.setCScore(form.getCscore());
                             }
 
                             if(form.getTimestamp() != null){
@@ -164,7 +164,7 @@ public class InterpersonalAPI {
                     }
 
                     // Create new eval
-                    Evaluation newEval = new Evaluation(null, form.getTimestamp(), form.getNote(), form.getCScore(), member);
+                    Evaluation newEval = new Evaluation(null, form.getTimestamp(), form.getNote(), form.getCscore(), member);
                     evaluationService.save(newEval);
                     return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Evaluation Saved", ResponseMessage.Severity.INFORMATIONAL, "Evaluation has been saved to member"));
                 }else{

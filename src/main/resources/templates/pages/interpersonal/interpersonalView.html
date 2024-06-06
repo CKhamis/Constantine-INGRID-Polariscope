@@ -173,7 +173,7 @@
         let data = {
             "id": null,
             "timestamp": document.querySelector("#date-form-modal").value,
-            "cScore": document.querySelector("#cScore-form-modal").value,
+            "cscore": document.querySelector("#cScore-form-modal").value,
             "note": document.querySelector("#note-form-modal").value,
             "memberId": document.querySelector("#id-form").value
         };
@@ -181,8 +181,8 @@
         postData("/api/interpersonal/evaluation/save", data)
             .then((message) => {
                 console.log(message.json());
-            })
-            .then(refresh)
+                refresh();
+            });
     }
 
     function renderInfoTab(){
@@ -261,7 +261,7 @@
             tableHTML += `
                 <tr id="${eval.id}">
                     <th>${formatDate(eval.timestamp)}</th>
-                    <th>${eval.cScore}</th>
+                    <th>${eval.cscore}</th>
                     <th>${eval.note}</th>
                     <th>button</th>
                     <th><button class="btn btn-danger">Delete</button></th>

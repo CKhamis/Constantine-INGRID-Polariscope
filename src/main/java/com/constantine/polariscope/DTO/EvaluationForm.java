@@ -12,7 +12,8 @@ import java.util.UUID;
 public class EvaluationForm {
     private UUID id;
     private String note;
-    private Integer cScore;
+    private Integer cscore;
+    @NonNull
     private LocalDateTime timestamp;
     @NonNull
     private UUID memberId;
