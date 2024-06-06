@@ -1,5 +1,6 @@
 package com.constantine.polariscope.API;
 
+import com.constantine.polariscope.DTO.EvaluationForm;
 import com.constantine.polariscope.DTO.MemberListItem;
 import com.constantine.polariscope.DTO.NewMemberForm;
 import com.constantine.polariscope.DTO.ResponseMessage;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -26,6 +29,7 @@ import java.util.UUID;
 public class InterpersonalAPI {
     private final MemberService memberService;
     private final UserService userService;
+    private final EvaluationService evaluationService;
     private final int MAX_EVALUATIONS = 300;
 
     private User getCurrentUser(Principal principal) throws Exception{
@@ -84,6 +88,10 @@ public class InterpersonalAPI {
                         member.setShortTimeline(member.getTimeline());
                     }
 
+                    if(!member.getTimeline().isEmpty()){
+                        member.setMostRecentScore(member.getTimeline().get(member.getTimeline().size()-1).getCScore());
+                    }
+
                     return ResponseEntity.ok(member);
                 }else{
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Member", ResponseMessage.Severity.LOW, "Invalid Account"));
@@ -115,6 +123,60 @@ public class InterpersonalAPI {
             }
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, e.getMessage()));
+        }
+    }
+
+    @PostMapping("/evaluation/save")
+    public ResponseEntity<ResponseMessage> saveEvaluation(@Valid @RequestBody EvaluationForm form, Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            try{
+                Member member = memberService.findMember(form.getMemberId());
+
+                if(retrievedUser.getId().equals(member.getAuthor().getId())){
+                    // Member author matches logged in user
+
+                    // Check to see if editing or creating new eval
+                    if(form.getId() != null){
+                        Optional<Evaluation> optionalEvaluation = evaluationService.findById(form.getId());
+                        if(optionalEvaluation.isPresent()){
+                            Evaluation existing = optionalEvaluation.get();
+
+                            // Change values if different
+                            if(!form.getNote().isEmpty()){
+                                existing.setNote(form.getNote());
+                            }
+
+                            if(form.getCScore() != null){
+                                existing.setCScore(form.getCScore());
+                            }
+
+                            if(form.getTimestamp() != null){
+                                existing.setTimestamp(form.getTimestamp());
+                            }
+
+                            existing.setModified(LocalDateTime.now());
+
+                            evaluationService.save(existing);
+                            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Evaluation Edited", ResponseMessage.Severity.INFORMATIONAL, "Modified values of existing evaluation"));
+                        }
+                    }
+
+                    // Create new eval
+                    Evaluation newEval = new Evaluation(null, form.getTimestamp(), form.getNote(), form.getCScore(), member);
+                    evaluationService.save(newEval);
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Evaluation Saved", ResponseMessage.Severity.INFORMATIONAL, "Evaluation has been saved to member"));
+                }else{
+                    // Member author does not match logged in user
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Evaluation", ResponseMessage.Severity.LOW, "Evaluation could not be saved"));
+                }
+            }catch (Exception e){
+                // Member not found or database issue
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Evaluation", ResponseMessage.Severity.LOW, "Evaluation could not be saved"));
+            }
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error saving member"));
         }
     }
 }

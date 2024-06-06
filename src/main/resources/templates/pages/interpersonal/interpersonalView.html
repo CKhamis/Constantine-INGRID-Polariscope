@@ -28,7 +28,7 @@
                 <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="sex-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sex"/>
                 <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="orientation-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sexuality"/>
             </div>
-            <div class="mt-4 bg-light-subtle d-flex justify-content-center align-items-center py-4" role="button">
+            <div class="mt-4 bg-light-subtle d-flex justify-content-center align-items-center py-4" role="button" data-bs-toggle="modal" data-bs-target="#addEvalModal">
                 <p class="fs-4 fs-bold text-center m-0">+ Add Evaluation</p>
             </div>
         </div>
@@ -78,9 +78,8 @@
                             <p class="mb-0 mx-2 fs-5 fw-bold">Filter</p>
                             <img class="square-image" th:src="@{/icons/Filter.svg}" alt="edit" style="width: 30px;"/>
                         </div>
-                        <div id="eval-table-container"></div>
                     </div>
-
+                    <div id="eval-table-container"></div>
                 </div>
                 <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">Settings</div>
             </div>
@@ -88,8 +87,45 @@
     </div>
 </div>
 </main>
+
+<div class="modal fade" id="addEvalModal" tabindex="-1" aria-labelledby="aemt" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="aemt">Add Evaluation</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <h4 class="fw-bold text-center" id="recent-score-modal"></h4>
+                    </div>
+                    <div class="col-9">
+                        <label for="date-form-modal" class="form-label">Date</label>
+                        <input type="datetime-local" class="form-control" id="date-form-modal">
+                    </div>
+                    <div class="col-3 mb-3">
+                        <label for="cScore-form-modal" class="form-label">cScore</label>
+                        <input type="number" class="form-control" id="cScore-form-modal" required>
+                    </div>
+                    <div class="col-12">
+                        <label for="note-form-modal" class="form-label">Note</label>
+                        <textarea class="form-control" id="note-form-modal" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="modalSaveEval()" data-bs-dismiss="modal">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <input type="hidden" th:value="${id}" id="id-form" />
 <div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
 <script>
@@ -115,7 +151,11 @@
                 renderMemberSelect(data[0]);
                 renderBadges();
                 document.querySelector("#member-name").textContent = memberDetails.firstName + " " + memberDetails.lastName;
+                if(memberDetails.mostRecentScore != null){
+                    document.querySelector("#recent-score-modal").textContent = "Most recent cScore" + memberDetails.mostRecentScore;
+                }
                 renderInfoTab();
+                renderEvaluationTable();
             })
             .catch((response) => {
                 console.log(response);
@@ -127,6 +167,22 @@
                         console.error("Error parsing error response:", error);
                     });
             })
+    }
+
+    function modalSaveEval(){
+        let data = {
+            "id": null,
+            "timestamp": document.querySelector("#date-form-modal").value,
+            "cScore": document.querySelector("#cScore-form-modal").value,
+            "note": document.querySelector("#note-form-modal").value,
+            "memberId": document.querySelector("#id-form").value
+        };
+
+        postData("/api/interpersonal/evaluation/save", data)
+            .then((message) => {
+                console.log(message.json());
+            })
+            .then(refresh)
     }
 
     function renderInfoTab(){
@@ -182,6 +238,39 @@
         }else{
             sexualityIcon.src = "/icons/Unknown.svg";
         }
+    }
+
+    function renderEvaluationTable(before = null, after = null, noteHas = null, addon = ""){
+        let tableHTML = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Timestamp</th>
+                    <th scope="col">cScore</th>
+                    <th scope="col">Note</th>
+                    <th scope="col">Edit</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            ${addon}
+        `; // todo: use the addon to implement inline forms to add in more cScore values at once
+
+        memberDetails.shortTimeline.forEach((eval) => {
+            console.log(eval);
+            tableHTML += `
+                <tr id="${eval.id}">
+                    <th>${formatDate(eval.timestamp)}</th>
+                    <th>${eval.cScore}</th>
+                    <th>${eval.note}</th>
+                    <th>button</th>
+                    <th><button class="btn btn-danger">Delete</button></th>
+                </tr>
+            `;
+        });
+
+        tableHTML +="</tbody></table>";
+        document.querySelector("#eval-table-container").innerHTML = tableHTML;
     }
 
     function changeUser(){

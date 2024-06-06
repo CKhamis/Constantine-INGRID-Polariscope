@@ -51,10 +51,13 @@ public class Member {
 
     @JsonIgnore
     @OneToMany(mappedBy = "member")
-    List<Evaluation> timeline;
+    private List<Evaluation> timeline;
 
     @Transient
-    List<Evaluation> shortTimeline;
+    private List<Evaluation> shortTimeline;
+
+    @Transient
+    private Integer mostRecentScore;
 
     public Member(){
         created = LocalDateTime.now();

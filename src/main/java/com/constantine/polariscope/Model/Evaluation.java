@@ -25,7 +25,7 @@ public class Evaluation {
     private LocalDateTime created;
     private LocalDateTime modified;
     private String note;
-    private int cScore;
+    private Integer cScore;
 
     @JsonIgnore
     @ManyToOne
@@ -36,7 +36,7 @@ public class Evaluation {
         modified = LocalDateTime.now();
     }
 
-    public Evaluation(UUID id, LocalDateTime timestamp, String note, int cScore, Member member) {
+    public Evaluation(UUID id, LocalDateTime timestamp, String note, Integer cScore, Member member) {
         this.id = id;
         this.timestamp = timestamp;
         this.note = note;
