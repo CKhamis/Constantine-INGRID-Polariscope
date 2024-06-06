@@ -25,4 +25,5 @@ public class EvaluationService {
     public void save(Evaluation eval){
         evaluationRepository.save(eval);
     }
+    public void delete(Evaluation eval){evaluationRepository.deleteById(eval.getId());}
 }

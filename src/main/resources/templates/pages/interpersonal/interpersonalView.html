@@ -74,6 +74,7 @@
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <h2 class="fw-bold mt-3">All Evaluations</h2>
+
                         <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button">
                             <p class="mb-0 mx-2 fs-5 fw-bold">Filter</p>
                             <img class="square-image" th:src="@{/icons/Filter.svg}" alt="edit" style="width: 30px;"/>
@@ -132,6 +133,7 @@
 <script>
     let memberList;
     let memberDetails;
+    let tableAddons;
 
     refresh();
 
@@ -147,6 +149,7 @@
                 return Promise.all([data[0].json(), data[1].json()]);
             })
             .then(data => {
+                tableAddons = "";
                 memberList = data[0];
                 memberDetails = data[1];
                 renderMemberSelect(data[0]);
@@ -183,6 +186,31 @@
         postData("/api/interpersonal/evaluation/save", data)
             .then(() => {
                 document.getElementById(`${toastId}-body`).innerText = "✅ New Evaluation Added";
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .then(refresh);
+    }
+
+    function deleteEvaluation(id){
+        let toastId = createToast("Delete Evaluation");
+        postData("/api/interpersonal/evaluation/delete", id)
+            .then(() => {
+                document.getElementById(`${toastId}-body`).innerText = "✅ Evaluation Deleted";
                 document.getElementById(`${toastId}-loading`).style.color = "green";
             })
             .catch((response) => {
@@ -258,7 +286,7 @@
         }
     }
 
-    function renderEvaluationTable(before = null, after = null, noteHas = null, addon = ""){
+    function renderEvaluationTable(before = null, after = null, noteHas = null){
         let tableHTML = `
         <table class="table">
             <thead>
@@ -271,7 +299,7 @@
                 </tr>
             </thead>
             <tbody>
-            ${addon}
+            ${tableAddons}
         `; // todo: use the addon to implement inline forms to add in more cScore values at once
 
         memberDetails.shortTimeline.forEach((eval) => {
@@ -282,7 +310,7 @@
                     <th>${eval.cscore}</th>
                     <th>${eval.note}</th>
                     <th>button</th>
-                    <th><button class="btn btn-danger">Delete</button></th>
+                    <th><button class="btn btn-danger" onclick="deleteEvaluation('${eval.id}')">Delete</button></th>
                 </tr>
             `;
         });

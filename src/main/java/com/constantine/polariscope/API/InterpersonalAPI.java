@@ -179,4 +179,34 @@ public class InterpersonalAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error saving member"));
         }
     }
+
+    @PostMapping("/evaluation/delete")
+    public ResponseEntity<ResponseMessage> deleteEvaluation(@RequestBody UUID id, Principal principal){
+        try{
+            User user = getCurrentUser(principal);
+
+            // Get id of evaluation
+            Optional<Evaluation> optionalEvaluation = evaluationService.findById(id);
+
+            if(optionalEvaluation.isPresent()){
+                Evaluation evaluation = optionalEvaluation.get();
+
+                // Check if member is owned by logged in user
+                Member member = evaluation.getMember();
+
+                if(member.getAuthor().getId().equals(user.getId())){
+                    evaluationService.delete(evaluation);
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Evaluation Saved", ResponseMessage.Severity.INFORMATIONAL, "Evaluation has been saved to member"));
+                }else{
+                    // Member author does not match with logged in user
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Evaluation", ResponseMessage.Severity.LOW, "Evaluation could not be deleted"));
+                }
+            }else{
+                // Evaluation not found
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Evaluation", ResponseMessage.Severity.LOW, "Evaluation could not be deleted"));
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error deleting evaluation"));
+        }
+    }
 }
