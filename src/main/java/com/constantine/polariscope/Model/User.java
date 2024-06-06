@@ -33,7 +33,6 @@ public class User implements UserDetails {
     private String password;
     @NonNull
     private Role role;
-    @NonNull
     private boolean isEnabled;
     @NonNull
     private LocalDateTime created;

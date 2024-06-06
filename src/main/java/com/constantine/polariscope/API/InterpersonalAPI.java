@@ -3,17 +3,17 @@ package com.constantine.polariscope.API;
 import com.constantine.polariscope.DTO.MemberListItem;
 import com.constantine.polariscope.DTO.NewMemberForm;
 import com.constantine.polariscope.DTO.ResponseMessage;
+import com.constantine.polariscope.Model.Evaluation;
 import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
+import com.constantine.polariscope.Service.EvaluationService;
 import com.constantine.polariscope.Service.MemberService;
 import com.constantine.polariscope.Service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -26,6 +26,7 @@ import java.util.UUID;
 public class InterpersonalAPI {
     private final MemberService memberService;
     private final UserService userService;
+    private final int MAX_EVALUATIONS = 300;
 
     private User getCurrentUser(Principal principal) throws Exception{
         if(principal == null){
@@ -75,6 +76,14 @@ public class InterpersonalAPI {
                 Member member = memberService.findMember(id);
 
                 if(member.getAuthor().getId().equals(retrievedUser.getId())){
+
+                    // Reduce the number of attached evals for speed purposes
+                    if(member.getTimeline().size() > MAX_EVALUATIONS){
+                        member.setShortTimeline(member.getTimeline().subList(0, MAX_EVALUATIONS));
+                    }else{
+                        member.setShortTimeline(member.getTimeline());
+                    }
+
                     return ResponseEntity.ok(member);
                 }else{
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Member", ResponseMessage.Severity.LOW, "Invalid Account"));
@@ -84,6 +93,28 @@ public class InterpersonalAPI {
             }
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Member", ResponseMessage.Severity.LOW, "Invalid Account"));
+        }
+    }
+
+    @GetMapping("/evaluation/all/{id}")
+    public ResponseEntity<?> viewEvaluations(@PathVariable UUID id, Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            //Find evaluations. Give same error if member is not found or wrong user account
+            try{
+                Member subject = memberService.findMember(id);
+                if(subject.getAuthor().getId().equals(retrievedUser.getId())){
+                    return ResponseEntity.ok(subject.getTimeline());
+                }else{
+                    // Invalid user account
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Error Retrieving Evaluations", ResponseMessage.Severity.LOW, "Member not found"));
+                }
+            }catch(Exception e){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Error Retrieving Evaluations", ResponseMessage.Severity.LOW, "Member not found"));
+            }
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, e.getMessage()));
         }
     }
 }

@@ -49,12 +49,36 @@ public class Member {
     @OneToOne
     private Place placeMet;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "member")
     List<Evaluation> timeline;
+
+    @Transient
+    List<Evaluation> shortTimeline;
 
     public Member(){
         created = LocalDateTime.now();
         lastModified = LocalDateTime.now();
+    }
+
+    public Member(@NonNull UUID id, @NonNull String firstName, @NonNull String lastName, String middleName, RelationshipType relationship, Sexuality sexuality, String personality, String favoriteColor, String description, Sex sex, Integer ageMet, LocalDate birthday, @NonNull LocalDateTime created, @NonNull LocalDateTime lastModified, @NonNull User author, Place placeMet, List<Evaluation> timeline) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+        this.relationship = relationship;
+        this.sexuality = sexuality;
+        this.personality = personality;
+        this.favoriteColor = favoriteColor;
+        this.description = description;
+        this.sex = sex;
+        this.ageMet = ageMet;
+        this.birthday = birthday;
+        this.created = created;
+        this.lastModified = lastModified;
+        this.author = author;
+        this.placeMet = placeMet;
+        this.timeline = timeline;
     }
 
     public Member(NewMemberForm form, @NonNull User user){

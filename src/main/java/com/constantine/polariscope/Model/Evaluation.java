@@ -1,9 +1,11 @@
 package com.constantine.polariscope.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,10 +27,21 @@ public class Evaluation {
     private String note;
     private int cScore;
 
+    @JsonIgnore
     @ManyToOne
     private Member member;
 
     public Evaluation(){
+        created = LocalDateTime.now();
+        modified = LocalDateTime.now();
+    }
+
+    public Evaluation(UUID id, LocalDateTime timestamp, String note, int cScore, Member member) {
+        this.id = id;
+        this.timestamp = timestamp;
+        this.note = note;
+        this.cScore = cScore;
+        this.member = member;
         created = LocalDateTime.now();
         modified = LocalDateTime.now();
     }
