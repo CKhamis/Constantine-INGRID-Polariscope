@@ -210,7 +210,7 @@ public class PolariscopeApplicationTests {
 	@WithMockUser(username = "test")
 	public void testViewMember() throws Exception {
 		when(userService.loadUserByUsername("test")).thenReturn(perfectUser);
-		when(memberService.findMember(perfectMember.getId())).thenReturn(perfectMember);
+		when(memberService.findMemberWithEval(perfectMember.getId())).thenReturn(perfectMember);
 
 		mockMvc.perform(get("/api/interpersonal/member/view/" + perfectMember.getId()))
 				.andExpect(status().isOk())
@@ -223,7 +223,7 @@ public class PolariscopeApplicationTests {
 	@WithMockUser(username = "ak")
 	public void testViewMemberObserverRestriction() throws Exception {
 		when(userService.loadUserByUsername("ak")).thenReturn(perfectObserver);
-		when(memberService.findMember(perfectMember.getId())).thenReturn(perfectMember);
+		when(memberService.findMemberWithEval(perfectMember.getId())).thenReturn(perfectMember);
 
 		mockMvc.perform(get("/api/interpersonal/member/view/" + perfectMember.getId()))
 				.andExpect(status().isBadRequest())
@@ -236,7 +236,7 @@ public class PolariscopeApplicationTests {
 	@WithMockUser(username = "chuck")
 	public void testViewMemberWrongUser() throws Exception {
 		when(userService.loadUserByUsername("chuck")).thenReturn(perfectUser2);
-		when(memberService.findMember(perfectMember.getId())).thenReturn(perfectMember);
+		when(memberService.findMemberWithEval(perfectMember.getId())).thenReturn(perfectMember);
 
 		mockMvc.perform(get("/api/interpersonal/member/view/" + perfectMember.getId()))
 				.andExpect(status().isBadRequest())
@@ -249,7 +249,7 @@ public class PolariscopeApplicationTests {
 	@WithMockUser(username = "test")
 	public void testViewMemberNotFound() throws Exception {
 		when(userService.loadUserByUsername("test")).thenReturn(perfectUser);
-		when(memberService.findMember(perfectMember.getId())).thenThrow(new RuntimeException("Member not found"));
+		when(memberService.findMemberWithEval(perfectMember.getId())).thenThrow(new RuntimeException("Member not found"));
 
 		mockMvc.perform(get("/api/interpersonal/member/view/" + perfectMember.getId()))
 				.andExpect(status().isNotFound())

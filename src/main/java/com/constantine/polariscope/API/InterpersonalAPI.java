@@ -77,7 +77,7 @@ public class InterpersonalAPI {
             User retrievedUser = getCurrentUser(principal);
 
             try{
-                Member member = memberService.findMember(id);
+                Member member = memberService.findMemberWithEval(id);
 
                 if(member.getAuthor().getId().equals(retrievedUser.getId())){
 

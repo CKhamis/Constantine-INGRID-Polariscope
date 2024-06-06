@@ -1,8 +1,10 @@
 package com.constantine.polariscope.Service;
 
 import com.constantine.polariscope.DTO.MemberListItem;
+import com.constantine.polariscope.Model.Evaluation;
 import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
+import com.constantine.polariscope.Repository.EvaluationRepository;
 import com.constantine.polariscope.Repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.UUID;
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final EvaluationRepository evaluationRepository;
 
     public List<MemberListItem> allMembers(User author) throws Exception{
         List<Member> members = memberRepository.findAllByAuthorOrderByLastModifiedDesc(author);
@@ -33,5 +36,12 @@ public class MemberService {
 
     public Member findMember(UUID id){
         return memberRepository.findById(id).orElseThrow();
+    }
+
+    public Member findMemberWithEval(UUID id){
+        Member m = memberRepository.findById(id).orElseThrow();
+        List<Evaluation> evals = evaluationRepository.findAllByMemberOrderByTimestampDesc(m);
+        m.setTimeline(evals);
+        return m;
     }
 }

@@ -128,6 +128,7 @@
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
+<div th:replace="~{components/Toast :: toast}"></div>
 <script>
     let memberList;
     let memberDetails;
@@ -178,11 +179,28 @@
             "memberId": document.querySelector("#id-form").value
         };
 
+        let toastId = createToast("Insert Evaluation");
         postData("/api/interpersonal/evaluation/save", data)
-            .then((message) => {
-                console.log(message.json());
-                refresh();
-            });
+            .then(() => {
+                document.getElementById(`${toastId}-body`).innerText = "✅ New Evaluation Added";
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .then(refresh);
     }
 
     function renderInfoTab(){

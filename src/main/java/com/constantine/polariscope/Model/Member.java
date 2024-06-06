@@ -50,7 +50,7 @@ public class Member {
     private Place placeMet;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Evaluation> timeline;
 
     @Transient
