@@ -353,13 +353,19 @@
             type: 'line',
             data:scores,
             options: {
+                aspectRatio: 5,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
                 scales: {
-                    aspectRatio: 2,
                     x: {
                         type: 'time',
                         time: {
                             unit: 'day',
-                        },
+                        }
                     },
                 },
             }
