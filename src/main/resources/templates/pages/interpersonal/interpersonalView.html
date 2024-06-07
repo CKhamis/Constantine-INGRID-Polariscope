@@ -133,9 +133,11 @@
 <script>
     let memberList;
     let memberDetails;
-    let tableAddons;
+
+    let evalChartEval;
 
     refresh();
+    createEvalChart();
 
     function refresh(){
         let memberId = document.querySelector("#id-form").value;
@@ -156,9 +158,10 @@
                 renderBadges();
                 document.querySelector("#member-name").textContent = memberDetails.firstName + " " + memberDetails.lastName;
                 if(memberDetails.mostRecentScore != null){
-                    document.querySelector("#recent-score-modal").textContent = "Most recent cScore" + memberDetails.mostRecentScore;
+                    document.querySelector("#recent-score-modal").textContent = "Most recent cScore: " + memberDetails.mostRecentScore;
                 }
                 renderInfoTab();
+                updateEvalChart();
                 renderEvaluationTable();
             })
             .catch((response) => {
@@ -299,17 +302,15 @@
                 </tr>
             </thead>
             <tbody>
-            ${tableAddons}
-        `; // todo: use the addon to implement inline forms to add in more cScore values at once
+        `;
 
         memberDetails.shortTimeline.forEach((eval) => {
-            console.log(eval);
             tableHTML += `
                 <tr id="${eval.id}">
                     <th>${formatDate(eval.timestamp)}</th>
                     <th>${eval.cscore}</th>
                     <th>${eval.note}</th>
-                    <th>button</th>
+                    <th><button class="btn btn-secondary">Edit</button></th>
                     <th><button class="btn btn-danger" onclick="deleteEvaluation('${eval.id}')">Delete</button></th>
                 </tr>
             `;
@@ -332,6 +333,37 @@
         const formattedDate = localDate.toISOString().slice(0, 16); // Format as "YYYY-MM-DDTHH:MM"
         dateInput.value = formattedDate;
 
+    }
+
+    function updateEvalChart(){
+        let newScores = {data:[]};
+        memberDetails.shortTimeline.forEach((eval) =>{
+            newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore});
+        });
+
+        evalChartEval.data.datasets.pop();
+        evalChartEval.data.datasets.push(newScores);
+        evalChartEval.update();
+    }
+
+    function createEvalChart(){
+        let canvas = document.querySelector("#evaluation-history-chart");
+        let scores = {datasets: [{data:[]}]};
+        evalChartEval = new Chart(canvas, {
+            type: 'line',
+            data:scores,
+            options: {
+                scales: {
+                    aspectRatio: 2,
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                        },
+                    },
+                },
+            }
+        });
     }
 </script>
 </body>
