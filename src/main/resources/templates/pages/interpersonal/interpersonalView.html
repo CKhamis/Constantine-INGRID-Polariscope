@@ -75,7 +75,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h2 class="fw-bold mt-3">All Evaluations</h2>
 
-                        <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button">
+                        <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button" data-bs-toggle="modal" data-bs-target="#filterModal">
                             <p class="mb-0 mx-2 fs-5 fw-bold">Filter</p>
                             <img class="square-image" th:src="@{/icons/Filter.svg}" alt="edit" style="width: 30px;"/>
                         </div>
@@ -119,6 +119,47 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" onclick="modalSaveEval()" data-bs-dismiss="modal">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="fmt" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="fmt">Filter Settings</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <label for="before-form" class="form-label">Show Evaluations Before</label>
+                        <div class="input-group mb-3" id="before-form">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="before-checkbox-filter-modal" aria-label="Enable filtering before a date">
+                            </div>
+                            <input type="datetime-local" class="form-control" aria-label="before input" id="before-form-filter-modal">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label for="after-form" class="form-label">Show Evaluations After</label>
+                        <div class="input-group mb-3" id="after-form">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="after-checkbox-filter-modal" aria-label="Enable filtering after a date">
+                            </div>
+                            <input type="datetime-local" class="form-control" aria-label="after input" id="after-form-filter-modal">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label for="keyword-filter-modal" class="form-label">Note contains</label>
+                        <textarea class="form-control" id="keyword-filter-modal" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="renderEvaluationTable()" data-bs-dismiss="modal">Save changes</button>
             </div>
         </div>
     </div>
@@ -193,13 +234,13 @@
 
         let toastId = createToast("Saving Evaluation");
         postData("/api/interpersonal/evaluation/save", data)
-            .then((response) => {
-                console.log(response);
-                document.getElementById(`${toastId}-body`).innerText = "✅ Evaluation Saved";
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
                 document.getElementById(`${toastId}-loading`).style.color = "green";
             })
             .catch((response) => {
-                console.log(response);
                 response.json()
                     .then(errorData => {
                         document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
@@ -213,8 +254,8 @@
                         document.getElementById(`${toastId}-loading`).style.color = "red";
                     });
             })
-            .then(refresh)
             .finally(() => {
+                refresh();
                 document.querySelector("#id-evaluation-modal").value = "";
             });
     }
@@ -222,8 +263,9 @@
     function deleteEvaluation(id){
         let toastId = createToast("Delete Evaluation");
         postData("/api/interpersonal/evaluation/delete", id)
-            .then(() => {
-                document.getElementById(`${toastId}-body`).innerText = "✅ Evaluation Deleted";
+            .then((message) => {
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
                 document.getElementById(`${toastId}-loading`).style.color = "green";
             })
             .catch((response) => {
@@ -299,7 +341,7 @@
         }
     }
 
-    function renderEvaluationTable(before = null, after = null, noteHas = null){
+    function renderEvaluationTable(){
         let tableHTML = `
         <table class="table">
             <thead>
@@ -315,8 +357,17 @@
             <tbody>
         `;
 
+        const beforeFilterEnable = document.querySelector("#before-checkbox-filter-modal").checked;
+        const beforeForm = new Date(document.querySelector("#before-form-filter-modal").value);
+        const afterFilterEnable = document.querySelector("#after-checkbox-filter-modal").checked;
+        const afterForm = new Date(document.querySelector("#after-form-filter-modal").value);
+        const filterByKeywordEnable = document.querySelector("#keyword-filter-modal").value.length > 0;
+        const noteHas = document.querySelector("#keyword-filter-modal").value;
+
+
         memberDetails.shortTimeline.forEach((eval) => {
-            tableHTML += `
+            if((!beforeFilterEnable || beforeForm > new Date(eval.timestamp)) && (!afterFilterEnable || afterForm < new Date(eval.timestamp)) && (!filterByKeywordEnable || eval.note.includes(noteHas))){
+                tableHTML += `
                 <tr id="${eval.id}">
                     <th>${formatTimestamp(eval.timestamp)}</th>
                     <th>${eval.cscore}</th>
@@ -326,6 +377,7 @@
                     <th><button class="btn btn-danger" onclick="deleteEvaluation('${eval.id}')">Delete</button></th>
                 </tr>
             `;
+            }
         });
 
         tableHTML +="</tbody></table>";
