@@ -28,7 +28,7 @@
                 <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="sex-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sex"/>
                 <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="orientation-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sexuality"/>
             </div>
-            <div class="mt-4 bg-light-subtle d-flex justify-content-center align-items-center py-4" role="button" data-bs-toggle="modal" data-bs-target="#addEvalModal" onclick="updateModalTime()">
+            <div class="mt-4 bg-light-subtle d-flex justify-content-center align-items-center py-4" role="button" data-bs-toggle="modal" data-bs-target="#addEvalModal" onclick="updateModal()">
                 <p class="fs-4 fs-bold text-center m-0">+ Add Evaluation</p>
             </div>
         </div>
@@ -93,7 +93,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="aemt">Add Evaluation</h1>
+                <h1 class="modal-title fs-5" id="aemt">Save Evaluation</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -113,6 +113,7 @@
                         <label for="note-form-modal" class="form-label">Note</label>
                         <textarea class="form-control" id="note-form-modal" rows="3"></textarea>
                     </div>
+                    <input type="hidden" id="id-evaluation-modal" />
                 </div>
             </div>
             <div class="modal-footer">
@@ -177,18 +178,24 @@
     }
 
     function modalSaveEval(){
+        const idField = document.querySelector("#id-evaluation-modal").value;
+        let id = null;
+        if(idField.length > 0){
+            id = idField;
+        }
         let data = {
-            "id": null,
+            "id": id,
             "timestamp": document.querySelector("#date-form-modal").value,
             "cscore": document.querySelector("#cScore-form-modal").value,
             "note": document.querySelector("#note-form-modal").value,
             "memberId": document.querySelector("#id-form").value
         };
 
-        let toastId = createToast("Insert Evaluation");
+        let toastId = createToast("Saving Evaluation");
         postData("/api/interpersonal/evaluation/save", data)
-            .then(() => {
-                document.getElementById(`${toastId}-body`).innerText = "✅ New Evaluation Added";
+            .then((response) => {
+                console.log(response);
+                document.getElementById(`${toastId}-body`).innerText = "✅ Evaluation Saved";
                 document.getElementById(`${toastId}-loading`).style.color = "green";
             })
             .catch((response) => {
@@ -206,7 +213,10 @@
                         document.getElementById(`${toastId}-loading`).style.color = "red";
                     });
             })
-            .then(refresh);
+            .then(refresh)
+            .finally(() => {
+                document.querySelector("#id-evaluation-modal").value = "";
+            });
     }
 
     function deleteEvaluation(id){
@@ -298,6 +308,7 @@
                     <th scope="col">cScore</th>
                     <th scope="col">Note</th>
                     <th scope="col">Edit</th>
+                    <th scope="col">Duplicate</th>
                     <th scope="col">Action</th>
                 </tr>
             </thead>
@@ -310,7 +321,8 @@
                     <th>${formatDate(eval.timestamp)}</th>
                     <th>${eval.cscore}</th>
                     <th>${eval.note}</th>
-                    <th><button class="btn btn-secondary">Edit</button></th>
+                    <th><button class="btn btn-secondary" onclick="updateModal('${eval.timestamp}', '${eval.cscore}', '${eval.note}', '${eval.id}')" data-bs-toggle="modal" data-bs-target="#addEvalModal">Edit</button></th>
+                    <th><button class="btn btn-secondary" onclick="updateModal('${eval.timestamp}', '${eval.cscore}', '${eval.note}')" data-bs-toggle="modal" data-bs-target="#addEvalModal">Duplicate</button></th>
                     <th><button class="btn btn-danger" onclick="deleteEvaluation('${eval.id}')">Delete</button></th>
                 </tr>
             `;
@@ -325,20 +337,29 @@
         refresh();
     }
 
-    function updateModalTime(){
+    function updateModal(date = new Date(), score = "", note = "", id = ""){
         const dateInput = document.getElementById('date-form-modal');
 
-        const currentDate = new Date();
-        const localDate = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000);
+        const parsedDate = new Date(date);
+        const localDate = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000);
         const formattedDate = localDate.toISOString().slice(0, 16); // Format as "YYYY-MM-DDTHH:MM"
         dateInput.value = formattedDate;
 
+        document.querySelector("#cScore-form-modal").value = score;
+        document.querySelector("#note-form-modal").value = note;
+        document.querySelector("#id-evaluation-modal").value = id;
+
+        if(id.length > 0){
+            document.querySelector("#aemt").textContent = "Edit Evaluation";
+        }else{
+            document.querySelector("#aemt").textContent = "Add Evaluation";
+        }
     }
 
     function updateEvalChart(){
         let newScores = {data:[]};
         memberDetails.shortTimeline.forEach((eval) =>{
-            newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore});
+            newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore, note: eval.note});
         });
 
         evalChartEval.data.datasets.pop();
