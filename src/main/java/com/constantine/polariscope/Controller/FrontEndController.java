@@ -52,8 +52,12 @@ public class FrontEndController {
     }
 
     @GetMapping("/interpersonal/view/{id}")
-    public String getMember(@PathVariable String id, Model model){
+    public String getMember(@PathVariable String id, Model model, Principal principal){
         model.addAttribute("id", id);
+        model.addAttribute("relationshipTypes", Member.RelationshipType.values());
+        model.addAttribute("sexualityTypes", Member.Sexuality.values());
+        model.addAttribute("sexTypes", Member.Sex.values());
+        model.addAttribute("places", placeService.findAll(getCurrentUser(principal)));
         return "pages/interpersonal/interpersonalView";
     }
 }

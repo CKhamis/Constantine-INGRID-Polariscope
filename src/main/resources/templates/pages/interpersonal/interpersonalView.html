@@ -44,28 +44,80 @@
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active" id="nav-overview" role="tabpanel" aria-labelledby="nav-overview-tab" tabindex="0">Home</div>
                 <div class="tab-pane fade" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab" tabindex="0">
+                    <h2 class="fw-bold mt-3">Member Details</h2>
+                    <div class="row mt-2">
+                        <div class="col-md-4 mb-3">
+                            <label for="fnf">First name</label>
+                            <input type="text" class="form-control" id="fnf" name="firstName" placeholder="First name" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="lnf">Last name</label>
+                            <input type="text" class="form-control" id="lnf" name="lastName" placeholder="Last name">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="mnf">Middle name</label>
+                            <input type="text" class="form-control" id="mnf" name="middleName" placeholder="Middle name">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="relationf">Relationship Type</label>
+                            <select class="form-select" id="relationf" name="relationship" required>
+                                <option value="" disabled="disabled">Select Relationship Type</option>
+                                <th:block th:each="relationshipType : ${relationshipTypes}">
+                                    <option th:value="${relationshipType}" th:text="${relationshipType.toString().toLowerCase()}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="sexf">Sex</label>
+                            <select class="form-select" id="sexf" name="relationship">
+                                <option value="">Decline to state</option>
+                                <th:block th:each="SexType : ${sexTypes}">
+                                    <option th:value="${SexType}" th:text="${SexType.toString().toLowerCase()}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="sexualityf">Sexuality</label>
+                            <select class="form-select" id="sexualityf" name="sexuality">
+                                <option value="">Decline to state</option>
+                                <th:block th:each="sexualityType : ${sexualityTypes}">
+                                    <option th:value="${sexualityType}" th:text="${sexualityType.toString().toLowerCase()}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="mbp">MB Personality</label>
+                            <input type="text" class="form-control" id="mbp" name="personality" placeholder="ENFJ">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="fcf">Favorite Color</label>
+                            <input type="text" class="form-control" id="fcf" name="favoriteColor" placeholder="Red">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="amf">Year Met</label>
+                            <input type="number" class="form-control" id="amf" name="ageMet" placeholder="2001" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="bdf">Birthday</label>
+                            <input type="date" class="form-control" id="bdf" name="birthday" required>
+                        </div>
 
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="fw-bold mt-3">Member Information</h2>
-                        <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button">
-                            <p class="mb-0 mx-2 fs-5 fw-bold">Edit</p>
-                            <img class="square-image" th:src="@{/icons/Edit.svg}" alt="edit" style="width: 30px;"/>
+                        <div class="col-md-4 mb-3">
+                            <label for="psf">Places</label>
+                            <select class="form-select" id="psf">
+                                <option value="">None</option>
+                                <th:block th:each="place : ${places}">
+                                    <option th:value="${place}" th:text="${place.toString().toLowerCase()}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="df">Description</label>
+                            <input type="text" class="form-control" id="df" name="description" placeholder="Description of member">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 col-lg-4 col-xl-3 px-2 mb-2">
-                            <div class="p-4 bg-secondary-subtle h-100" id="info-relationship">
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-8 col-xl-6 px-2 mb-2">
-                            <div class="p-4 bg-secondary-subtle h-100" id="info-description">
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-4 col-xl-3 px-2 mb-2">
-                            <div class="p-4 bg-secondary-subtle h-100" id="info-general">
-                            </div>
-                        </div>
-                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="submit()" id="submit-button">Submit</button>
                 </div>
                 <div class="tab-pane fade" id="nav-evaluation" role="tabpanel" aria-labelledby="nav-evaluation-tab" tabindex="0">
                     <h2 class="fw-bold mt-3">Evaluation Records</h2>
@@ -84,6 +136,13 @@
                 </div>
                 <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
                     <h2 class="fw-bold mt-3">Member Settings</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Delete Member</h5>
+                            <p class="card-text">Deletes a member from database permanently. This procedure deletes the member as well as associated data such as evaluations. Not recommended for almost any scenario</p>
+                            <button class="btn btn-danger bevel-sm" onclick="">Delete Member</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -289,27 +348,27 @@
     }
 
     function renderInfoTab(){
-        document.querySelector("#info-relationship").innerHTML = `
-        <h3 class="fw-bold text-center">Relationship</h3>
-        <p>Type: ${memberDetails.relationship}</p>
-        <p>Year met: ${memberDetails.ageMet}</p>
-        <p>Place met: ${memberDetails.placeMet}</p>
-        <p>Latest Score: ${memberDetails.mostRecentScore}</p>
-        <p>Timeline Size: ${memberDetails.timelineSize}</p>
-        `;
-
-        document.querySelector("#info-description").innerHTML = `
-        <h3 class="fw-bold">Description</h3>
-        <p>${memberDetails.description}</p>
-        `;
-
-        document.querySelector("#info-general").innerHTML = `
-        <h3 class="fw-bold text-center">General</h3>
-        <p>Birthday: ${formatTimestamp(memberDetails.birthday)}</p>
-        <p>Favorite color: ${memberDetails.favoriteColor}</p>
-        <p>Sexuality: ${memberDetails.sexuality}</p>
-        <p>Personality: ${memberDetails.personality}</p>
-        `;
+        // document.querySelector("#info-relationship").innerHTML = `
+        // <h3 class="fw-bold text-center">Relationship</h3>
+        // <p>Type: ${memberDetails.relationship}</p>
+        // <p>Year met: ${memberDetails.ageMet}</p>
+        // <p>Place met: ${memberDetails.placeMet}</p>
+        // <p>Latest Score: ${memberDetails.mostRecentScore}</p>
+        // <p>Timeline Size: ${memberDetails.timelineSize}</p>
+        // `;
+        //
+        // document.querySelector("#info-description").innerHTML = `
+        // <h3 class="fw-bold">Description</h3>
+        // <p>${memberDetails.description}</p>
+        // `;
+        //
+        // document.querySelector("#info-general").innerHTML = `
+        // <h3 class="fw-bold text-center">General</h3>
+        // <p>Birthday: ${formatTimestamp(memberDetails.birthday)}</p>
+        // <p>Favorite color: ${memberDetails.favoriteColor}</p>
+        // <p>Sexuality: ${memberDetails.sexuality}</p>
+        // <p>Personality: ${memberDetails.personality}</p>
+        // `;
     }
 
     function renderMemberSelect(members){
@@ -378,7 +437,7 @@
                     <th>${eval.note}</th>
                     <th><button class="btn btn-secondary" onclick="updateModal('${eval.timestamp}', '${eval.cscore}', '${eval.note}', '${eval.id}')" data-bs-toggle="modal" data-bs-target="#addEvalModal">Edit</button></th>
                     <th><button class="btn btn-secondary" onclick="updateModal('${eval.timestamp}', '${eval.cscore}', '${eval.note}')" data-bs-toggle="modal" data-bs-target="#addEvalModal">Duplicate</button></th>
-                    <th><button class="btn btn-danger" onclick="deleteEvaluation('${eval.id}')">Delete</button></th>
+                    <th><button class="btn btn-danger bevel-sm" onclick="deleteEvaluation('${eval.id}')">Delete</button></th>
                 </tr>
             `;
             }
