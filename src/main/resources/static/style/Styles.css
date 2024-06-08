@@ -12,3 +12,13 @@
     aspect-ratio: 1 / 1;
     width: 100%;
 }
+
+.bevel-lg {
+    position: relative;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+}
+
+.bevel-sm {
+    position: relative;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}

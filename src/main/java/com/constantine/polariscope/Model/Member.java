@@ -59,6 +59,9 @@ public class Member {
     @Transient
     private Integer mostRecentScore;
 
+    @Transient
+    private int timelineSize;
+
     public Member(){
         created = LocalDateTime.now();
         lastModified = LocalDateTime.now();

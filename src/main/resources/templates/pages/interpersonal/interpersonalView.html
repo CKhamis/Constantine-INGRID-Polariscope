@@ -14,7 +14,7 @@
             <div class="input-group">
                 <select class="form-select" id="member-select">
                 </select>
-                <button class="btn btn-primary" type="button" onclick="changeUser()">Change</button>
+                <button class="btn btn-primary bevel-sm" type="button" onclick="changeUser()">Change</button>
             </div>
         </div>
     </nav>
@@ -28,7 +28,7 @@
                 <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="sex-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sex"/>
                 <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="orientation-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sexuality"/>
             </div>
-            <div class="mt-4 bg-light-subtle d-flex justify-content-center align-items-center py-4" role="button" data-bs-toggle="modal" data-bs-target="#addEvalModal" onclick="updateModal()">
+            <div class="mt-4 bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button" data-bs-toggle="modal" data-bs-target="#addEvalModal" onclick="updateModal()">
                 <p class="fs-4 fs-bold text-center m-0">+ Add Evaluation</p>
             </div>
         </div>
@@ -82,7 +82,9 @@
                     </div>
                     <div id="eval-table-container"></div>
                 </div>
-                <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">Settings</div>
+                <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
+                    <h2 class="fw-bold mt-3">Member Settings</h2>
+                </div>
             </div>
         </div>
     </div>
@@ -292,6 +294,8 @@
         <p>Type: ${memberDetails.relationship}</p>
         <p>Year met: ${memberDetails.ageMet}</p>
         <p>Place met: ${memberDetails.placeMet}</p>
+        <p>Latest Score: ${memberDetails.mostRecentScore}</p>
+        <p>Timeline Size: ${memberDetails.timelineSize}</p>
         `;
 
         document.querySelector("#info-description").innerHTML = `
@@ -351,7 +355,7 @@
                     <th scope="col">Note</th>
                     <th scope="col">Edit</th>
                     <th scope="col">Duplicate</th>
-                    <th scope="col">Action</th>
+                    <th scope="col">Delete</th>
                 </tr>
             </thead>
             <tbody>

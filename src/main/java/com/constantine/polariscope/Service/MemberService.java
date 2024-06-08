@@ -42,6 +42,7 @@ public class MemberService {
         Member m = memberRepository.findById(id).orElseThrow();
         List<Evaluation> evals = evaluationRepository.findAllByMemberOrderByTimestampDesc(m);
         m.setTimeline(evals);
+        m.setTimelineSize(evals.size());
         return m;
     }
 }
