@@ -4,13 +4,14 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
-public class NewMemberForm {
-    private int ageMet;
+public class MemberForm {
+    private String id;
+    private Integer ageMet;
     private LocalDate birthday;
     private String favoriteColor;
     @NotBlank(message = "First name is mandatory")

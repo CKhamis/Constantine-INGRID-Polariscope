@@ -2,7 +2,7 @@ package com.constantine.polariscope.API;
 
 import com.constantine.polariscope.DTO.EvaluationForm;
 import com.constantine.polariscope.DTO.MemberListItem;
-import com.constantine.polariscope.DTO.NewMemberForm;
+import com.constantine.polariscope.DTO.MemberForm;
 import com.constantine.polariscope.DTO.ResponseMessage;
 import com.constantine.polariscope.Model.Evaluation;
 import com.constantine.polariscope.Model.Member;
@@ -45,7 +45,7 @@ public class InterpersonalAPI {
     }
 
     @PostMapping("/member/new")
-    public ResponseEntity<ResponseMessage> newMember(@Valid @RequestBody NewMemberForm formElements, Principal principal){
+    public ResponseEntity<ResponseMessage> newMember(@Valid @RequestBody MemberForm formElements, Principal principal){
         try{
             User retrievedUser = getCurrentUser(principal);
 
@@ -53,6 +53,74 @@ public class InterpersonalAPI {
             Member member = new Member(formElements, retrievedUser);
             memberService.save(member);
             return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member saved to Polariscope"));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error saving member"));
+        }
+    }
+
+    @PostMapping("/member/save")
+    public ResponseEntity<ResponseMessage> saveMember(@Valid @RequestBody MemberForm formElements, Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            if(formElements.getId() != null){
+                // Save to existing user
+
+                try{
+                    Member retrievedMember = memberService.findMember(UUID.fromString(formElements.getId()));
+                    // Check if member author matches logged in user
+
+                    if(retrievedMember.getAuthor().getId().equals(retrievedUser.getId())){
+                        if(!formElements.getFirstName().isEmpty()){
+                            retrievedMember.setFirstName(formElements.getFirstName());
+                        }
+                        if(!formElements.getMiddleName().isEmpty()){
+                            retrievedMember.setMiddleName(formElements.getMiddleName());
+                        }
+                        if(!formElements.getLastName().isEmpty()){
+                            retrievedMember.setLastName(formElements.getLastName());
+                        }
+                        if(formElements.getAgeMet() != null){
+                            retrievedMember.setAgeMet(formElements.getAgeMet());
+                        }
+                        if(formElements.getBirthday() != null){
+                            retrievedMember.setBirthday(formElements.getBirthday());
+                        }
+                        if(!formElements.getFavoriteColor().isEmpty()){
+                            retrievedMember.setFavoriteColor(formElements.getFavoriteColor());
+                        }
+                        if(!formElements.getPersonality().isEmpty()){
+                            retrievedMember.setPersonality(formElements.getPersonality());
+                        }
+                        if(!formElements.getDescription().isEmpty()){
+                            retrievedMember.setDescription(formElements.getDescription());
+                        }
+                        if(!formElements.getRelationship().isEmpty()){
+                            retrievedMember.setRelationship(Member.RelationshipType.valueOf(formElements.getRelationship()));
+                        }
+                        if(!formElements.getSex().isEmpty()){
+                            retrievedMember.setSex(Member.Sex.valueOf(formElements.getSex()));
+                        }
+                        if(!formElements.getSexuality().isEmpty()){
+                            retrievedMember.setSexuality(Member.Sexuality.valueOf(formElements.getSexuality()));
+                        }
+
+                        memberService.save(retrievedMember);
+                        return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member details saved"));
+                    }else{
+                        // Throw the same error
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.MEDIUM, "ID not found"));
+                    }
+                }catch (Exception e){
+                    // Member not found. Throw an error
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.MEDIUM, "ID not found"));
+                }
+            }else{
+                // Save to new user
+                Member member = new Member(formElements, retrievedUser);
+                memberService.save(member);
+                return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member saved to Polariscope"));
+            }
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error saving member"));
         }

@@ -2,7 +2,7 @@ package com.constantine.polariscope;
 
 import com.constantine.polariscope.API.InterpersonalAPI;
 import com.constantine.polariscope.DTO.MemberListItem;
-import com.constantine.polariscope.DTO.NewMemberForm;
+import com.constantine.polariscope.DTO.MemberForm;
 import com.constantine.polariscope.Model.Evaluation;
 import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
@@ -26,7 +26,6 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -44,7 +43,7 @@ public class PolariscopeApplicationTests {
 
 	private User perfectUser, perfectUser2, perfectObserver;
 	private Member perfectMember, minimalMember;
-	private NewMemberForm perfectNewMemberForm;
+	private MemberForm perfectMemberForm;
 	private Evaluation perfectEvaluation;
 
 	LocalDate specificDate = LocalDate.of(2024, 6, 3);
@@ -64,7 +63,7 @@ public class PolariscopeApplicationTests {
 		timeline.add(perfectEvaluation);
 		perfectMember.setTimeline(timeline);
 
-		perfectNewMemberForm = new NewMemberForm(2001, specificDate, "Red", "Birdie", "Bird", "Angry", "ISTJ", "Costi is really cool", Member.RelationshipType.FRIEND.name(), Member.Sex.MALE.name(), Member.Sexuality.HETEROSEXUAL.name());
+		perfectMemberForm = new MemberForm(2001, specificDate, "Red", "Birdie", "Bird", "Angry", "ISTJ", "Costi is really cool", Member.RelationshipType.FRIEND.name(), Member.Sex.MALE.name(), Member.Sexuality.HETEROSEXUAL.name());
 	}
 
 	@Test

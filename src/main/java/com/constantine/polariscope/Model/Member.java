@@ -1,6 +1,6 @@
 package com.constantine.polariscope.Model;
 
-import com.constantine.polariscope.DTO.NewMemberForm;
+import com.constantine.polariscope.DTO.MemberForm;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -46,7 +46,7 @@ public class Member {
     @ManyToOne
     private User author;
 
-    @OneToOne
+    @ManyToOne
     private Place placeMet;
 
     @JsonIgnore
@@ -87,7 +87,7 @@ public class Member {
         this.timeline = timeline;
     }
 
-    public Member(NewMemberForm form, @NonNull User user){
+    public Member(MemberForm form, @NonNull User user){
         created = LocalDateTime.now();
         lastModified = LocalDateTime.now();
         ageMet = form.getAgeMet();
@@ -118,9 +118,9 @@ public class Member {
     }
     public enum Sexuality{
         HETEROSEXUAL,
-        PANSEXUAL,
         BISEXUAL,
-        HOMOSEXUAL,
+        GAY,
+        LESBIAN,
         ASEXUAL,
     }
 

@@ -99,7 +99,7 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="bdf">Birthday</label>
-                            <input type="date" class="form-control" id="bdf" name="birthday" required>
+                            <input type="date" class="form-control" id="bdf" name="birthday">
                         </div>
 
                         <div class="col-md-4 mb-3">
@@ -117,7 +117,7 @@
                             <input type="text" class="form-control" id="df" name="description" placeholder="Description of member">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit()" id="submit-button">Submit</button>
+                    <button type="submit" class="btn btn-primary" onclick="saveMember()" id="submit-button">Submit</button>
                 </div>
                 <div class="tab-pane fade" id="nav-evaluation" role="tabpanel" aria-labelledby="nav-evaluation-tab" tabindex="0">
                     <h2 class="fw-bold mt-3">Evaluation Records</h2>
@@ -348,27 +348,69 @@
     }
 
     function renderInfoTab(){
-        // document.querySelector("#info-relationship").innerHTML = `
-        // <h3 class="fw-bold text-center">Relationship</h3>
-        // <p>Type: ${memberDetails.relationship}</p>
-        // <p>Year met: ${memberDetails.ageMet}</p>
-        // <p>Place met: ${memberDetails.placeMet}</p>
-        // <p>Latest Score: ${memberDetails.mostRecentScore}</p>
-        // <p>Timeline Size: ${memberDetails.timelineSize}</p>
-        // `;
-        //
-        // document.querySelector("#info-description").innerHTML = `
-        // <h3 class="fw-bold">Description</h3>
-        // <p>${memberDetails.description}</p>
-        // `;
-        //
-        // document.querySelector("#info-general").innerHTML = `
-        // <h3 class="fw-bold text-center">General</h3>
-        // <p>Birthday: ${formatTimestamp(memberDetails.birthday)}</p>
-        // <p>Favorite color: ${memberDetails.favoriteColor}</p>
-        // <p>Sexuality: ${memberDetails.sexuality}</p>
-        // <p>Personality: ${memberDetails.personality}</p>
-        // `;
+        document.querySelector("#fnf").value = memberDetails.firstName;
+        document.querySelector("#lnf").value = memberDetails.lastName;
+        document.querySelector("#mnf").value = memberDetails.middleName;
+        document.querySelector("#relationf").value = memberDetails.relationship; //since it is a select, might neeed to do something else
+        document.querySelector("#sexf").value = memberDetails.sex;
+        document.querySelector("#sexualityf").value = memberDetails.sexuality;
+        document.querySelector("#mbp").value = memberDetails.personality;
+        document.querySelector("#fcf").value = memberDetails.favoriteColor;
+        document.querySelector("#amf").value = memberDetails.ageMet;
+        document.querySelector("#bdf").value = new Date(memberDetails.birthday).toISOString().slice(0, 10);
+        document.querySelector("#df").value = memberDetails.description;
+    }
+
+    function saveMember(){
+        let member = {
+            "id": memberDetails.id,
+            "firstName": document.querySelector("#fnf").value,
+            "lastName": document.querySelector("#lnf").value,
+            "middleName": document.querySelector("#mnf").value,
+            "relationship": document.querySelector("#relationf").value,
+            "sex": document.querySelector("#sexf").value,
+            "sexuality": document.querySelector("#sexualityf").value,
+            "personality": document.querySelector("#mbp").value,
+            "favoriteColor": document.querySelector("#fcf").value,
+            "ageMet": document.querySelector("#amf").value,
+            "birthday": document.querySelector("#bdf").value,
+            "description": document.querySelector("#df").value
+        }
+        let button = document.querySelector("#submit-button");
+        button.disabled = true;
+        button.classList.remove("btn-primary");
+        button.classList.add("btn-disabled");
+        button.textContent = "Saving...";
+
+        let toastId = createToast("Saving Member Details");
+        postData("/api/interpersonal/member/save", member)
+            .then((message) => {
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .then(refresh)
+            .finally(() => {
+                button.disabled = false;
+                button.classList.remove("btn-disabled");
+                button.classList.add("btn-primary");
+                button.textContent = "Submit";
+            });
     }
 
     function renderMemberSelect(members){
