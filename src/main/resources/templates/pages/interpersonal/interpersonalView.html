@@ -129,7 +129,7 @@
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
-<div th:replace="~{components/Formatting :: date-formatting}"></div>
+<div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
 <script>
     let memberList;
@@ -259,7 +259,7 @@
 
         document.querySelector("#info-general").innerHTML = `
         <h3 class="fw-bold text-center">General</h3>
-        <p>Birthday: ${formatDate(memberDetails.birthday)}</p>
+        <p>Birthday: ${formatTimestamp(memberDetails.birthday)}</p>
         <p>Favorite color: ${memberDetails.favoriteColor}</p>
         <p>Sexuality: ${memberDetails.sexuality}</p>
         <p>Personality: ${memberDetails.personality}</p>
@@ -318,7 +318,7 @@
         memberDetails.shortTimeline.forEach((eval) => {
             tableHTML += `
                 <tr id="${eval.id}">
-                    <th>${formatDate(eval.timestamp)}</th>
+                    <th>${formatTimestamp(eval.timestamp)}</th>
                     <th>${eval.cscore}</th>
                     <th>${eval.note}</th>
                     <th><button class="btn btn-secondary" onclick="updateModal('${eval.timestamp}', '${eval.cscore}', '${eval.note}', '${eval.id}')" data-bs-toggle="modal" data-bs-target="#addEvalModal">Edit</button></th>
@@ -359,7 +359,7 @@
     function updateEvalChart(){
         let newScores = {data:[]};
         memberDetails.shortTimeline.forEach((eval) =>{
-            newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore, note: eval.note});
+            newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore});
         });
 
         evalChartEval.data.datasets.pop();
