@@ -12,12 +12,30 @@
         </div>
         <div>
             <div class="input-group">
-                <input type="date" class="form-control" id="bdf" name="evaluation-date">
-                <button class="btn btn-primary bevel-sm" type="button" onclick="changeUser()">Set Date</button>
+                <input type="datetime-local" class="form-control" id="bdf" name="evaluation-date">
+                <button class="btn btn-primary bevel-sm" type="button" onclick="setDate()">Set Timestamp</button>
             </div>
         </div>
     </nav>
 
+    <div class="row mt-3">
+        <div class="col-md-3 col-lg-2 mb-4" id="left-pane">
+            <div class="border border-5 d-flex justify-content-center align-items-center p-4 mb-3" role="button">
+                <h4 class="fw-bold">Costi Khamis</h4>
+            </div>
+            <div class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button">
+                <h4 class="fw-bold">Costi Khamis</h4>
+            </div>
+        </div>
+        <div class="col-md-9 col-lg-10 px-3" id="right-pane">
+            <h2 class="fw-bold">Batch Evaluation</h2>
+            <canvas id="score-canvas"></canvas>
+            <div class="card d-flex flex-row-reverse overflow-x" id="score-container"></div>
+            <label for="note-form-modal" class="form-label mt-3">Note</label>
+            <textarea class="form-control" id="note-form-modal" rows="3"></textarea>
+            <button type="button" class="btn btn-primary mt-3" onclick="saveEval()" data-bs-dismiss="modal">Save changes</button>
+        </div>
+    </div>
 
 </div>
 </main>

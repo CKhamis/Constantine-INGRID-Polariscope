@@ -60,4 +60,9 @@ public class FrontEndController {
         model.addAttribute("places", placeService.findAll(getCurrentUser(principal)));
         return "pages/interpersonal/interpersonalView";
     }
+
+    @GetMapping("/interpersonal/batch-evaluate")
+    public String getBatchEvaluate() {
+        return "pages/interpersonal/BatchEvaluate";
+    }
 }
