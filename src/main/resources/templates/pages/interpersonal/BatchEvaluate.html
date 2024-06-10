@@ -40,5 +40,49 @@
 </div>
 </main>
 <div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
+<div th:replace="~{components/Toast :: toast}"></div>
+<div th:replace="~{components/Network :: network}"></div>
+<script>
+    let memberList;
+
+    refresh();
+    function refresh(){
+        const memberListFetch = fetch("/api/interpersonal/member/all", {});
+        Promise.all([memberListFetch])
+            .then(responses => {
+                return Promise.all([responses[0]]);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                memberList = data[0];
+                renderMemberList(data[0]);
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                    });
+            });
+
+        function renderMemberList(memberData){
+            let content = "";
+            memberData.forEach((member) => {
+                content += `
+                <div class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" onclick="selectMember('${member.id}')">
+                    <h4 class="fw-bold">${member.firstName} ${member.lastName}</h4>
+                </div>
+                `;
+            });
+            document.querySelector("#left-pane").innerHTML = content;
+        }
+    }
+</script>
 </body>
 </html>
