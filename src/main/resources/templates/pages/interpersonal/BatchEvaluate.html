@@ -64,6 +64,33 @@
 
 </div>
 </main>
+
+<div class="modal fade" tabindex="-1" aria-labelledby="be" id="timestamp-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="be">Welcome to Batch Evaluate</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <p>Batch evaluate allows you to produce evaluations for all registered members at a time. It is highly recommended to add evaluations to your members on this screen in order to be more consistent with scores. Please choose a timestamp for evaluations:</p>
+                    </div>
+                    <div class="col-12">
+                        <label for="date-form-modal" class="form-label">Timestamp for Evaluations</label>
+                        <input type="datetime-local" class="form-control" id="date-form-modal">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateTimestamp()" data-bs-dismiss="modal">Use Timestamp</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
@@ -254,6 +281,15 @@
                     dequeue(document.querySelector("#id-form").value);
                 }
             });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var myModal = new bootstrap.Modal(document.getElementById('timestamp-modal'));
+        myModal.show();
+    });
+
+    function updateTimestamp(){
+        document.querySelector("#evaluation-date").value = document.querySelector("#date-form-modal").value;
     }
 </script>
 </body>
