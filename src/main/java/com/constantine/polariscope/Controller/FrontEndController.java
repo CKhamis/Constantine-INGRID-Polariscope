@@ -51,7 +51,7 @@ public class FrontEndController {
         return "pages/interpersonal/newMember";
     }
 
-    @GetMapping("/interpersonal/view/{id}")
+    @GetMapping("/interpersonal/member/view/{id}")
     public String getMember(@PathVariable String id, Model model, Principal principal){
         model.addAttribute("id", id);
         model.addAttribute("relationshipTypes", Member.RelationshipType.values());

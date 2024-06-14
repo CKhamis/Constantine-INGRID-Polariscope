@@ -45,4 +45,8 @@ public class MemberService {
         m.setTimelineSize(evals.size());
         return m;
     }
+
+    public List<Evaluation> findEvaluationByMember(Member member){
+        return evaluationRepository.findAllByMemberOrderByTimestampDesc(member);
+    }
 }

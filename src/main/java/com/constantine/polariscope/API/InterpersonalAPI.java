@@ -181,7 +181,9 @@ public class InterpersonalAPI {
             try{
                 Member subject = memberService.findMember(id);
                 if(subject.getAuthor().getId().equals(retrievedUser.getId())){
-                    return ResponseEntity.ok(subject.getTimeline());
+
+
+                    return ResponseEntity.ok(memberService.findEvaluationByMember(subject));
                 }else{
                     // Invalid user account
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Error Retrieving Evaluations", ResponseMessage.Severity.LOW, "Member not found"));
