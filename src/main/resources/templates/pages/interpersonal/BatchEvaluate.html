@@ -21,8 +21,13 @@
     <div class="row mt-3">
         <div class="col-md-3 col-lg-2 mb-4" id="left-pane">
         </div>
-        <div class="col-md-9 col-lg-10 px-3" id="right-pane">
-            <h2 class="fw-bold mb-2">Batch Evaluation</h2>
+        <div class="col-md-9 col-lg-10 px-3 mb-4" id="right-pane">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="fw-bold mb-2">Batch Evaluation</h2>
+                <div id="queue-button">
+
+                </div>
+            </div>
             <canvas id="score-canvas" class="mb-5"></canvas>
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
@@ -55,7 +60,7 @@
             </div>
 
             <a role="button" class="btn btn-info mt-3" id="info-link">View User Info</a>
-            <button type="button" class="btn btn-primary mt-3" onclick="saveEval()" data-bs-dismiss="modal">Save changes</button>
+            <button type="button" class="btn btn-primary mt-3" onclick="saveEval()">Save & Dequeue</button>
         </div>
     </div>
 
@@ -85,7 +90,7 @@
             })
             .then(data => {
                 memberList = data[0];
-                renderMemberList(data[0]);
+                renderMemberList();
             })
             .catch((response) => {
                 console.log(response);
@@ -97,23 +102,6 @@
                         console.error("Error parsing error response:", error);
                     });
             });
-
-        function renderMemberList(memberData){
-            let content = "";
-            memberData.forEach((member) => {
-                content += `
-                <div class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" onclick="selectMember('${member.id}')">
-                    <h4 class="fw-bold">${member.firstName} ${member.lastName}</h4>
-                </div>
-                `;
-            });
-            content += `
-            <a class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" href="/interpersonal/new">
-                <h4 class="fw-bold"> + New Member</h4>
-            </a>
-            `;
-            document.querySelector("#left-pane").innerHTML = content;
-        }
     }
 
     function selectMember(id) {
@@ -171,6 +159,34 @@
             document.querySelector("#member-relationship").textContent = member.relationship;
             document.querySelector("#member-date-created").textContent = formatDate(member.created);
             document.querySelector("#member-sex").textContent = member.sex;
+            document.querySelector("#queue-button").innerHTML = `<button type="button" class="btn btn-secondary mt-3" onclick="dequeue('${id}')">Dequeue</button>`;
+        }
+    }
+
+    function renderMemberList(){
+        let content = "";
+        memberList.forEach((member) => {
+            content += `
+                <div class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" onclick="selectMember('${member.id}')">
+                    <h4 class="fw-bold">${member.firstName} ${member.lastName}</h4>
+                </div>
+                `;
+        });
+        content += `
+            <a class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" href="/interpersonal/new">
+                <h4 class="fw-bold"> + New Member</h4>
+            </a>
+            `;
+        document.querySelector("#left-pane").innerHTML = content;
+    }
+
+    function dequeue(id){
+        memberList = memberList.filter(obj => obj.id !== id);
+        renderMemberList();
+        if(memberList.length > 0){
+            selectMember(memberList[0].id);
+        }else{
+            document.querySelector("#right-pane").innerHTML = "<h1 class='text-center'>Completed Queue</h1>";
         }
     }
 
