@@ -21,8 +21,21 @@
         let ampm = hours >= 12 ? 'PM' : 'AM';
 
         hours = hours % 12;
-        hours = hours ? ("0" + hours).slice(-2) : 12; // the hour '0' should be '12'
+        hours = hours ? ("0" + hours).slice(-2) : 12;
 
         return `${month}/${day}/${year} ${hours}:${minutes} ${ampm}`;
+    }
+</script>
+<script th:fragment="time-formatting">
+    function formatTimeOnly(dateString) {
+        let date = new Date(dateString);
+        let hours = date.getHours();
+        let minutes = ("0" + date.getMinutes()).slice(-2);
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+
+        hours = hours % 12;
+        hours = hours ? ("0" + hours).slice(-2) : 12;
+
+        return `${hours}:${minutes} ${ampm}`;
     }
 </script>

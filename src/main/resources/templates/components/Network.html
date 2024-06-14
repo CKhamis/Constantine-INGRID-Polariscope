@@ -29,4 +29,8 @@
             return Promise.reject(response);
         }
     }
+
+    function getObjectById(list, id) {
+        return list.find(obj => obj["id"] === id);
+    }
 </script>
