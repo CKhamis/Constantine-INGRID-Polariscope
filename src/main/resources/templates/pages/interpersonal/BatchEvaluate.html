@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xml:th="https://www.thymeleaf.org">
-<head th:replace="~{components/Header :: head('Home')}"></head>
+<head th:replace="~{components/Header :: head('Batch Evaluate')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: navigation}"></div>
 <main class="pt-3">
@@ -117,6 +117,9 @@
             .then(data => {
                 memberList = data[0];
                 renderMemberList();
+                if(memberList.length > 0){
+                    selectMember(memberList[0].id);
+                }
             })
             .catch((response) => {
                 console.log(response);
@@ -260,6 +263,12 @@
                 document.getElementById(`${toastId}-title`).innerText = message.title;
                 document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
                 document.getElementById(`${toastId}-loading`).style.color = "green";
+
+                if(dq){
+                    dequeue(document.querySelector("#id-form").value);
+                }else{
+                    selectMember(document.querySelector("#id-form").value)
+                }
             })
             .catch((response) => {
                 response.json()
@@ -274,16 +283,17 @@
                         document.getElementById(`${toastId}-title`).innerText = "Error";
                         document.getElementById(`${toastId}-loading`).style.color = "red";
                     });
-            })
-            .finally(() => {
-                selectMember(document.querySelector("#id-form").value);
-                if(dq){
-                    dequeue(document.querySelector("#id-form").value);
-                }
             });
     }
 
     document.addEventListener("DOMContentLoaded", function() {
+        const dateInput = document.getElementById('date-form-modal');
+
+        const parsedDate = new Date();
+        const localDate = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000);
+        const formattedDate = localDate.toISOString().slice(0, 16); // Format as "YYYY-MM-DDTHH:MM"
+        dateInput.value = formattedDate;
+
         var myModal = new bootstrap.Modal(document.getElementById('timestamp-modal'));
         myModal.show();
     });

@@ -233,6 +233,9 @@ public class InterpersonalAPI {
                         }
                     }
 
+                    if(form.getCscore() == null){
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Evaluation", ResponseMessage.Severity.LOW, "Missing cScore"));
+                    }
                     // Create new eval
                     Evaluation newEval = new Evaluation(null, form.getTimestamp(), form.getNote(), form.getCscore(), member);
                     evaluationService.save(newEval);
