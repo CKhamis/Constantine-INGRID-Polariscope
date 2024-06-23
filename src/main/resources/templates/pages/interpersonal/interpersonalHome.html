@@ -4,7 +4,24 @@
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: navigation}"></div>
 <main class="container px-4 py-5">
-
+    <h2 class="fw-bold text-center">Interpersonal Relationships</h2>
+    <div class="row">
+        <a class="col-md-6 col-lg-4 mt-4 px-3" href="/interpersonal/batch-evaluate">
+            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                <p class="fs-4 fs-bold text-center m-0">Batch Evaluate</p>
+            </div>
+        </a>
+        <a class="col-md-6 col-lg-4 mt-4 px-3" href="/interpersonal/batch-evaluate">
+            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                <p class="fs-4 fs-bold text-center m-0">All Members</p>
+            </div>
+        </a>
+        <a class="col-md-6 col-lg-4 mt-4 px-3" href="/interpersonal/interpersonal/new">
+            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                <p class="fs-4 fs-bold text-center m-0">+ Add Member</p>
+            </div>
+        </a>
+    </div>
 </main>
 <div th:replace="~{components/External :: external}"></div>
 </body>
