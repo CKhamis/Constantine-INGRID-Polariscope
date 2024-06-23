@@ -42,6 +42,11 @@ public class FrontEndController {
         return "pages/interpersonal/interpersonalHome";
     }
 
+    @GetMapping("/interpersonal/members")
+    public String getInterpersonalMembers() {
+        return "pages/interpersonal/interpersonalMembers";
+    }
+
     @GetMapping("/interpersonal/new")
     public String getNewMember(Model model, Principal principal) {
         model.addAttribute("relationshipTypes", Member.RelationshipType.values());
