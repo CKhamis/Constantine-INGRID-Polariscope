@@ -15,9 +15,9 @@
     </nav>
     <div class="row mt-3">
         <div class="col-md-3 col-lg-2 mb-4" id="left-pane">
-            <p class="fs-4 fw-bold text-center mb-2">Member Composition</p>
+            <p class="fs-4 fw-bold text-center mb-4">Member Composition</p>
             <canvas id="composition-canvas"></canvas>
-            <p class="fs-4 text-center mt-5">poop</p>
+<!--            <p class="fs-4 fw-bold text-center mb-4">Member Composition</p>-->
         </div>
         <div class="col-md-9 col-lg-10 px-3" id="right-pane">
             <div class="container-fluid table-responsive">
@@ -102,23 +102,27 @@
     }
 
     function updateGraph(){
-        let newData = {data:[]};
-        let newLabels = [];
-
-        allMembers.forEach((member) =>{
-            const type = member.relationship;
-            if (newLabels[type]) {
-                newData[type]++;
+        const tally = allMembers.reduce((acc, obj) => {
+            const type = obj.relationship;
+            if (acc[type]) {
+                acc[type]++;
             } else {
-                newLabels[type] = 1;
-                newLabels.push(type);
+                acc[type] = 1;
             }
-        });
+            return acc;
+        }, {});
 
-        memberCompositionChart.data.datasets.pop();
-        memberCompositionChart.data.datasets.push(newData);
-        memberCompositionChart.data.datasets.pop();
-        memberCompositionChart.data.datasets.push(newData);
+        const labels = Object.keys(tally);
+        const values = Object.values(tally);
+
+        let data = {
+            datasets: [{
+                data:values
+            }],
+            labels:labels
+        };
+
+        memberCompositionChart.data = data;
         memberCompositionChart.update();
     }
 
@@ -130,10 +134,17 @@
             }],
             labels:[]
         };
-        //todo: process data fro graph
         memberCompositionChart = new Chart(canvas, {
             type: 'doughnut',
             data:data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
         });
     }
 </script>
