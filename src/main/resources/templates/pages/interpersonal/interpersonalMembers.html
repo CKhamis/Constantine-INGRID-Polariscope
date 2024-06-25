@@ -3,7 +3,7 @@
 <head th:replace="~{components/Header :: head('Home')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: navigation}"></div>
-<main class="container-fluid px-4 py-2">
+<main class="container-fluid px-4 pt-2">
     <nav class="navbar d-flex justify-content-between align-items-center">
         <div>
             <a href="/interpersonal">< Interpersonal Home</a>
@@ -13,27 +13,47 @@
         </div>
         <div></div>
     </nav>
-    <div class="container table-responsive">
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th scope="col">Handle</th>
-            </tr>
-            </thead>
-            <tbody id="table-body">
-
-            </tbody>
-        </table>
+    <div class="row mt-3">
+        <div class="col-md-3 col-lg-2 mb-4" id="left-pane">
+            <p class="fs-4 fw-bold text-center mb-2">Member Composition</p>
+            <canvas id="composition-canvas"></canvas>
+            <p class="fs-4 text-center mt-5">poop</p>
+        </div>
+        <div class="col-md-9 col-lg-10 px-3" id="right-pane">
+            <div class="container-fluid table-responsive">
+                <nav class="navbar d-flex justify-content-start align-items-center">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2 me-2" role="button" onclick="refresh()">
+                        <img class="square-image" th:src="@{/icons/Refresh.svg}" alt="refresh" style="width: 30px;"/>
+                    </div>
+                    <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <p class="mb-0 mx-2 fs-5 fw-bold">Filter</p>
+                        <img class="square-image" th:src="@{/icons/Filter.svg}" alt="edit" style="width: 30px;"/>
+                    </div>
+                </nav>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Photo</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Relationship</th>
+                        <th scope="col">Sex</th>
+                        <th scope="col">Sexuality</th>
+                        <th scope="col">View</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </main>
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: external}"></div>
 <script>
+    let allMembers, memberCompositionChart;
     refresh();
+    setupGraph();
     function refresh(){
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         Promise.all([memberListFetch])
@@ -44,21 +64,10 @@
                 return Promise.all([data[0].json()]);
             })
             .then(data => {
-                console.log(data[0]);
-                let tableContents = '';
-                data[0].forEach((member) => {
-                    tableContents += `
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>${member.firstName} ${member.lastName}</td>
-                        <td>${member.relationship}</td>
-                        <td>${member.sex}</td>
-                        <td>${member.sexuality}</td>
-                        <td><a href="/interpersonal/member/view/${member.id}">View Member ></a></td>
-                    </tr>
-                    `;
-                });
-                document.querySelector("#table-body").innerHTML = tableContents;
+                allMembers = data[0];
+                renderTable();
+                renderStats();
+                updateGraph();
             })
             .catch((response) => {
                 console.log(response);
@@ -70,6 +79,62 @@
                         console.error("Error parsing error response:", error);
                     });
             })
+    }
+    function renderTable(){
+        let tableContents = '';
+        allMembers.forEach((member) => {
+            tableContents += `
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>${member.firstName} ${member.lastName}</td>
+                        <td>${member.relationship}</td>
+                        <td>${member.sex}</td>
+                        <td>${member.sexuality}</td>
+                        <td><a href="/interpersonal/member/view/${member.id}">View Member ></a></td>
+                    </tr>
+                    `;
+        });
+        document.querySelector("#table-body").innerHTML = tableContents;
+    }
+
+    function renderStats(){
+
+    }
+
+    function updateGraph(){
+        let newData = {data:[]};
+        let newLabels = [];
+
+        allMembers.forEach((member) =>{
+            const type = member.relationship;
+            if (newLabels[type]) {
+                newData[type]++;
+            } else {
+                newLabels[type] = 1;
+                newLabels.push(type);
+            }
+        });
+
+        memberCompositionChart.data.datasets.pop();
+        memberCompositionChart.data.datasets.push(newData);
+        memberCompositionChart.data.datasets.pop();
+        memberCompositionChart.data.datasets.push(newData);
+        memberCompositionChart.update();
+    }
+
+    function setupGraph(){
+        let canvas = document.querySelector("#composition-canvas");
+        let data = {
+            datasets: [{
+                data:[]
+            }],
+            labels:[]
+        };
+        //todo: process data fro graph
+        memberCompositionChart = new Chart(canvas, {
+            type: 'doughnut',
+            data:data,
+        });
     }
 </script>
 </body>
