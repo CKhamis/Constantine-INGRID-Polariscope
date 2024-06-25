@@ -47,6 +47,47 @@
         </div>
     </div>
 </main>
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="fmt" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="fmt">Filter Settings</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <label for="fn-form-g" class="form-label">First Name</label>
+                        <div class="input-group mb-3" id="fn-form-g">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="before-checkbox-filter-modal" aria-label="Enable filtering before a date">
+                            </div>
+                            <input type="text" class="form-control" aria-label="first name" id="fn-form">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label for="after-form" class="form-label">Show Evaluations After</label>
+                        <div class="input-group mb-3" id="after-form">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="after-checkbox-filter-modal" aria-label="Enable filtering after a date">
+                            </div>
+                            <input type="datetime-local" class="form-control" aria-label="after input" id="after-form-filter-modal">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label for="keyword-filter-modal" class="form-label">Note contains</label>
+                        <textarea class="form-control" id="keyword-filter-modal" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="renderEvaluationTable()" data-bs-dismiss="modal">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: external}"></div>
