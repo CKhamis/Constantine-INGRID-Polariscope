@@ -43,7 +43,10 @@ public class FrontEndController {
     }
 
     @GetMapping("/interpersonal/members")
-    public String getInterpersonalMembers() {
+    public String getInterpersonalMembers(Model model) {
+        model.addAttribute("relationshipTypes", Member.RelationshipType.values());
+        model.addAttribute("sexualityTypes", Member.Sexuality.values());
+        model.addAttribute("sexTypes", Member.Sex.values());
         return "pages/interpersonal/interpersonalMembers";
     }
 

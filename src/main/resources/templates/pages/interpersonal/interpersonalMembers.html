@@ -57,26 +57,61 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-12">
-                        <label for="fn-form-g" class="form-label">First Name</label>
+                        <label for="fn-form-g" class="form-label">Filter by First Name</label>
                         <div class="input-group mb-3" id="fn-form-g">
                             <div class="input-group-text">
-                                <input class="form-check-input mt-0" type="checkbox" value="" id="before-checkbox-filter-modal" aria-label="Enable filtering before a date">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="fn-checkbox-filter-modal" aria-label="Filter by first name">
                             </div>
                             <input type="text" class="form-control" aria-label="first name" id="fn-form">
                         </div>
                     </div>
                     <div class="col-12">
-                        <label for="after-form" class="form-label">Show Evaluations After</label>
-                        <div class="input-group mb-3" id="after-form">
+                        <label for="ln-form-g" class="form-label">Filter by Last Name</label>
+                        <div class="input-group mb-3" id="ln-form-g">
                             <div class="input-group-text">
-                                <input class="form-check-input mt-0" type="checkbox" value="" id="after-checkbox-filter-modal" aria-label="Enable filtering after a date">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="ln-checkbox-filter-modal" aria-label="Filter by last name">
                             </div>
-                            <input type="datetime-local" class="form-control" aria-label="after input" id="after-form-filter-modal">
+                            <input type="text" class="form-control" aria-label="first name" id="ln-form">
                         </div>
                     </div>
                     <div class="col-12">
-                        <label for="keyword-filter-modal" class="form-label">Note contains</label>
-                        <textarea class="form-control" id="keyword-filter-modal" rows="3"></textarea>
+                        <label for="relationship-form-group" class="form-label">Filter by Relationship Type</label>
+                        <div class="input-group mb-3" id="relationship-form-group">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="relationship-checkbox-filter-modal" aria-label="Enable filtering by relationship">
+                            </div>
+                            <select class="form-select" name="relationship" id="relationship-form">
+                                <th:block th:each="relationshipType : ${relationshipTypes}">
+                                    <option th:value="${relationshipType}" th:text="${relationshipType.toString().toLowerCase()}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label for="sex-form-group" class="form-label">Filter by Sex</label>
+                        <div class="input-group mb-3" id="sex-form-group">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="sex-checkbox-filter-modal" aria-label="Enable filtering by sex">
+                            </div>
+                            <select class="form-select" name="relationship" id="sex-form">
+                                <th:block th:each="SexType : ${sexTypes}">
+                                    <option th:value="${SexType}" th:text="${SexType.toString().toLowerCase()}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label for="sexuality-form-group" class="form-label">Filter by Sexuality</label>
+                        <div class="input-group mb-3" id="sexuality-form-group">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="sexuality-checkbox-filter-modal" aria-label="Enable filtering by sexuality">
+                            </div>
+                            <select class="form-select" name="relationship" id="sexuality-form">
+                                <th:block th:each="sexualityType : ${sexualityTypes}">
+                                    <option th:value="${sexualityType}" th:text="${sexualityType.toString().toLowerCase()}"></option>
+                                </th:block>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
