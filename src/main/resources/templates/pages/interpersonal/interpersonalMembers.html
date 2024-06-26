@@ -117,7 +117,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="renderEvaluationTable()" data-bs-dismiss="modal">Save changes</button>
+                <button type="button" class="btn btn-primary" onclick="renderTable()" data-bs-dismiss="modal">Filter Members</button>
             </div>
         </div>
     </div>
@@ -158,8 +158,21 @@
     }
     function renderTable(){
         let tableContents = '';
+        const fnCheck = document.querySelector("#fn-checkbox-filter-modal").checked;
+        const lnCheck = document.querySelector("#ln-checkbox-filter-modal").checked;
+        const relationshipCheck = document.querySelector("#relationship-checkbox-filter-modal").checked;
+        const sexualityCheck = document.querySelector("#sexuality-checkbox-filter-modal").checked;
+        const sexCheck = document.querySelector("#sex-checkbox-filter-modal").checked;
+
+        const fn = document.querySelector("#fn-form").value;
+        const ln = document.querySelector("#ln-form").value;
+        const relationship = document.querySelector("#relationship-form").value;
+        const sex = document.querySelector("#sex-form").value;
+        const sexuality = document.querySelector("#sexuality-form").value;
+
         allMembers.forEach((member) => {
-            tableContents += `
+            if((!fnCheck || member.firstName.toLowerCase().includes(fn.toLowerCase())) && (!lnCheck || member.lastName.toLowerCase().includes(ln.toLowerCase())) && (!relationshipCheck || relationship === member.relationship) && (!sexualityCheck || sexuality === member.sexuality) && (!sexCheck || sex === member.sex)){
+                tableContents += `
                     <tr>
                         <th scope="row">1</th>
                         <td>${member.firstName} ${member.lastName}</td>
@@ -169,6 +182,7 @@
                         <td><a href="/interpersonal/member/view/${member.id}">View Member ></a></td>
                     </tr>
                     `;
+            }
         });
         document.querySelector("#table-body").innerHTML = tableContents;
     }
