@@ -73,4 +73,9 @@ public class FrontEndController {
     public String getBatchEvaluate() {
         return "pages/interpersonal/BatchEvaluate";
     }
+
+    @GetMapping("/interpersonal/import")
+    public String getTransferTool() {
+        return "pages/interpersonal/Import";
+    }
 }

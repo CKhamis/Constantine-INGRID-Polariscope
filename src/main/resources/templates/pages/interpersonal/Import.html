@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xml:th="https://www.thymeleaf.org">
+<head th:replace="~{components/Header :: head('Import Utility')}"></head>
+<body class="bg-2 text-1" data-bs-theme="dark">
+<div th:replace="~{components/Navigation :: navigation}"></div>
+<main class="container px-4 py-5">
+<div class="row">
+    <div class="d-none d-lg-block col-3">
+        <h2 class="fw-bold">Instructions</h2>
+        <p>Enter the information regarding a person of interest in your life. This information will be used for identification and analytical purposes within Polariscope.</p>
+    </div>
+    <div class="col-12 col-md-9 px-3">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label for="formFileLg" class="form-label">Large file input example</label>
+                <input class="form-control form-control-lg" id="formFileLg" type="file">
+             </div>
+        </div>
+        <button type="submit" class="btn btn-primary" onclick="submit()" id="submit-button">Submit</button>
+    </div>
+</div>
+</main>
+<div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/Network :: network}"></div>
+<div th:replace="~{components/Network :: data-upload}"></div>
+<script>
+    function submit(){
+        let form = new FormData();
+        form.append('file', document.querySelector('#formFileLg').files[0]);
+        postDataWithFile("/api/ingrid/upload", form)
+    }
+
+</script>
+</body>
+</html>
