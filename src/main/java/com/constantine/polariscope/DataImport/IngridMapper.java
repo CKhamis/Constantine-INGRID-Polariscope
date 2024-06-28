@@ -89,7 +89,6 @@ public class IngridMapper {
                     memberPacket.importErrorList.add(new ImportError("Error importing birthday", e.getMessage()));
                 }
 
-                //todo: add notes
                 String noteCell = nextLine[nextLine.length-3];
                 TreeSet<DatedNote> notes = noteExtractor(noteCell);
 
