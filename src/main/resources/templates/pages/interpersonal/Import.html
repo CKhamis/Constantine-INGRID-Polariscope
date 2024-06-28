@@ -14,25 +14,35 @@
         <a href="/interpersonal" class="mt-5 text-info-emphasis">< Back to Interpersonal</a>
         <h1 class="fw-bold mb-0 text-info-emphasis">Constantine [IN]GRID Transfer Tool</h1>
     </nav>
-    <div class="p-4 flex-grow-1">
-        <label for="formFileLg" class="form-label">Large file input example</label>
-        <input class="form-control form-control-lg" id="formFileLg" type="file">
+    <div class="p-4 flex-grow-1" id="content-container">
+
     </div>
     <nav style="bottom: 0; width: 100%" class="p-4 bg-body-tertiary">
         <button type="submit" class="btn btn-info" onclick="submit()" id="submit-button">Submit</button>
+        <button type="submit" class="btn btn-info" onclick="renderScreen(-1)" id="prev-button">Previous</button>
+        <button type="submit" class="btn btn-info" onclick="renderScreen()" id="next-button">Next</button>
     </nav>
 
 </main>
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/Network :: data-upload}"></div>
+<div th:replace="~{components/ImportScreens :: import-info}"></div>
 <script>
+    let currentScreenP1 = 0;
+
+    renderScreen();
+
     function submit(){
         let form = new FormData();
         form.append('file', document.querySelector('#formFileLg').files[0]);
         postDataWithFile("/api/ingrid/upload", form)
     }
 
+    function renderScreen(jump = 1){
+        document.querySelector("#content-container").innerHTML = screensP1[currentScreenP1];
+        currentScreenP1 += jump;
+    }
 </script>
 </body>
 </html>
