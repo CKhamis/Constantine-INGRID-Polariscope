@@ -57,6 +57,9 @@ public class Member {
     private List<Evaluation> shortTimeline;
 
     @Transient
+    private List<Evaluation> importedTimeline;
+
+    @Transient
     private Integer mostRecentScore;
 
     @Transient

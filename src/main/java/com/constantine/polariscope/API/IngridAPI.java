@@ -52,7 +52,7 @@ public class IngridAPI {
         }
 
         try{
-            List<ImportedMember> members = mapper.extractMembers(file);
+            List<ImportedMember> members = mapper.extractMembers(file, getCurrentUser(principal));
             return ResponseEntity.ok().body(members);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(new ResponseMessage("Invalid File", ResponseMessage.Severity.MEDIUM, e.getMessage()));

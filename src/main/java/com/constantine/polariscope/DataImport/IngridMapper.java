@@ -2,6 +2,7 @@ package com.constantine.polariscope.DataImport;
 
 import com.constantine.polariscope.Model.Evaluation;
 import com.constantine.polariscope.Model.Member;
+import com.constantine.polariscope.Model.User;
 import com.opencsv.CSVReader;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,14 +13,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class IngridMapper {
     private final int TABLE_HEADER_ROW = 4;
     private final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("M/d/yyyy");
-    public List<ImportedMember> extractMembers(MultipartFile file) throws Exception{
+    public List<ImportedMember> extractMembers(MultipartFile file, User author) throws Exception{
         List<ImportedMember> members = new ArrayList<>();
         try (Reader reader = new InputStreamReader(file.getInputStream()); CSVReader csvReader = new CSVReader(reader)) {
 
@@ -87,15 +90,32 @@ public class IngridMapper {
                 }
 
                 //todo: add notes
+                String noteCell = nextLine[nextLine.length-3];
+                TreeSet<DatedNote> notes = noteExtractor(noteCell);
+
                 List<Evaluation> timeline = new ArrayList<>();
                 for(int index = 18; !tableHeader[index].equals("News & Updates"); index++){
                     if(!nextLine[index].isEmpty()){
                         LocalDate date = LocalDate.parse(tableHeader[index], DATE_FORMAT);
                         LocalDateTime timestamp = date.atTime(LocalTime.MIDNIGHT);
-                        timeline.add(new Evaluation(null, timestamp, "test", Integer.parseInt(nextLine[index]), memberPacket.member));
+
+                        // Create the note
+                        Set<DatedNote> notesBeforeDate = getNotesBefore(notes, timestamp);
+
+                        // Print the notes before the specified date
+                        StringBuilder note = new StringBuilder();
+                        Iterator<DatedNote> iterator = notesBeforeDate.iterator();
+                        while (iterator.hasNext()) {
+                            DatedNote n = iterator.next();
+                            note.append("[").append(n.getTimestamp().toString()).append("] ").append(n.getNote());
+                            iterator.remove();
+                        }
+
+                        timeline.add(new Evaluation(null, timestamp, note.toString(), Integer.parseInt(nextLine[index]), memberPacket.member));
                     }
                 }
-                memberPacket.member.setTimeline(timeline);
+                memberPacket.member.setImportedTimeline(timeline);
+                memberPacket.member.setAuthor(author);
 
                 members.add(memberPacket);
             }
@@ -104,5 +124,32 @@ public class IngridMapper {
         }catch (Exception e){
             throw e;
         }
+    }
+
+
+    private TreeSet<DatedNote> noteExtractor(String cell){
+        TreeSet<DatedNote> datedNotes = new TreeSet<>();
+
+        Pattern pattern = Pattern.compile("\\[(\\d{1,2}/\\d{1,2}/\\d{4})\\] (.+?)(?=\\[|$)");
+        Matcher matcher = pattern.matcher(cell);
+
+        while (matcher.find()) {
+            String dateString = matcher.group(1);
+            String note = matcher.group(2).trim();
+
+            try {
+                LocalDate date = LocalDate.parse(dateString, DATE_FORMAT);
+                LocalDateTime timestamp = date.atTime(LocalTime.MIDNIGHT);
+                datedNotes.add(new DatedNote(note, timestamp));
+            } catch (DateTimeParseException e) {
+                System.err.println("Invalid date format: " + dateString);
+            }
+        }
+
+        return datedNotes;
+    }
+
+    public static Set<DatedNote> getNotesBefore(TreeSet<DatedNote> notes, LocalDateTime date) {
+        return notes.headSet(new DatedNote("", date));
     }
 }
