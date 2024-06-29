@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <script th:replace="~{components/EULA :: eula}"></script>
 <script th:fragment="import-info">
-    const screensP1 = [
+    const screens = [
         `<h2 class="fw-bold">Welcome</h2>
          <p class="mb-3 fs-4">This software allows you to transfer data to Constantine [IN]GRID Polariscope from a source Constantine [IN]GRID or adjacent file.</p>
          <p class="mb-3 fs-4">This tool will allow you to either permanently overwrite existing data in Constantine [IN]GRID Polariscope or create new member entries from the imported data. Please be aware that changes made from this software cannot be reversed unless a backup is restored.</p>
@@ -24,7 +24,7 @@
         `<h2 class="fw-bold">About Merging Information Onto Existing Members</h2>
          <p class="mb-3 fs-4">This tool will allow you to overwrite existing members with members tracked in the incoming Constantine [IN]GRID source file. In order to overwrite the existing data on Constantine [IN]GRID Polariscope, you must manually map these members with each other.</p>
          <p class="mb-3 fs-4">Please give extra care to this step, as it can potentially overwrite and delete evaluations and data on a member. A recovery of this information will require a backup restoration.</p>`,
-        `<h2 class="fw-bold">About Merging Information Onto Existing Members</h2>
+        `<h2 class="fw-bold">Preparing Constantine [IN]GRID For Import</h2>
          <p class="mb-3 fs-4">This tool requires .CSV files to import members. Constantine [IN]GRID is typically kept in a Microsoft Excel format (.xlsx) which is currently not supported.</p>
          <p class="mb-3 fs-4">In order to continue the import, you must convert the RankStar sheet into its own .csv file before uploading it in this tool. Here are some general steps below:</p>
          <ol>
@@ -73,5 +73,6 @@
          </div>`,
         `<label for="formFileLg" class="form-label">Large file input example</label>
         <input class="form-control form-control-lg" id="formFileLg" type="file">`,
+        `test`
     ];
 </script>
