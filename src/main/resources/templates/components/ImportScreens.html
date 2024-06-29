@@ -16,6 +16,10 @@
             <li><p class="mb-3 fs-4">Sufficient storage space on target system for incoming data</p></li>
             <li><p class="mb-3 fs-4">A source Constantine [IN]GRID file</p></li>
          </ul>`,
+        `<h2 class="fw-bold">End User License Agreement</h2>
+         <p th:replace="~{components/EULA :: eula}"></p>
+         <p class="mb-3 fs-4">By continuing in this tool, you accept the license agreement</p>
+         `,
         `<h2 class="fw-bold">About Merging Information Onto Existing Members</h2>
          <p class="mb-3 fs-4">This tool will allow you to overwrite existing members with members tracked in the incoming Constantine [IN]GRID source file. In order to overwrite the existing data on Constantine [IN]GRID Polariscope, you must manually map these members with each other.</p>
          <p class="mb-3 fs-4">Please give extra care to this step, as it can potentially overwrite and delete evaluations and data on a member. A recovery of this information will require a backup restoration.</p>`,
@@ -34,14 +38,38 @@
          <ul>
             <li><p class="mb-3 fs-4">Member names, sex, birthday and relationship to you</p></li>
             <li><p class="mb-3 fs-4">Personality type, description, and sexuality</p></li>
-            <li><p class="mb-3 fs-4">Place met, favorite color, </p></li>
-            <li><p class="mb-3 fs-4">Carefully read through the warning popups and proceed to saving a copy as a .csv file</p></li>
-            <li><p class="mb-3 fs-4">Save this file in a location that you can locate and readily upload to this tool.</p></li>
+            <li><p class="mb-3 fs-4">Place met & favorite color</p></li>
+            <li><p class="mb-3 fs-4">Notes & Updates</p></li>
+            <li><p class="mb-3 fs-4">Weekly cScores</p></li>
          </ul>
          `,
-        ``,
-        ``,
-        ``,
+        `<h2 class="fw-bold">About Transferring Data (2/2)</h2>
+         <p class="mb-3 fs-4">The following data will not be transferred</p>
+         <ul>
+            <li><p class="mb-3 fs-4">All data not already inside RankStar sheet</p></li>
+            <li><p class="mb-3 fs-4">Constantine Keystone transfer flag</p></li>
+            <li><p class="mb-3 fs-4">Logo</p></li>
+            <li><p class="mb-3 fs-4">Status</p></li>
+            <li><p class="mb-3 fs-4">Table footer statistics</p></li>
+         </ul>`,
+        `<h2 class="fw-bold">Re-Interpretation of Weekly Evaluations</h2>
+         <p class="mb-3 fs-4">Currently, Constantine [IN]GRID tracks cScores in week long periods and notes at any time. Constantine [IN]GRID Polariscope allows you to track evaluations and notes at any point. However, evaluations always require an accompanying cSscore value.</p>
+         <p class="mb-3 fs-4">Because of the change in data recording, existing notes and updates will be compiled together as a single note for the week.</p>
+         <p class="mb-3 fs-4">Constantine [IN]GRID Polariscope currently offers batch evaluations in place of weekly cScore periods. This allows for greater flexibility and higher accuracy of score.</p>
+         <p class="mb-3 fs-4">Evaluations in Constantine [IN]GRID Polariscope are timestamped, meaning multiple evaluations can be given to the same user within the same day.</p>`,
+        `<h2 class="fw-bold">Other Notes</h2>
+         <ul>
+            <li><p class="mb-3 fs-4">It is highly recommended to use either Constantine [IN]GRID or Constantine [IN]GRID Polariscope and not both at the same time. This can result in merging conflicts and inconsistent data</p></li>
+            <li><p class="mb-3 fs-4">Application security is important. Make sure to secure endpoint IP addresses using Constantine WebSpy or not port forwarding this application.</p></li>
+            <li><p class="mb-3 fs-4">Any unauthorized content or technical modifications to Constantine [IN]GRID may result in data not being transferred correctly.</p></li>
+            <li><p class="mb-3 fs-4">Data may be lost if you turn the power off or disable internet communication during the transfer or conversion.</p></li>
+         </ul>`,
+        `<h2 class="fw-bold text-center mb-4">Starting the Transfer</h2>
+         <p class="mb-4 fs-4 text-center">If you are sure you have thoroughly read through the information, select <strong>Next</strong></p>
+         <p class="mb-4 fs-4 text-center">If you want to look over the details again, select <strong>Previous</strong></p>
+         <div class="alert alert-info my-5" role="alert">
+            <p class="m-0 fs-4 text-center">Please have Constantine [IN]GRID RankStar ready in a .csv format.</p>
+         </div>`,
         `<label for="formFileLg" class="form-label">Large file input example</label>
         <input class="form-control form-control-lg" id="formFileLg" type="file">`,
     ];
