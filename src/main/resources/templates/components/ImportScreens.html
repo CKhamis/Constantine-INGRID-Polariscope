@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<script th:replace="~{components/EULA :: eula}"></script>
 <script th:fragment="import-info">
     const screensP1 = [
         `<h2 class="fw-bold">Welcome</h2>
@@ -17,7 +18,7 @@
             <li><p class="mb-3 fs-4">A source Constantine [IN]GRID file</p></li>
          </ul>`,
         `<h2 class="fw-bold">End User License Agreement</h2>
-         <p th:replace="~{components/EULA :: eula}"></p>
+         <p class="mb-3 fs-4">Before entering personal information, please ensure your installation of Constantine [IN]GRID Polariscope is hosted on your own hardware and not a shared server. By entering your information into this tool, you accept ownership and responsibility of the data you enter. Developer(s) of this software will not be liable in the unlikely event of data loss or leakage.</p>
          <p class="mb-3 fs-4">By continuing in this tool, you accept the license agreement</p>
          `,
         `<h2 class="fw-bold">About Merging Information Onto Existing Members</h2>
@@ -64,7 +65,7 @@
             <li><p class="mb-3 fs-4">Any unauthorized content or technical modifications to Constantine [IN]GRID may result in data not being transferred correctly.</p></li>
             <li><p class="mb-3 fs-4">Data may be lost if you turn the power off or disable internet communication during the transfer or conversion.</p></li>
          </ul>`,
-        `<h2 class="fw-bold text-center mb-4">Starting the Transfer</h2>
+        `<h2 class="fw-bold text-center mb-4">Information Review</h2>
          <p class="mb-4 fs-4 text-center">If you are sure you have thoroughly read through the information, select <strong>Next</strong></p>
          <p class="mb-4 fs-4 text-center">If you want to look over the details again, select <strong>Previous</strong></p>
          <div class="alert alert-info my-5" role="alert">

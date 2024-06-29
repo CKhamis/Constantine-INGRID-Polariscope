@@ -17,7 +17,7 @@
     <div class="p-4 flex-grow-1" id="content-container">
 
     </div>
-    <nav style="bottom: 0; width: 100%" class="p-4 bg-body-tertiary">
+    <nav style="bottom: 0; width: 100%" class="p-4 bg-body-tertiary" >
         <button type="submit" class="btn btn-info" onclick="submit()" id="submit-button">Submit</button>
         <button type="submit" class="btn btn-info" onclick="renderScreen(-1)" id="prev-button">Previous</button>
         <button type="submit" class="btn btn-info" onclick="renderScreen()" id="next-button">Next</button>
@@ -29,7 +29,9 @@
 <div th:replace="~{components/Network :: data-upload}"></div>
 <div th:replace="~{components/ImportScreens :: import-info}"></div>
 <script>
-    let currentScreenP1 = 0;
+    let currentScreenP1 = -1;
+    let currentScreenP2 = -1;
+    let phase = 0;
 
     renderScreen();
 
@@ -40,8 +42,23 @@
     }
 
     function renderScreen(jump = 1){
-        document.querySelector("#content-container").innerHTML = screensP1[currentScreenP1];
-        currentScreenP1 += jump;
+        if(phase === 0){
+            currentScreenP1 += jump;
+            if(currentScreenP1 < 0){
+                currentScreenP1 = 0;
+            }
+
+            if(currentScreenP1 > 10){
+                phase = 1;
+            }
+            document.querySelector("#content-container").innerHTML = screensP1[currentScreenP1];
+        }else if(phase === 1){
+            if(currentScreenP2 < 0){
+                currentScreenP2 = 0;
+            }
+            document.querySelector("#content-container").innerHTML = "next phase";
+        }
+
     }
 </script>
 </body>
