@@ -17,10 +17,15 @@
     <div class="p-4 flex-grow-1" id="content-container">
 
     </div>
-    <nav style="bottom: 0; width: 100%" class="p-4 bg-body-tertiary" >
+    <nav style="bottom: 0; width: 100%" class="p-4 bg-body-tertiary d-flex flex-row align-items-center">
 <!--        <button type="submit" class="btn btn-info" onclick="submit()" id="submit-button">Submit</button>-->
-        <button type="submit" class="btn btn-info" onclick="prevPage()" id="prev-button">Previous</button>
-        <button type="submit" class="btn btn-info" onclick="nextPage()" id="next-button">Next</button>
+        <div class="pe-4">
+            <button type="submit" class="btn btn-info" onclick="prevPage()" id="prev-button">Previous</button>
+            <button type="submit" class="btn btn-info" onclick="nextPage()" id="next-button">Next</button>
+        </div>
+        <div class="progress flex-grow-1" role="progressbar" aria-label="Progress bar" aria-valuemin="0" aria-valuemax="100" style="height: 20px">
+            <div class="progress-bar" style="width: 0; transition: width 2s ease;" id="progress-bar"></div>
+        </div>
     </nav>
 
 </main>
@@ -38,6 +43,7 @@
         if(index >= screens.length || index < 0){
             return;
         }
+        document.querySelector("#progress-bar").style.width = (index / screens.length) * 100 + '%';
         document.querySelector("#content-container").innerHTML = screens[index];
     }
 
