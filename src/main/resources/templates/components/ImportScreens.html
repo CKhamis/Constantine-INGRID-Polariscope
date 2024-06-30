@@ -77,6 +77,12 @@
         <label for="formFileLg" class="form-label">Constantine [IN]GRID source file</label>
         <input class="form-control form-control-lg" id="formFileLg" type="file">`,
         `<h2 class="fw-bold text-center mb-5">Constantine [IN]GRID Interpreter Status</h2>
-         `
+         <div class="alert alert-secondary my-5 d-flex justify-content-evenly align-items-center" role="alert" id="conversion-status-container" style="margin: 0 20%">
+            <p class="m-0 fs-4">Awaiting Conversion</p>
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+         </div>
+        <p class="my-5 fs-4 text-center" id="conversion-status-text">Constantine [IN]GRID Polarium is currently receiving and converting the given Constantine [IN]GRID file. During this process, please do not interrupt the internet connection or conversion results may be corrupted. No changes will be made to the given file or database during this process. Please stand by...</p>`
     ];
 </script>
