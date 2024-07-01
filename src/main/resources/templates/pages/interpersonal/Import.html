@@ -59,20 +59,26 @@
                 document.querySelector("#next-button").classList.remove("btn-primary");
                 document.querySelector("#next-button").classList.add("btn-info");
 
-
                 if(checkPointCheck(currentPage)){
                     document.querySelector("#prev-button").classList.remove("btn-info");
                     document.querySelector("#prev-button").classList.add("disabled");
+
+                    document.querySelector("#next-button").classList.remove("btn-info");
+                    document.querySelector("#next-button").classList.add("disabled");
                 }else{
                     document.querySelector("#prev-button").classList.add("btn-info");
                     document.querySelector("#prev-button").classList.remove("disabled");
                 }
-
-                if(checkPointCheck(currentPage - 1)){
-                    submit();
-                }
             }
-            showPage(currentPage);
+
+            if(currentPage === 11){
+                let form = document.querySelector('#formFileLg').files[0];
+                showPage(currentPage);
+                submitCSV(form);
+            }else{
+                showPage(currentPage);
+                eventListenerAdder(currentPage);
+            }
         }
     }
 
@@ -83,10 +89,12 @@
 
             if(checkPointCheck(currentPage)){
                 document.querySelector("#prev-button").classList.remove("btn-info");
-                document.querySelector("#prev-button").classList.add("btn-disabled");
+                document.querySelector("#prev-button").classList.add("disabled");
+
+                eventListenerAdder(currentPage);
             }else{
                 document.querySelector("#prev-button").classList.add("btn-info");
-                document.querySelector("#prev-button").classList.remove("btn-disabled");
+                document.querySelector("#prev-button").classList.remove("disabled");
             }
         }
     }
@@ -95,12 +103,61 @@
         return checkpoints.some(checkpoint => index === checkpoint);
     }
 
-    function submit(){
+    function submitCSV(f){
         let form = new FormData();
-        form.append('file', document.querySelector('#formFileLg').files[0]);
+        form.append('file', f);
+        const container = document.querySelector("#conversion-status-container");
+        const description = document.querySelector("#conversion-status-text");
         postDataWithFile("/api/ingrid/upload", form)
+            .then((response) => {
+                console.log(response);
+                document.querySelector("#conversion-status-container").innerHTML = "test" + response.message;
+            })
+            .catch((response) => {
+                response.json()
+                    .then(errorMessage => {
+                        console.log(errorMessage);
+                        container.classList.add("alert-danger");
+                        container.classList.remove("alert-secondary");
+                        container.classList.remove("d-flex");
+                        container.innerHTML = `
+                        <h3 class="text-center fw-bold text-danger-emphasis mb-3">${errorMessage.title}</h3>
+                        <p class="text-center">${errorMessage.message}</p>
+                        `;
+                        description.innerText = `Because of the errors associated with the given file, you must correct the changes before continuing. After reading through the error and making the required changes, press previous and re-upload the file.`;
+                        document.querySelector("#next-button").classList.remove("btn-info");
+                        document.querySelector("#next-button").classList.add("disabled");
+                    })
+                    .catch(error => {
+                        container.classList.add("alert-danger");
+                        container.classList.remove("alert-secondary");
+                        container.classList.remove("d-flex");
+                        console.log(error);
+                        container.innerHTML = `
+                        <h3 class="text-center fw-bold text-danger-emphasis mb-4">Error Parsing Document</h3>
+                        <p class="text-center">${error}</p>
+                        `;
+                        description.innerText = `There is an error parsing the given file and an additional error parsing the error message associated with it. Please check the console for more information.`;
+                        document.querySelector("#next-button").classList.remove("btn-info");
+                        document.querySelector("#next-button").classList.add("disabled");
+                    });
+            });
     }
 
+    function eventListenerAdder(l){
+        if(l === 10){
+            document.querySelector('#formFileLg').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file && (file.type === 'text/csv') || (file.type === 'application/vnd.ms-excel')) {
+                    document.querySelector("#next-button").classList.add("btn-info");
+                    document.querySelector("#next-button").classList.remove("disabled");
+                } else {
+                    alert('Please select a .csv file.');
+                    event.target.value = '';
+                }
+            });
+        }
+    }
 </script>
 </body>
 </html>
