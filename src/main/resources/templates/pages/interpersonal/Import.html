@@ -109,9 +109,13 @@
         const container = document.querySelector("#conversion-status-container");
         const description = document.querySelector("#conversion-status-text");
         postDataWithFile("/api/ingrid/upload", form)
+            .then((r) => {return r.json()})
             .then((response) => {
                 console.log(response);
-                document.querySelector("#conversion-status-container").innerHTML = "test" + response.message;
+                document.querySelector("#conversion-status-container").innerHTML = `<h2 class="fw-bold text-center">Valid [IN]GRID</h2>`;
+                container.classList.add("alert-success");
+                container.classList.remove("alert-secondary");
+                description.innerText = "Submitted file is a valid Constantine [IN]GRID file. This can be used for member importing into Constantine [IN]GRID Polariscope. Please proceed by clicking on Next.";
             })
             .catch((response) => {
                 response.json()
