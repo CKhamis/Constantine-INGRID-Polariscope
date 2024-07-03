@@ -2,7 +2,7 @@
 <html xml:th="https://www.thymeleaf.org">
 <head th:replace="~{components/Header :: head('Import Utility')}"></head>
 <style>
-    body{
+    body {
         background-image: url("/backgrounds/stripe.svg");
         background-size: 5px;
     }
@@ -18,7 +18,7 @@
 
     </div>
     <nav style="bottom: 0; width: 100%" class="p-4 bg-body-tertiary d-flex flex-row align-items-center">
-<!--        <button type="submit" class="btn btn-info" onclick="submit()" id="submit-button">Submit</button>-->
+        <!--        <button type="submit" class="btn btn-info" onclick="submit()" id="submit-button">Submit</button>-->
         <div class="pe-4">
             <button type="submit" class="btn btn-info" onclick="prevPage()" id="prev-button">Previous</button>
             <button type="submit" class="btn btn-info" onclick="nextPage()" id="next-button">Next</button>
@@ -40,81 +40,83 @@
 
     showPage(currentPage);
 
-    function showPage(index){
-        if(index >= screens.length || index < 0){
+    function showPage(index) {
+        if (index >= screens.length || index < 0) {
             return;
         }
         document.querySelector("#progress-bar").style.width = (index / screens.length) * 100 + '%';
         document.querySelector("#content-container").innerHTML = screens[index];
 
-        if(index === 12){
+        if (index === 12) {
             renderSummary();
         }
     }
 
-    function nextPage(){
-        if(currentPage < screens.length -1){
+    function nextPage() {
+        if (currentPage < screens.length - 1) {
 
             currentPage++;
 
-            if(checkPointCheck(currentPage + 1)){
+            if (checkPointCheck(currentPage + 1)) {
                 document.querySelector("#next-button").classList.add("btn-primary");
                 document.querySelector("#next-button").classList.remove("btn-info");
-            }else{
+            } else {
                 document.querySelector("#next-button").classList.remove("btn-primary");
                 document.querySelector("#next-button").classList.add("btn-info");
 
-                if(checkPointCheck(currentPage)){
+                if (checkPointCheck(currentPage)) {
                     document.querySelector("#prev-button").classList.remove("btn-info");
                     document.querySelector("#prev-button").classList.add("disabled");
 
                     document.querySelector("#next-button").classList.remove("btn-info");
                     document.querySelector("#next-button").classList.add("disabled");
-                }else{
+                } else {
                     document.querySelector("#prev-button").classList.add("btn-info");
                     document.querySelector("#prev-button").classList.remove("disabled");
                 }
             }
 
-            if(currentPage === 11){
+            if (currentPage === 11) {
                 let form = document.querySelector('#formFileLg').files[0];
                 showPage(currentPage);
                 submitCSV(form);
-            }else{
+            } else {
                 showPage(currentPage);
                 eventListenerAdder(currentPage);
             }
         }
     }
 
-    function prevPage(){
-        if(currentPage > 0 && !checkPointCheck(currentPage)){
+    function prevPage() {
+        if (currentPage > 0 && !checkPointCheck(currentPage)) {
             currentPage--;
             showPage(currentPage);
 
-            if(checkPointCheck(currentPage)){
+            if (checkPointCheck(currentPage)) {
                 document.querySelector("#prev-button").classList.remove("btn-info");
                 document.querySelector("#prev-button").classList.add("disabled");
 
                 eventListenerAdder(currentPage);
-            }else{
+            } else {
                 document.querySelector("#prev-button").classList.add("btn-info");
                 document.querySelector("#prev-button").classList.remove("disabled");
             }
         }
     }
 
-    function checkPointCheck(index){
+    function checkPointCheck(index) {
         return checkpoints.some(checkpoint => index === checkpoint);
     }
 
-    function submitCSV(f){
+    function submitCSV(f) {
         let form = new FormData();
         form.append('file', f);
         const container = document.querySelector("#conversion-status-container");
         const description = document.querySelector("#conversion-status-text");
         postDataWithFile("/api/ingrid/upload", form)
-            .then((r) => {return r.json()})
+            .then((r) => {
+                return r.json()
+            })
             .then((response) => {
                 console.log(response);
                 document.querySelector("#conversion-status-container").innerHTML = `<h2 class="fw-bold text-center">Valid [IN]GRID</h2>`;
@@ -154,9 +156,9 @@
             });
     }
 
-    function eventListenerAdder(l){
-        if(l === 10){
-            document.querySelector('#formFileLg').addEventListener('change', function(event) {
+    function eventListenerAdder(l) {
+        if (l === 10) {
+            document.querySelector('#formFileLg').addEventListener('change', function (event) {
                 const file = event.target.files[0];
                 if (file && (file.type === 'text/csv') || (file.type === 'application/vnd.ms-excel')) {
                     document.querySelector("#next-button").classList.add("btn-info");
@@ -169,21 +171,63 @@
         }
     }
 
-    function renderSummary(){
+    function renderSummary() {
         let content = ``, userCount = allData.length, errCount = 0, cScoreCount = 0;
         allData.forEach((member, index) => {
             errCount += member.importErrorList.length;
             cScoreCount += member.member.importedTimeline.length;
+
+            let errorContent = ``;
+            member.importErrorList.forEach((error) => {
+                errorContent += `
+                <div class="alert alert-secondary mb-2" role="alert">
+                  <strong>${error.title}</strong> ${error.message}
+                </div>
+                `;
+            });
+
             content += `
               <div class="accordion-item">
                 <h2 class="accordion-header">
                   <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc-${index}">
-                    <p class="fw-bold">${member.member.firstName} ${member.member.lastName}</p>
+                    <p class="fw-bold mb-0">${member.member.firstName} ${member.member.lastName} ${member.importErrorList.length > 0? ' [Errors: ' + member.importErrorList.length + ']': ''}</p>
                   </button>
                 </h2>
                 <div id="acc-${index}" class="accordion-collapse collapse">
                   <div class="accordion-body">
+                  <div class="d-flex flex-wrap justify-content-evenly">
+                    <div class="mx-2">
+                        <p class="fw-bold text-center mb-0">Errors</p>
+                        <p class="fs-5 text-center">${member.importErrorList.length}</p>
+                    </div>
+                    <div class="mx-2">
+                        <p class="fw-bold text-center mb-0">Sex</p>
+                        <p class="fs-5 text-center">${member.member.sex}</p>
+                    </div>
+                    <div class="mx-2">
+                        <p class="fw-bold text-center mb-0">Sexuality</p>
+                        <p class="fs-5 text-center">${member.member.sexuality}</p>
+                    </div>
+                    <div class="mx-2">
+                        <p class="fw-bold text-center mb-0">Relationship</p>
+                        <p class="fs-5 text-center">${member.member.relationship}</p>
+                    </div>
+                    <div class="mx-2">
+                        <p class="fw-bold text-center mb-0">Birthday</p>
+                        <p class="fs-5 text-center">${member.member.birthday}</p>
+                    </div>
+                    <div class="mx-2">
+                        <p class="fw-bold text-center mb-0">Age Met</p>
+                        <p class="fs-5 text-center">${member.member.ageMet}</p>
+                    </div>
+                    <div class="mx-2">
+                        <p class="fw-bold text-center mb-0">Personality</p>
+                        <p class="fs-5 text-center">${member.member.personality}</p>
+                    </div>
+                  </div>
                     ${member.member.description}
+                    ${member.importErrorList.length > 0? '<h5 class="fw-bold mt-3 mb-2">Error List</h5>' : ''}
+                    ${errorContent}
                   </div>
                 </div>
               </div>
