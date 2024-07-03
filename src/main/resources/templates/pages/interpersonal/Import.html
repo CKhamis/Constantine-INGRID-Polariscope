@@ -35,7 +35,8 @@
 <div th:replace="~{components/ImportScreens :: import-info}"></div>
 <script>
     let currentPage = 0;
-    const checkpoints = [10];
+    const checkpoints = [10, 12];
+    let allData;
 
     showPage(currentPage);
 
@@ -45,6 +46,10 @@
         }
         document.querySelector("#progress-bar").style.width = (index / screens.length) * 100 + '%';
         document.querySelector("#content-container").innerHTML = screens[index];
+
+        if(index === 12){
+            renderSummary();
+        }
     }
 
     function nextPage(){
@@ -116,6 +121,7 @@
                 container.classList.add("alert-success");
                 container.classList.remove("alert-secondary");
                 description.innerText = "Submitted file is a valid Constantine [IN]GRID file. This can be used for member importing into Constantine [IN]GRID Polariscope. Please proceed by clicking on Next.";
+                allData = response;
             })
             .catch((response) => {
                 response.json()
@@ -161,6 +167,33 @@
                 }
             });
         }
+    }
+
+    function renderSummary(){
+        let content = ``, userCount = allData.length, errCount = 0, cScoreCount = 0;
+        allData.forEach((member, index) => {
+            errCount += member.importErrorList.length;
+            cScoreCount += member.member.importedTimeline.length;
+            content += `
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc-${index}">
+                    <p class="fw-bold">${member.member.firstName} ${member.member.lastName}</p>
+                  </button>
+                </h2>
+                <div id="acc-${index}" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    ${member.member.description}
+                  </div>
+                </div>
+              </div>
+            `;
+        });
+
+        document.querySelector("#summary-acc").innerHTML = content;
+        document.querySelector("#mem-count").textContent = userCount;
+        document.querySelector("#err-count").textContent = errCount;
+        document.querySelector("#score-count").textContent = cScoreCount;
     }
 </script>
 </body>
