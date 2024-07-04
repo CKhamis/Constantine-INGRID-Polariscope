@@ -113,7 +113,7 @@ public class IngridMapper {
                         timeline.add(new Evaluation(null, timestamp, note.toString(), Integer.parseInt(nextLine[index]), memberPacket.member));
                     }
                 }
-                memberPacket.member.setImportedTimeline(timeline);
+                memberPacket.member.setImportedTimeline(timeline.reversed());
                 memberPacket.member.setAuthor(author);
 
                 members.add(memberPacket);
