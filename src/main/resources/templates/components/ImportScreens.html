@@ -105,6 +105,78 @@
          <p class="fs-4">The information on the previous screen displayed the extracted information from the given Constantine [IN]GRID RankStar file.</p>
          <p class="fs-4">You will now be given a queue of extracted members. After updating any potentially outdated or missing information, you will be given the option to either overwrite or create a new entry into your Polariscope member repository.</p>
          <p class="fs-4">Please be careful during the next step, as this will overwrite your currently saved data. The only way to completely revert the changes made on the next screen is to restore a backup.</p>`,
-        `<h2 class="fw-bold">Review & Save Members</h2>`
+        `<h2 class="fw-bold mb-3">Review & Save Members</h2>
+         <div class="d-flex flex-row-reverse overflow-x-auto mb-3" id="member-name-container"></div>
+         <canvas id="score-canvas" class="mb-3"></canvas>
+         <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-3">
+                    <label for="first-name-form" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="first-name-form">
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <label for="middle-name-form" class="form-label">Middle Name</label>
+                    <input type="text" class="form-control" id="middle-name-form">
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <label for="last-name-form" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="last-name-form">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="relationf">Relationship Type</label>
+                    <select class="form-select" id="relationf" name="relationship" required>
+                        <option value="" disabled="disabled">Select Relationship Type</option>
+
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="sexf">Sex</label>
+                    <select class="form-select" id="sexf" name="relationship">
+                        <option value="">Decline to state</option>
+
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="sexualityf">Sexuality</label>
+                    <select class="form-select" id="sexualityf" name="sexuality">
+                        <option value="">Decline to state</option>
+
+                    </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                <label for="mbp">MB Personality</label>
+                    <input type="text" class="form-control" id="mbp" name="personality" placeholder="ENFJ">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="fcf">Favorite Color</label>
+                    <input type="text" class="form-control" id="fcf" name="favoriteColor" placeholder="Red">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="bdf">Birthday</label>
+                    <input type="date" class="form-control" id="bdf" name="birthday" required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="amf">Year Met</label>
+                    <input type="number" class="form-control" id="amf" name="ageMet" placeholder="2001" required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="psf">Place Met</label>
+                    <select class="form-select" id="psf">
+                        <option value="">None</option>
+
+                    </select>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="df">Description</label>
+                    <input type="text" class="form-control" id="df" name="description" placeholder="Description of member">
+                </div>
+            </div>
+         </div>`
     ];
 </script>

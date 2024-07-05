@@ -52,6 +52,9 @@
             renderSummary();
             document.querySelector("#next-button").classList.add("btn-info");
             document.querySelector("#next-button").classList.remove("disabled");
+        }else if(index === 14){
+            renderMemberEditor();
+            createEvalChart();
         }
     }
 
@@ -259,6 +262,76 @@
         document.querySelector("#mem-count").textContent = userCount;
         document.querySelector("#err-count").textContent = errCount;
         document.querySelector("#score-count").textContent = cScoreCount;
+    }
+
+    function renderMemberEditor(){
+        if(allData.length === 0){
+            alert("Completed Queue");
+        }
+
+        let names = ``;
+        allData.forEach((member, index) => {
+            names += `
+            <div class="mx-1 flex-grow-1" onclick="memberEditorSelectUser(${index})" role="button">
+                <div class="card d-flex justify-content-center px-3" style="height: 4rem;">
+                    <p class="fs-5 fw-bold m-0 text-center" style="white-space: nowrap;">${member.member.firstName} ${member.member.lastName}</p>
+                </div>
+            </div>
+            `;
+        });
+
+        document.querySelector("#member-name-container").innerHTML = names;
+    }
+
+    function memberEditorSelectUser(index){
+        let member = allData[index];
+        console.log(member);
+
+        let newScores = {data:[]};
+        member.member.importedTimeline.forEach((eval) =>{
+            newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore});
+            // scoreChartContent += `
+            //     <div class="mx-1">
+            //         <div class="card d-flex justify-content-center" style="width: 5rem; height: 5rem;">
+            //             <p class="fs-2 fw-bold m-0 text-center">${eval.cscore}</p>
+            //         </div>
+            //         <p class="text-center mb-0 mt-1">${formatDate(eval.timestamp)}</p>
+            //         <p class="text-center mb-0">${formatTimeOnly(eval.timestamp)}</p>
+            //     </div>
+            //     `;
+        });
+
+        evalChartEval.data.datasets.pop();
+        evalChartEval.data.datasets.push(newScores);
+        evalChartEval.update();
+
+        console.log(member);
+    }
+
+    function createEvalChart(){
+        let canvas = document.querySelector("#score-canvas");
+        let scores = {datasets: [{data:[]}]};
+        evalChartEval = new Chart(canvas, {
+            type: 'line',
+            data:scores,
+            options: {
+                aspectRatio: 5,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                        }
+                    },
+                },
+            }
+        });
     }
 </script>
 </body>
