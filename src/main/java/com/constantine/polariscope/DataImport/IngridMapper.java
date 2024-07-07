@@ -93,10 +93,15 @@ public class IngridMapper {
                 TreeSet<DatedNote> notes = noteExtractor(noteCell);
 
                 List<Evaluation> timeline = new ArrayList<>();
+                LocalDateTime previous = LocalDateTime.MIN;
                 for(int index = 18; !tableHeader[index].equals("News & Updates"); index++){
                     if(!nextLine[index].isEmpty()){
                         LocalDate date = LocalDate.parse(tableHeader[index], DATE_FORMAT);
                         LocalDateTime timestamp = date.atTime(LocalTime.MIDNIGHT);
+
+                        if(timestamp.isBefore(previous)){
+                            throw new Exception("cScore dates are out of order and may not be accurate.");
+                        }
 
                         // Create the note
                         Set<DatedNote> notesBeforeDate = getNotesBefore(notes, timestamp);
@@ -111,6 +116,8 @@ public class IngridMapper {
                         }
 
                         timeline.add(new Evaluation(null, timestamp, note.toString(), Integer.parseInt(nextLine[index]), memberPacket.member));
+
+                        previous = timestamp;
                     }
                 }
                 memberPacket.member.setImportedTimeline(timeline.reversed());

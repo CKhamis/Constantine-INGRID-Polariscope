@@ -281,6 +281,7 @@
         });
 
         document.querySelector("#member-name-container").innerHTML = names;
+        document.querySelector("#action-menu").innerHTML = `<button type="button" class="btn btn-secondary mt-3" onclick="dequeue('poop')">Dequeue</button>`;
     }
 
     function memberEditorSelectUser(index){
@@ -305,6 +306,17 @@
         evalChartEval.data.datasets.push(newScores);
         evalChartEval.update();
 
+        document.querySelector("#first-name-form").value = member.member.firstName;
+        document.querySelector("#last-name-form").value = member.member.lastName;
+        document.querySelector("#middle-name-form").value = member.member.middleName;
+        document.querySelector("#relationf").value = member.member.relationship;
+        document.querySelector("#sexf").value = member.member.sex;
+        document.querySelector("#sexualityf").value = member.member.sexuality;
+        document.querySelector("#mbp").value = member.member.personality;
+        document.querySelector("#fcf").value = member.member.favoriteColor;
+        document.querySelector("#amf").value = member.member.ageMet;
+        document.querySelector("#bdf").value = (member.member.birthday != null ?  new Date(member.member.birthday).toISOString().slice(0, 10) : '');
+        document.querySelector("#df").value = member.member.description;
         console.log(member);
     }
 
