@@ -41,25 +41,28 @@
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
 <script>
     let currentPage = 0;
-    const checkpoints = [10, 12];
+    const checkpoints = [10, 12, 14];
     let allData;
     let enums;
+    let memberList;
 
     initialize();
     function initialize(){
         const enumFetch = fetch("/api/interpersonal/enums", {});
-        Promise.all([enumFetch])
+        const memberListFetch = fetch("/api/interpersonal/member/all", {});
+        Promise.all([enumFetch, memberListFetch])
             .then(responses => {
-                return Promise.all([responses[0]]);
+                return Promise.all([responses[0], responses[1]]);
             })
             .then(data => {
-                return Promise.all([data[0].json()]);
+                return Promise.all([data[0].json(), data[1].json()]);
             })
             .then(data => {
                 if(data[0]["status"] != null){
                     document.querySelector("#content-container").innerHTML = `<h3 class="text-center fw-bold mt-2">Fatal Error Starting Import Tool</h3><p class="text-center">${data[0].error}</p>`;
                 }else{
                     enums = data[0];
+                    memberList = data[1];
                     showPage(currentPage);
                 }
             })
@@ -322,6 +325,12 @@
             sexualityHTML += `<option value="${sexuality}">${sexuality}</option>`;
         });
         document.querySelector("#sexualityf").innerHTML = sexualityHTML;
+
+        let memberHTML = `<option value="">New Member</option>`;
+        memberList.forEach((mem) => {
+            memberHTML += `<option value="${mem.id}">Merge into ${mem.firstName} ${mem.lastName}</option>`;
+        });
+        document.querySelector("#replace-member").innerHTML = memberHTML;
 
         let names = ``;
         allData.forEach((member, index) => {
