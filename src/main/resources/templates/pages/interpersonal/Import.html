@@ -333,6 +333,8 @@
     }
 
     function renderMemberEditor(){
+        let membersLeft = 0;
+
         if(allData.length === 0){
             alert("Completed Queue");
         }
@@ -366,12 +368,14 @@
             let statusStyle = 'alert alert-warning';
             if(member["status"] == null){
                 statusStyle = 'alert alert-light';
+                membersLeft += 1;
             }else if(member["status"] === 'success'){
                 statusStyle = 'alert alert-success';
             }else if(member["status"] === 'dequeue'){
                 statusStyle = 'alert alert-secondary';
             }else if(member["status"] === 'fail'){
                 statusStyle = 'alert alert-warning';
+                membersLeft += 1;
             }
 
 
@@ -385,6 +389,8 @@
         });
 
         document.querySelector("#member-name-container").innerHTML = names;
+        document.querySelector("#members-left").textContent = "Members Left: " + membersLeft;
+        document.querySelector("#replace-member").value = "";
     }
 
     function memberEditorSelectUser(index){
@@ -428,10 +434,8 @@
 
         document.querySelector("#action-menu").innerHTML = `
             <button type="button" class="btn btn-info mt-3" onclick="openSaveMenu(${index})" data-bs-toggle="modal" data-bs-target="#save-menu">Save</button>
-            <button type="button" class="btn btn-danger mt-3" onclick="dequeue(${index})">Don't Import</button>
+            <button type="button" class="btn btn-secondary mt-3" onclick="dequeue(${index})">Don't Import</button>
         `;
-
-        console.log(member);
     }
 
     function createEvalChart(){

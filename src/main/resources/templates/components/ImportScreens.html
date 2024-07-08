@@ -106,7 +106,10 @@
          <p class="fs-4">You will now be given a queue of extracted members. After updating any potentially outdated or missing information, you will be given the option to either overwrite or create a new entry into your Polariscope member repository.</p>
          <p class="fs-4">Please be careful during the next step, as this will overwrite your currently saved data. The only way to completely revert the changes made on the next screen is to restore a backup.</p>
          <p class="fs-4">Please observe the following cScore graphs of each member to ensure the dates are in order and correct. If you see that there is an issue with them, please make the corrections and restart the import tool.</p>`,
-        `<h2 class="fw-bold mb-3">Review & Save Members</h2>
+        `<div class="d-flex justify-content-between align-items-center">
+            <h2 class="fw-bold mb-3">Review & Save Members</h2>
+            <p id="members-left"></p>
+        </div>
          <div class="d-flex flex-row-reverse overflow-x-auto mb-3" id="member-name-container"></div>
          <canvas id="score-canvas" class="mb-3"></canvas>
          <div class="container">
