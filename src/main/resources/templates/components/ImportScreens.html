@@ -110,6 +110,7 @@
          <div class="d-flex flex-row-reverse overflow-x-auto mb-3" id="member-name-container"></div>
          <canvas id="score-canvas" class="mb-3"></canvas>
          <div class="container">
+            <div class="row" id="error-list"></div>
             <div class="row">
                 <div class="col-lg-4 mb-3">
                     <label for="first-name-form" class="form-label">First Name</label>
@@ -126,10 +127,7 @@
 
                 <div class="col-md-4 mb-3">
                     <label for="relationf">Relationship Type</label>
-                    <select class="form-select" id="relationf" name="relationship" required>
-                        <option value="" disabled="disabled">Select Relationship Type</option>
-
-                    </select>
+                    <select class="form-select" id="relationf" name="relationship"></select>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="sexf">Sex</label>

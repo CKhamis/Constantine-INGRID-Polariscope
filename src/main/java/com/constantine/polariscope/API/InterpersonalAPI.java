@@ -1,14 +1,13 @@
 package com.constantine.polariscope.API;
 
-import com.constantine.polariscope.DTO.EvaluationForm;
-import com.constantine.polariscope.DTO.MemberListItem;
-import com.constantine.polariscope.DTO.MemberForm;
-import com.constantine.polariscope.DTO.ResponseMessage;
+import com.constantine.polariscope.DTO.*;
 import com.constantine.polariscope.Model.Evaluation;
 import com.constantine.polariscope.Model.Member;
+import com.constantine.polariscope.Model.Place;
 import com.constantine.polariscope.Model.User;
 import com.constantine.polariscope.Service.EvaluationService;
 import com.constantine.polariscope.Service.MemberService;
+import com.constantine.polariscope.Service.PlaceService;
 import com.constantine.polariscope.Service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -30,6 +29,7 @@ public class InterpersonalAPI {
     private final MemberService memberService;
     private final UserService userService;
     private final EvaluationService evaluationService;
+    private final PlaceService placeService;
     private final int MAX_EVALUATIONS = 300;
 
     private User getCurrentUser(Principal principal) throws Exception{
@@ -136,6 +136,19 @@ public class InterpersonalAPI {
             return ResponseEntity.ok(members);
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, e.getMessage()));
+        }
+    }
+
+    @GetMapping("/enums")
+    public ResponseEntity<?> enums(Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            // Get all places from repository
+            List<Place> places = placeService.findAll(retrievedUser);
+            return ResponseEntity.ok(new InterpersonalEnums(places));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Enums", ResponseMessage.Severity.LOW, e.getMessage()));
         }
     }
 

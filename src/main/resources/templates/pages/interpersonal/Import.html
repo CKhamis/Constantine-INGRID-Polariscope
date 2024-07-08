@@ -15,7 +15,12 @@
         <h1 class="fw-bold mb-0 text-info-emphasis">Constantine [IN]GRID Transfer Tool</h1>
     </nav>
     <div class="p-4 flex-grow-1 overflow-auto" id="content-container">
-
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <h3 class="text-center fw-bold">Please Wait</h3>
     </div>
     <nav style="bottom: 0; width: 100%" class="p-4 bg-body-tertiary d-flex flex-row align-items-center">
         <!--        <button type="submit" class="btn btn-info" onclick="submit()" id="submit-button">Submit</button>-->
@@ -38,8 +43,39 @@
     let currentPage = 0;
     const checkpoints = [10, 12];
     let allData;
+    let enums;
 
-    showPage(currentPage);
+    initialize();
+    function initialize(){
+        const enumFetch = fetch("/api/interpersonal/enums", {});
+        Promise.all([enumFetch])
+            .then(responses => {
+                return Promise.all([responses[0]]);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                if(data[0]["status"] != null){
+                    document.querySelector("#content-container").innerHTML = `<h3 class="text-center fw-bold mt-2">Fatal Error Starting Import Tool</h3><p class="text-center">${data[0].error}</p>`;
+                }else{
+                    enums = data[0];
+                    showPage(currentPage);
+                }
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                        document.querySelector("#content-container").innerHTML = `<h3 class="text-center fw-bold mt-2">${errorData.title}</h3><p class="text-center">${errorData.body}</p>`;
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.querySelector("#content-container").innerHTML = `<h3 class="text-center fw-bold mt-2">Fatal Error</h3><p class="text-center">${error}</p>`;
+                    });
+            });
+    }
 
     function showPage(index) {
         if (index >= screens.length || index < 0) {
@@ -269,11 +305,39 @@
             alert("Completed Queue");
         }
 
+        let relationshipHTML = `<option value="" disabled="disabled">Select Relationship Type</option>`;
+        enums.relationship.forEach((relation) => {
+            relationshipHTML += `<option value="${relation}">${relation}</option>`;
+        });
+        document.querySelector("#relationf").innerHTML = relationshipHTML;
+
+        let sexHTML = `<option value="" disabled="disabled">Select Sex</option>`;
+        enums.sex.forEach((sex) => {
+            sexHTML += `<option value="${sex}">${sex}</option>`;
+        });
+        document.querySelector("#sexf").innerHTML = sexHTML;
+
+        let sexualityHTML = `<option value="">Select Sexuality</option>`;
+        enums.sexuality.forEach((sexuality) => {
+            sexualityHTML += `<option value="${sexuality}">${sexuality}</option>`;
+        });
+        document.querySelector("#sexualityf").innerHTML = sexualityHTML;
+
         let names = ``;
         allData.forEach((member, index) => {
+            let statusStyle = 'alert alert-warning';
+            if(member["status"] == null){
+                statusStyle = 'alert alert-secondary';
+            }else if(member["status"] === 'success'){
+                statusStyle = 'alert alert-success';
+            }else if(member["status"] === 'fail'){
+                statusStyle = 'alert alert-danger';
+            }
+
+
             names += `
-            <div class="mx-1 flex-grow-1" onclick="memberEditorSelectUser(${index})" role="button">
-                <div class="card d-flex justify-content-center px-3" style="height: 4rem;">
+            <div class="mx-1 flex-grow-1 mb-3" onclick="memberEditorSelectUser(${index})" role="button">
+                <div class="card d-flex justify-content-center px-3 ${statusStyle}" style="height: 4rem;">
                     <p class="fs-5 fw-bold m-0 text-center" style="white-space: nowrap;">${member.member.firstName} ${member.member.lastName}</p>
                 </div>
             </div>
@@ -291,16 +355,21 @@
         let newScores = {data:[]};
         member.member.importedTimeline.forEach((eval) =>{
             newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore});
-            // scoreChartContent += `
-            //     <div class="mx-1">
-            //         <div class="card d-flex justify-content-center" style="width: 5rem; height: 5rem;">
-            //             <p class="fs-2 fw-bold m-0 text-center">${eval.cscore}</p>
-            //         </div>
-            //         <p class="text-center mb-0 mt-1">${formatDate(eval.timestamp)}</p>
-            //         <p class="text-center mb-0">${formatTimeOnly(eval.timestamp)}</p>
-            //     </div>
-            //     `;
         });
+
+        let errorContent = ``;
+        member.importErrorList.forEach((error) => {
+            errorContent += `
+                <div class="col col-lg-6 p-2">
+                    <div class="alert alert-secondary" role="alert">
+                        <p class="fw-bold mb-1">${error.title}</p>
+                        <p>${error.message}</p>
+                    </div>
+                </div>
+                `;
+        });
+
+        document.querySelector("#error-list").innerHTML = errorContent;
 
         evalChartEval.data.datasets.pop();
         evalChartEval.data.datasets.push(newScores);
