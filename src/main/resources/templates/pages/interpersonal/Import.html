@@ -32,8 +32,37 @@
             <div class="progress-bar" style="width: 0; transition: width 2s ease;" id="progress-bar"></div>
         </div>
     </nav>
-
 </main>
+
+<div class="modal fade" id="save-menu" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Save to Member</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="member-id-form" />
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <label for="replace-member" class="form-label">Merge with existing member</label>
+                            <select class="form-select" id="replace-member" name="member"></select>
+                            <p>Use this field to overwrite evaluation scores and member information onto an existing member in Polariscope. Changes made to members cannot be reversed.</p>
+                            <p>To create a new user, select "New Member"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/Network :: data-upload}"></div>
@@ -336,11 +365,13 @@
         allData.forEach((member, index) => {
             let statusStyle = 'alert alert-warning';
             if(member["status"] == null){
-                statusStyle = 'alert alert-secondary';
+                statusStyle = 'alert alert-light';
             }else if(member["status"] === 'success'){
                 statusStyle = 'alert alert-success';
+            }else if(member["status"] === 'dequeue'){
+                statusStyle = 'alert alert-secondary';
             }else if(member["status"] === 'fail'){
-                statusStyle = 'alert alert-danger';
+                statusStyle = 'alert alert-warning';
             }
 
 
@@ -354,7 +385,6 @@
         });
 
         document.querySelector("#member-name-container").innerHTML = names;
-        document.querySelector("#action-menu").innerHTML = `<button type="button" class="btn btn-secondary mt-3" onclick="dequeue('poop')">Dequeue</button>`;
     }
 
     function memberEditorSelectUser(index){
@@ -395,6 +425,12 @@
         document.querySelector("#amf").value = member.member.ageMet;
         document.querySelector("#bdf").value = (member.member.birthday != null ?  new Date(member.member.birthday).toISOString().slice(0, 10) : '');
         document.querySelector("#df").value = member.member.description;
+
+        document.querySelector("#action-menu").innerHTML = `
+            <button type="button" class="btn btn-info mt-3" onclick="openSaveMenu(${index})" data-bs-toggle="modal" data-bs-target="#save-menu">Save</button>
+            <button type="button" class="btn btn-danger mt-3" onclick="dequeue(${index})">Don't Import</button>
+        `;
+
         console.log(member);
     }
 
@@ -422,6 +458,16 @@
                 },
             }
         });
+    }
+
+    function dequeue(index){
+        allData[index]["status"] = 'dequeue';
+        renderMemberEditor();
+        memberEditorSelectUser(index);
+    }
+
+    function openSaveMenu(index){
+        document.querySelector("#member-id-form").value = index;
     }
 </script>
 </body>
