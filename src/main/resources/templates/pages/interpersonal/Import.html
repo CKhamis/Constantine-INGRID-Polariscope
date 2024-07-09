@@ -56,7 +56,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="markMemberToSave()">Save changes</button>
+                <button type="button" class="btn btn-primary" onclick="markMemberToSave()" data-bs-dismiss="modal">Save changes</button>
             </div>
         </div>
     </div>
@@ -431,7 +431,7 @@
         document.querySelector("#mbp").value = member.member.personality;
         document.querySelector("#fcf").value = member.member.favoriteColor;
         document.querySelector("#amf").value = member.member.ageMet;
-        document.querySelector("#bdf").value = (member.member.birthday != null ?  new Date(member.member.birthday).toISOString().slice(0, 10) : '');
+        document.querySelector("#bdf").value = (member.member.birthday != null || member.member.birthday === ""  ?  new Date(member.member.birthday).toISOString().slice(0, 10) : '');
         document.querySelector("#df").value = member.member.description;
 
         document.querySelector("#action-menu").innerHTML = `
@@ -475,11 +475,27 @@
     function markMemberToSave(){
         let index = document.querySelector("#member-index-form").value;
         let memberId = document.querySelector("#replace-member-form").value;
+        let member = allData[index];
 
-        allData[index]["id"] = memberId;
-        allData[index]["status"] = (memberId === '' ? 'new' : 'merge');
+        member["id"] = memberId;
+        member["status"] = (memberId === '' ? 'new' : 'merge');
+
+        member.member.firstName = document.querySelector("#first-name-form").value ;
+        member.member.lastName = document.querySelector("#last-name-form").value;
+        member.member.middleName = document.querySelector("#middle-name-form").value;
+        member.member.relationship = document.querySelector("#relationf").value ;
+        member.member.sex = document.querySelector("#sexf").value;
+        member.member.sexuality = document.querySelector("#sexualityf").value;
+        member.member.personality = document.querySelector("#mbp").value;
+        member.member.favoriteColor = document.querySelector("#fcf").value;
+        member.member.ageMet = document.querySelector("#amf").value;
+        member.member.birthday = document.querySelector("#bdf").value;
+        member.member.description = document.querySelector("#df").value;
 
         renderMemberEditor();
+        memberEditorSelectUser(index);
+
+        console.log(member);
     }
 </script>
 </body>
