@@ -42,12 +42,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="member-id-form" />
+                <input type="hidden" id="member-index-form" />
                 <div class="row">
                     <div class="col-12">
                         <div class="alert alert-info">
-                            <label for="replace-member" class="form-label">Merge with existing member</label>
-                            <select class="form-select" id="replace-member" name="member"></select>
+                            <label for="replace-member-form" class="form-label">Merge with existing member</label>
+                            <select class="form-select" id="replace-member-form" name="member"></select>
                             <p>Use this field to overwrite evaluation scores and member information onto an existing member in Polariscope. Changes made to members cannot be reversed.</p>
                             <p>To create a new user, select "New Member"</p>
                         </div>
@@ -56,7 +56,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-primary" onclick="markMemberToSave()">Save changes</button>
             </div>
         </div>
     </div>
@@ -361,7 +361,7 @@
         memberList.forEach((mem) => {
             memberHTML += `<option value="${mem.id}">Merge into ${mem.firstName} ${mem.lastName}</option>`;
         });
-        document.querySelector("#replace-member").innerHTML = memberHTML;
+        document.querySelector("#replace-member-form").innerHTML = memberHTML;
 
         let names = ``;
         allData.forEach((member, index) => {
@@ -369,12 +369,12 @@
             if(member["status"] == null){
                 statusStyle = 'alert alert-light';
                 membersLeft += 1;
-            }else if(member["status"] === 'success'){
+            }else if(member["status"] === 'merge'){
                 statusStyle = 'alert alert-success';
             }else if(member["status"] === 'dequeue'){
                 statusStyle = 'alert alert-secondary';
-            }else if(member["status"] === 'fail'){
-                statusStyle = 'alert alert-warning';
+            }else if(member["status"] === 'new'){
+                statusStyle = 'alert alert-primary';
                 membersLeft += 1;
             }
 
@@ -390,12 +390,14 @@
 
         document.querySelector("#member-name-container").innerHTML = names;
         document.querySelector("#members-left").textContent = "Members Left: " + membersLeft;
-        document.querySelector("#replace-member").value = "";
+        document.querySelector("#replace-member-form").value = "";
     }
 
     function memberEditorSelectUser(index){
         let member = allData[index];
-        console.log(member);
+
+        document.querySelector("#replace-member-form").value = (member.id == null ? '' : member.id);
+        document.querySelector("#member-index-form").value = index;
 
         let newScores = {data:[]};
         member.member.importedTimeline.forEach((eval) =>{
@@ -433,7 +435,7 @@
         document.querySelector("#df").value = member.member.description;
 
         document.querySelector("#action-menu").innerHTML = `
-            <button type="button" class="btn btn-info mt-3" onclick="openSaveMenu(${index})" data-bs-toggle="modal" data-bs-target="#save-menu">Save</button>
+            <button type="button" class="btn btn-info mt-3" data-bs-toggle="modal" data-bs-target="#save-menu">Save</button>
             <button type="button" class="btn btn-secondary mt-3" onclick="dequeue(${index})">Don't Import</button>
         `;
     }
@@ -470,8 +472,14 @@
         memberEditorSelectUser(index);
     }
 
-    function openSaveMenu(index){
-        document.querySelector("#member-id-form").value = index;
+    function markMemberToSave(){
+        let index = document.querySelector("#member-index-form").value;
+        let memberId = document.querySelector("#replace-member-form").value;
+
+        allData[index]["id"] = memberId;
+        allData[index]["status"] = (memberId === '' ? 'new' : 'merge');
+
+        renderMemberEditor();
     }
 </script>
 </body>
