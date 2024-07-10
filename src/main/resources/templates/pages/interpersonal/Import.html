@@ -391,6 +391,11 @@
         document.querySelector("#member-name-container").innerHTML = names;
         document.querySelector("#members-left").textContent = "Members Left: " + membersLeft;
         document.querySelector("#replace-member-form").value = "";
+
+        if(membersLeft === 0){
+            document.querySelector("#next-button").classList.add("btn-info");
+            document.querySelector("#next-button").classList.remove("disabled");
+        }
     }
 
     function memberEditorSelectUser(index){
