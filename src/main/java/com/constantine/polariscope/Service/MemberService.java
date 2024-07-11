@@ -30,8 +30,8 @@ public class MemberService {
 
         return memberListItems;
     }
-    public void save(Member member){
-        memberRepository.save(member);
+    public Member save(Member member){
+        return memberRepository.save(member);
     }
 
     public Member findMember(UUID id){

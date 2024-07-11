@@ -506,41 +506,42 @@
     }
 
     function beginTransfer(){
-
+        transferMember();
     }
 
-    function transferMember(index){
-        let member = allData[index];
+    function transferMember(){
+        if(allData.middleName === 0){
+            console.log("complete.")
+            return;
+        }
+        let member = allData[0];
 
-        if(member.status !== "dequeue"){
+        if(member.status !== null && member.status !== "dequeue"){
             let convertedMember = {
-                member: {
-                    id: (member.member.id ? member.member.id : null),
-                    ageMet: member.member.ageMet,
-                    birthday: member.member.birthday,
-                    created: member.member.created,
-                    description: member.member.description,
-                    favoriteColor: member.member.favoriteColor,
-                    firstName: member.member.firstName,
-                    lastModified: new Date(),
-                    lastName: member.member.lastName,
-                    middleName: member.member.middleName,
-                    personality: member.member.personality,
+                id: (member.member.id ? member.member.id : null),
+                ageMet: member.member.ageMet,
+                birthday: member.member.birthday,
+                created: member.member.created,
+                description: member.member.description,
+                favoriteColor: member.member.favoriteColor,
+                firstName: member.member.firstName,
+                lastModified: new Date(),
+                lastName: member.member.lastName,
+                middleName: member.member.middleName,
+                personality: member.member.personality,
 
-                    relationship: member.member.relationship,
-                    sex: member.member.sex,
-                    sexuality: member.member.sexuality
-                },
+                relationship: member.member.relationship,
+                sex: member.member.sex,
+                sexuality: member.member.sexuality,
                 timeline: member.member.importedTimeline
             };
             console.log(convertedMember);
 
-            postData("/api/interpersonal/?", convertedMember)
+            postData("/api/ingrid/save", convertedMember)
                 .then((r) => {
-                    return r.json()
-                })
-                .then(() => {
-
+                    console.log(r);
+                    allData.pop(index);
+                    transferMember()
                 })
         }
     }
