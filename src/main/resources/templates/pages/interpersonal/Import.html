@@ -123,6 +123,8 @@
         }else if(index === 14){
             renderMemberEditor();
             createEvalChart();
+        }else if(index === 16){
+            beginTransfer();
         }
     }
 
@@ -501,6 +503,46 @@
         memberEditorSelectUser(index);
 
         console.log(member);
+    }
+
+    function beginTransfer(){
+
+    }
+
+    function transferMember(index){
+        let member = allData[index];
+
+        if(member.status !== "dequeue"){
+            let convertedMember = {
+                member: {
+                    id: (member.member.id ? member.member.id : null),
+                    ageMet: member.member.ageMet,
+                    birthday: member.member.birthday,
+                    created: member.member.created,
+                    description: member.member.description,
+                    favoriteColor: member.member.favoriteColor,
+                    firstName: member.member.firstName,
+                    lastModified: new Date(),
+                    lastName: member.member.lastName,
+                    middleName: member.member.middleName,
+                    personality: member.member.personality,
+
+                    relationship: member.member.relationship,
+                    sex: member.member.sex,
+                    sexuality: member.member.sexuality
+                },
+                timeline: member.member.importedTimeline
+            };
+            console.log(convertedMember);
+
+            postData("/api/interpersonal/?", convertedMember)
+                .then((r) => {
+                    return r.json()
+                })
+                .then(() => {
+
+                })
+        }
     }
 </script>
 </body>
