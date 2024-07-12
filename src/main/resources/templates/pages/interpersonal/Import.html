@@ -123,7 +123,9 @@
         }else if(index === 14){
             renderMemberEditor();
             createEvalChart();
-        }else if(index === 16){
+        }else if(index === 15){
+            renderTransferTables();
+        } else if(index === 16){
             beginTransfer();
         }
     }
@@ -510,13 +512,13 @@
     }
 
     function transferMember(){
-        if(allData.middleName === 0){
+        if(allData.length === 0){
             console.log("complete.")
             return;
         }
         let member = allData[0];
 
-        if(member.status !== null && member.status !== "dequeue"){
+        if('status' in member && member.status !== null && member.status !== "dequeue"){
             let convertedMember = {
                 id: (member.member.id ? member.member.id : null),
                 ageMet: member.member.ageMet,
@@ -540,10 +542,36 @@
             postData("/api/ingrid/save", convertedMember)
                 .then((r) => {
                     console.log(r);
-                    allData.pop(index);
+                    allData.shift();
                     transferMember()
                 })
         }
+    }
+
+    function renderTransferTables(){
+        let newTable = document.querySelector("#new-member-table");
+        let mergeTable = document.querySelector("#merge-member-table");
+
+        let newTableContent = ``;
+        let mergeTableContent = ``;
+
+        allData.forEach((mem) => {
+            if(mem.status === 'new'){
+                newTableContent += `<tr><th>${mem.member.firstName} ${mem.member.lastName}</th></tr>`;
+            }else if(mem.status === 'merge'){
+                let polMember = memberList.find(m => m.id === mem.id);
+                console.log(polMember);
+                mergeTableContent += `
+                <tr>
+                    <th>${mem.member.firstName} ${mem.member.lastName}</th>
+                    <th>${polMember.firstName} ${polMember.lastName}</th>
+                </tr>
+                `;
+            }
+        });
+
+        newTable.innerHTML = newTableContent;
+        mergeTable.innerHTML = mergeTableContent;
     }
 </script>
 </body>

@@ -183,9 +183,36 @@
             </div>
          </div>`,
         `<h2 class="fw-bold">Final Review</h2>
-         <p class="fs-4">Please review the proposed changes to your member repository. All changes are listed below. Once you have confirmed you are happy with the changes, please select <strong>Next</strong></p>
+         <p class="fs-4">Please review the proposed changes to your member repository. All changes are listed below. Once you have confirmed the changes, please select <strong>Next</strong></p>
          <p class="fs-4">If you would like to make changes or adjustments, select <strong>Previous</strong></p>
          <p class="fs-4">Changes made on the following screen are irreversible without a backup restoration. Please make sure you have a strong internet connection.</p>
+         <div class="row">
+            <div class="table-responsive col-12 col-lg-6">
+                <h3 class="fs-bold text-center">New Members</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="new-member-table"></tbody>
+                </table>
+            </div>
+            <div class="table-responsive col-12 col-lg-6">
+                <h3 class="fs-bold text-center">Merging Members</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">[IN]GRID</th>
+                            <th scope="col">Polariscope (receiver)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="merge-member-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+
         `,
         `<h2 class="fw-bold">Transferring Data</h2>
          <marquee direction="right" height="100px" id="status">
