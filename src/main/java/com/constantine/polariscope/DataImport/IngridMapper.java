@@ -100,7 +100,7 @@ public class IngridMapper {
                         LocalDateTime timestamp = date.atTime(LocalTime.MIDNIGHT);
 
                         if(timestamp.isBefore(previous)){
-                            throw new Exception("cScore dates are out of order and may not be accurate.");
+                            throw new Exception("cScore dates are out of order and may not be accurate. See \"" + tableHeader[index - 1] + "\"");
                         }
 
                         // Create the note

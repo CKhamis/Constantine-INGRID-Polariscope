@@ -1,10 +1,7 @@
 package com.constantine.polariscope.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +21,7 @@ public class Evaluation {
     private LocalDateTime timestamp;
     private LocalDateTime created;
     private LocalDateTime modified;
+    @Column(columnDefinition="text")
     private String note;
     private Integer cScore;
 

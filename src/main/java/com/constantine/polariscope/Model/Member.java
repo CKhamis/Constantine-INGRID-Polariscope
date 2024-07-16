@@ -31,6 +31,7 @@ public class Member {
     private Sexuality sexuality;
     private String personality;
     private String favoriteColor;
+    @Column(columnDefinition="text")
     private String description;
     private Sex sex;
     private Integer ageMet;
