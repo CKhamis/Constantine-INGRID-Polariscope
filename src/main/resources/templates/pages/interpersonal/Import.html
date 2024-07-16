@@ -379,7 +379,6 @@
                 statusStyle = 'alert alert-secondary';
             }else if(member["status"] === 'new'){
                 statusStyle = 'alert alert-primary';
-                membersLeft += 1;
             }
 
 
@@ -507,13 +506,16 @@
         console.log(member);
     }
 
+    let originalDataSize;
     function beginTransfer(){
+        originalDataSize = allData.length;
+        document.querySelector("#import-progress-bar").style.width = '0%';
         transferMember();
     }
 
     function transferMember(){
         if(allData.length === 0){
-            console.log("complete.")
+            console.log("complete.");
             return;
         }
         let member = allData[0];
@@ -537,14 +539,22 @@
                 sexuality: member.member.sexuality,
                 timeline: member.member.importedTimeline
             };
-            console.log(convertedMember);
-
             postData("/api/ingrid/save", convertedMember)
                 .then((r) => {
                     console.log(r);
-                    allData.shift();
-                    transferMember()
                 })
+                .catch((e) => {
+                    console.log(e)
+                })
+                .finally(() => {
+                    allData.shift();
+                    document.querySelector("#import-progress-bar").style.width = ((originalDataSize - allData.length) / originalDataSize) * 100 + '%';
+                    transferMember();
+                })
+        }else{
+            allData.shift();
+            document.querySelector("#import-progress-bar").style.width = ((originalDataSize - allData.length) / originalDataSize) * 100 + '%';
+            transferMember();
         }
     }
 
