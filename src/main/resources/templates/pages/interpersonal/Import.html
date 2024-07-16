@@ -29,7 +29,7 @@
             <button type="submit" class="btn btn-info" onclick="nextPage()" id="next-button">Next</button>
         </div>
         <div class="progress flex-grow-1" role="progressbar" aria-label="Progress bar" aria-valuemin="0" aria-valuemax="100" style="height: 20px">
-            <div class="progress-bar" style="width: 0; transition: width 2s ease;" id="progress-bar"></div>
+            <div class="progress-bar" style="width: 0; transition: width 2s ease, background-color 2s ease;" id="progress-bar"></div>
         </div>
     </nav>
 </main>
@@ -51,6 +51,7 @@
                             <p>Use this field to overwrite evaluation scores and member information onto an existing member in Polariscope. Changes made to members cannot be reversed.</p>
                             <p>To create a new user, select "New Member"</p>
                         </div>
+                        <p>Please make sure first name, last name, relationship type, sexuality, and sex are not empty or default values will be added</p>
                     </div>
                 </div>
             </div>
@@ -500,6 +501,22 @@
         member.member.birthday = document.querySelector("#bdf").value;
         member.member.description = document.querySelector("#df").value;
 
+        if(member.member.firstName.length === 0){
+            member.member.firstName = "Terence";
+        }
+        if(member.member.lastName.length === 0){
+            member.member.lastName = "Bird";
+        }
+        if(member.member.relationship.length === 0){
+            member.member.relationship = enums.relationship[0];
+        }
+        if(member.member.sex.length === 0){
+            member.member.sex = enums.sex[0];
+        }
+        if(member.member.sexuality.length === 0){
+            member.member.sexuality = enums.sexuality[0];
+        }
+
         renderMemberEditor();
         memberEditorSelectUser(index);
 
@@ -515,10 +532,22 @@
 
     function transferMember(){
         if(allData.length === 0){
-            console.log("complete.");
+            document.querySelector("#status-marquee").innerHTML = "";
+            document.querySelector("#transfer-log").innerHTML = "Transfer Complete";
+            document.querySelector("#transfer-instructions").classList.remove("d-none");
+
+            document.querySelector("#progress-bar").classList.add("bg-success");
+            document.querySelector("#progress-bar").style.width = '100%';
+
+            document.querySelector("#prev-button").classList.remove("btn-info");
+            document.querySelector("#prev-button").classList.add("disabled");
+
+            document.querySelector("#next-button").classList.remove("btn-info");
+            document.querySelector("#next-button").classList.add("disabled");
             return;
         }
         let member = allData[0];
+        document.querySelector("#transfer-log").innerHTML = 'Transferring ' + member.member.firstName + ' ' + member.member.lastName + ` <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
         if('status' in member && member.status !== null && member.status !== "dequeue"){
             let convertedMember = {
