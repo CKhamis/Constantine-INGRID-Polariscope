@@ -38,7 +38,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Save to Member</h1>
+                <h1 class="modal-title fs-5">Save to Member</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -63,6 +63,30 @@
     </div>
 </div>
 
+<div class="modal fade" id="save-all-menu" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Save All Members</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-warning">
+                            <p>This option will mark all members to save as new entries in your member repository. This will also fill in default information where information is required and not provided.</p>
+                        </div>
+                        <p>After this function is complete, you will be able to go back and modify members before they are saved.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" onclick="saveAll()" data-bs-dismiss="modal">Save All</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Network :: network}"></div>
@@ -440,12 +464,17 @@
         document.querySelector("#mbp").value = member.member.personality;
         document.querySelector("#fcf").value = member.member.favoriteColor;
         document.querySelector("#amf").value = member.member.ageMet;
-        document.querySelector("#bdf").value = (member.member.birthday != null || member.member.birthday === ""  ?  new Date(member.member.birthday).toISOString().slice(0, 10) : '');
+        if(member.member.birthday != null && member.member.birthday.length > 0){
+            document.querySelector("#bdf").value = new Date(member.member.birthday).toISOString().slice(0, 10);
+        }else{
+            document.querySelector("#bdf").value = '';
+        }
         document.querySelector("#df").value = member.member.description;
 
         document.querySelector("#action-menu").innerHTML = `
             <button type="button" class="btn btn-info mt-3" data-bs-toggle="modal" data-bs-target="#save-menu">Save</button>
             <button type="button" class="btn btn-secondary mt-3" onclick="dequeue(${index})">Don't Import</button>
+            <button type="button" class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#save-all-menu">Save All</button>
         `;
     }
 
@@ -479,6 +508,28 @@
         allData[index]["status"] = 'dequeue';
         renderMemberEditor();
         memberEditorSelectUser(index);
+    }
+
+    function saveAll(){
+        allData.forEach((member, index) => {
+            member["status"] = 'new';
+            if(member.member.firstName.length === 0){
+                member.member.firstName = "Terence";
+            }
+            if(member.member.lastName == null || member.member.lastName.length === 0){
+                member.member.lastName = "Bird";
+            }
+            if(member.member.relationship == null || member.member.relationship.length === 0){
+                member.member.relationship = enums.relationship[0];
+            }
+            if(member.member.sex == null || member.member.sex.length === 0){
+                member.member.sex = enums.sex[0];
+            }
+            if(member.member.sexuality == null || member.member.sexuality.length === 0){
+                member.member.sexuality = enums.sexuality[0];
+            }
+        });
+        renderMemberEditor();
     }
 
     function markMemberToSave(){
@@ -519,8 +570,6 @@
 
         renderMemberEditor();
         memberEditorSelectUser(index);
-
-        console.log(member);
     }
 
     let originalDataSize;
