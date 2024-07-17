@@ -162,15 +162,9 @@ public class InterpersonalAPI {
 
                 if(member.getAuthor().getId().equals(retrievedUser.getId())){
 
-                    // Reduce the number of attached evals for speed purposes
-                    if(member.getTimeline().size() > MAX_EVALUATIONS){
-                        member.setShortTimeline(member.getTimeline().subList(0, MAX_EVALUATIONS));
-                    }else{
-                        member.setShortTimeline(member.getTimeline());
-                    }
-
                     if(!member.getTimeline().isEmpty()){
-                        member.setMostRecentScore(member.getTimeline().get(member.getTimeline().size()-1).getCScore());
+                        member.setMostRecentEval(member.getTimeline().get(0));
+                        member.setFullTimeline(member.getTimeline());
                     }
 
                     return ResponseEntity.ok(member);

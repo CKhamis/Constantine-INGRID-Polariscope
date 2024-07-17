@@ -55,13 +55,13 @@ public class Member {
     private List<Evaluation> timeline;
 
     @Transient
-    private List<Evaluation> shortTimeline;
+    private List<Evaluation> fullTimeline;
 
     @Transient
     private List<Evaluation> importedTimeline;
 
     @Transient
-    private Integer mostRecentScore;
+    private Evaluation mostRecentEval;
 
     @Transient
     private int timelineSize;

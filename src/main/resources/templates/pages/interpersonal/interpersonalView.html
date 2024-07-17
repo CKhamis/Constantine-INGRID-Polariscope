@@ -260,8 +260,8 @@
                 renderMemberSelect(data[0]);
                 renderBadges();
                 document.querySelector("#member-name").textContent = memberDetails.firstName + " " + memberDetails.lastName;
-                if(memberDetails.mostRecentScore != null){
-                    document.querySelector("#recent-score-modal").textContent = "Most recent cScore: " + memberDetails.mostRecentScore;
+                if(memberDetails.mostRecentEval != null){
+                    document.querySelector("#recent-score-modal").textContent = "Most recent cScore: " + memberDetails.mostRecentEval.cscore;
                 }
                 renderInfoTab();
                 updateEvalChart();
@@ -470,15 +470,15 @@
         const noteHas = document.querySelector("#keyword-filter-modal").value;
 
 
-        memberDetails.shortTimeline.forEach((eval) => {
+        memberDetails.fullTimeline.forEach((eval) => {
             if((!beforeFilterEnable || beforeForm > new Date(eval.timestamp)) && (!afterFilterEnable || afterForm < new Date(eval.timestamp)) && (!filterByKeywordEnable || eval.note.includes(noteHas))){
                 tableHTML += `
                 <tr id="${eval.id}">
                     <th>${formatTimestamp(eval.timestamp)}</th>
                     <th>${eval.cscore}</th>
                     <th>${eval.note}</th>
-                    <th><button class="btn btn-secondary" onclick="updateModal('${eval.timestamp}', '${eval.cscore}', '${eval.note}', '${eval.id}')" data-bs-toggle="modal" data-bs-target="#addEvalModal">Edit</button></th>
-                    <th><button class="btn btn-secondary" onclick="updateModal('${eval.timestamp}', '${eval.cscore}', '${eval.note}')" data-bs-toggle="modal" data-bs-target="#addEvalModal">Duplicate</button></th>
+                    <th><button class="btn btn-secondary" onclick="updateModal(false, '${eval.id}')" data-bs-toggle="modal" data-bs-target="#addEvalModal">Edit</button></th>
+                    <th><button class="btn btn-secondary" onclick="updateModal(true, '${eval.id}')" data-bs-toggle="modal" data-bs-target="#addEvalModal">Duplicate</button></th>
                     <th><button class="btn btn-danger bevel-sm" onclick="deleteEvaluation('${eval.id}')">Delete</button></th>
                 </tr>
             `;
@@ -494,28 +494,37 @@
         refresh();
     }
 
-    function updateModal(date = new Date(), score = "", note = "", id = ""){
-        const dateInput = document.getElementById('date-form-modal');
-
-        const parsedDate = new Date(date);
-        const localDate = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000);
-        const formattedDate = localDate.toISOString().slice(0, 16); // Format as "YYYY-MM-DDTHH:MM"
-        dateInput.value = formattedDate;
-
-        document.querySelector("#cScore-form-modal").value = score;
-        document.querySelector("#note-form-modal").value = note;
-        document.querySelector("#id-evaluation-modal").value = id;
-
-        if(id.length > 0){
-            document.querySelector("#aemt").textContent = "Edit Evaluation";
+    function updateModal(isNew = true, id = ""){
+        if(id === ""){
+            document.querySelector("#aemt").textContent = "New Evaluation";
+            document.querySelector("#cScore-form-modal").value = "";
+            document.querySelector("#note-form-modal").value = "";
+            document.querySelector("#id-evaluation-modal").value = "";
+            document.getElementById('date-form-modal').value = new Date().toISOString().slice(0, 16);
         }else{
-            document.querySelector("#aemt").textContent = "Add Evaluation";
+            const eval = memberDetails.fullTimeline.find(eval => eval.id === id);
+
+            const parsedDate = new Date(eval.timestamp);
+            const localDate = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000);
+            const formattedDate = localDate.toISOString().slice(0, 16); // Format as "YYYY-MM-DDTHH:MM"
+
+            document.getElementById('date-form-modal').value = formattedDate;
+            document.querySelector("#cScore-form-modal").value = eval.cscore;
+            document.querySelector("#note-form-modal").value = eval.note;
+
+            if(isNew){
+                document.querySelector("#aemt").textContent = "Duplicate Evaluation";
+                document.querySelector("#id-evaluation-modal").value = "";
+            }else{
+                document.querySelector("#aemt").textContent = "Edit Evaluation";
+                document.querySelector("#id-evaluation-modal").value = id;
+            }
         }
     }
 
     function updateEvalChart(){
         let newScores = {data:[]};
-        memberDetails.shortTimeline.forEach((eval) =>{
+        memberDetails.fullTimeline.forEach((eval) =>{
             newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore});
         });
 
