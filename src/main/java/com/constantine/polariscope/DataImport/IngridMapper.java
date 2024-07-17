@@ -111,7 +111,7 @@ public class IngridMapper {
                         Iterator<DatedNote> iterator = notesBeforeDate.iterator();
                         while (iterator.hasNext()) {
                             DatedNote n = iterator.next();
-                            note.append("[").append(n.getTimestamp().toString()).append("] ").append(n.getNote());
+                            note.append("[").append(n.getTimestamp().getMonthValue()).append("/").append(n.getTimestamp().getDayOfMonth()).append("/").append(n.getTimestamp().getYear()).append("] ").append(n.getNote());
                             iterator.remove();
                         }
 
@@ -156,6 +156,6 @@ public class IngridMapper {
     }
 
     public static Set<DatedNote> getNotesBefore(TreeSet<DatedNote> notes, LocalDateTime date) {
-        return notes.headSet(new DatedNote("", date));
+        return notes.headSet(new DatedNote("", date.plusDays(1)));
     }
 }
