@@ -2,27 +2,79 @@
 <html xml:th="https://www.thymeleaf.org">
 <head th:replace="~{components/Header :: head('Home')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
-<div th:replace="~{components/Navigation :: navigation}"></div>
-<main class="container px-4 py-5">
-    <h2 class="fw-bold text-center">Interpersonal Relationships</h2>
+<!--<div th:replace="~{components/Navigation :: navigation}"></div>-->
+<main class="container px-4 py-3 bg-body" style="height: 100vh">
     <div class="row">
-        <a class="col-md-6 col-lg-4 mt-4 px-3" href="/interpersonal/batch-evaluate">
-            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
-                <p class="fs-4 fs-bold text-center m-0">Batch Evaluate</p>
+        <div class="col-lg-2 col-12">
+            <ul class="nav nav-pills flex-column nav-fill mb-3" id="pills-tab" role="tablist">
+                <a class="d-flex justify-content-center align-items-center navbar-brand mb-4" href="/">
+                    <img th:src="@{/icons/Logo.svg}" alt="Logo" width="30" class="d-inline-block align-text-top">
+                    <p class="fw-bold mb-1 fs-4 ms-2">Polariscope</p>
+                </a>
+                <li class="nav-item mb-3" role="presentation">
+                    <button class="nav-link bevel-sm active" id="pills-overview-tab" data-bs-toggle="pill" data-bs-target="#pills-overview" type="button">Overview</button>
+                </li>
+                <li class="nav-item mb-3" role="presentation">
+                    <button class="nav-link bevel-sm" id="pills-members-tab" data-bs-toggle="pill" data-bs-target="#pills-members" type="button">Members</button>
+                </li>
+                <li class="nav-item mb-3" role="presentation">
+                    <button class="nav-link bevel-sm" id="pills-compare-tab" data-bs-toggle="pill" data-bs-target="#pills-compare" type="button">Compare</button>
+                </li>
+                <li class="nav-item mb-3" role="presentation">
+                    <button class="nav-link bevel-sm" id="pills-settings-tab" data-bs-toggle="pill" data-bs-target="#pills-settings" type="button">Settings</button>
+                </li>
+            </ul>
+        </div>
+        <div class="col-lg-10 col-12">
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-overview" role="tabpanel" tabindex="0">
+                    <h2 class="fw-bold mb-4">Interpersonal Relationships</h2>
+                </div>
+                <div class="tab-pane fade" id="pills-members" role="tabpanel" tabindex="0">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold">Interpersonal Members</h2>
+                        <a href="/interpersonal/members">All Members ></a>
+                    </div>
+                    <h3 class="fw-bold">Least Recently Evaluated</h3>
+                    <h3 class="fw-bold">Highest Evaluation</h3>
+                    <h3 class="fw-bold">Lowest Evaluation</h3>
+                </div>
+                <div class="tab-pane fade" id="pills-compare" role="tabpanel" tabindex="0">...</div>
+                <div class="tab-pane fade" id="pills-settings" role="tabpanel" tabindex="0">
+                    <h2 class="fw-bold mb-4">Settings</h2>
+                    <div class="row">
+                        <a class="col-md-6 col-lg-4 mb-4 px-3" href="/interpersonal/batch-evaluate">
+                            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                                <p class="fs-4 fs-bold text-center m-0">Batch Evaluate</p>
+                            </div>
+                        </a>
+                        <a class="col-md-6 col-lg-4 mb-4 px-3" href="/interpersonal/members">
+                            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                                <p class="fs-4 fs-bold text-center m-0">All Members</p>
+                            </div>
+                        </a>
+                        <a class="col-md-6 col-lg-4 mb-4 px-3" href="/interpersonal/new">
+                            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                                <p class="fs-4 fs-bold text-center m-0">+ Add Member</p>
+                            </div>
+                        </a>
+                        <a class="col-md-6 col-lg-4 mb-4 px-3" href="/interpersonal/import">
+                            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                                <p class="fs-4 fs-bold text-center m-0">Import Members</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
-        </a>
-        <a class="col-md-6 col-lg-4 mt-4 px-3" href="/interpersonal/members">
-            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
-                <p class="fs-4 fs-bold text-center m-0">All Members</p>
-            </div>
-        </a>
-        <a class="col-md-6 col-lg-4 mt-4 px-3" href="/interpersonal/new">
-            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
-                <p class="fs-4 fs-bold text-center m-0">+ Add Member</p>
-            </div>
-        </a>
+        </div>
     </div>
 </main>
+<style>
+    body{
+        background-image: url("/backgrounds/stripe.svg");
+        background-size: 5px;
+    }
+</style>
 <div th:replace="~{components/External :: external}"></div>
 </body>
 </html>
