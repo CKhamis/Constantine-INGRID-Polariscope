@@ -3,10 +3,10 @@
 <head th:replace="~{components/Header :: head('Home')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
 <!--<div th:replace="~{components/Navigation :: navigation}"></div>-->
-<main class="container px-4 py-3 bg-body" style="height: 100vh">
-    <div class="row">
-        <div class="col-lg-2 col-12">
-            <ul class="nav nav-pills flex-column nav-fill mb-3" id="pills-tab" role="tablist">
+<main class="container bg-body bevel-lg">
+    <div class="row h-100">
+        <div class="col-lg-2 col-12 bg-body-tertiary h-lg-100 py-4">
+            <ul class="nav nav-pills flex-column nav-fill" id="pills-tab" role="tablist">
                 <a class="d-flex justify-content-center align-items-center navbar-brand mb-4" href="/">
                     <img th:src="@{/icons/Logo.svg}" alt="Logo" width="30" class="d-inline-block align-text-top">
                     <p class="fw-bold mb-1 fs-4 ms-2">Polariscope</p>
@@ -25,7 +25,7 @@
                 </li>
             </ul>
         </div>
-        <div class="col-lg-10 col-12">
+        <div class="col-lg-10 col-12 py-4">
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane fade show active" id="pills-overview" role="tabpanel" tabindex="0">
                     <h2 class="fw-bold mb-4">Interpersonal Relationships</h2>
@@ -73,6 +73,11 @@
     body{
         background-image: url("/backgrounds/stripe.svg");
         background-size: 5px;
+    }
+    @media (min-width: 991.98px) {
+        main{
+            height: 100vh
+        }
     }
 </style>
 <div th:replace="~{components/External :: external}"></div>
