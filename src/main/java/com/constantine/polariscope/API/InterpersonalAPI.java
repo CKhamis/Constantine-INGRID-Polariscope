@@ -9,13 +9,20 @@ import com.constantine.polariscope.Service.EvaluationService;
 import com.constantine.polariscope.Service.MemberService;
 import com.constantine.polariscope.Service.PlaceService;
 import com.constantine.polariscope.Service.UserService;
+import com.constantine.polariscope.Util.FileValidator;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,7 +66,7 @@ public class InterpersonalAPI {
     }
 
     @PostMapping("/member/save")
-    public ResponseEntity<ResponseMessage> saveMember(@Valid @RequestBody MemberForm formElements, Principal principal){
+    public ResponseEntity<ResponseMessage> saveMember(@Valid @RequestBody MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
         try{
             User retrievedUser = getCurrentUser(principal);
 
@@ -105,6 +112,18 @@ public class InterpersonalAPI {
                             retrievedMember.setSexuality(Member.Sexuality.valueOf(formElements.getSexuality()));
                         }
 
+                        // Profile image
+                        if (file != null && !file.isEmpty()) {
+                            String fileType = FileValidator.getImageFileType(file);
+                            if(!fileType.isEmpty()){
+                                retrievedMember.setProfileImageType(fileType);
+                                retrievedMember.setProfileImageData(file.getBytes());
+                                retrievedMember.setProfileImageTimestamp(LocalDateTime.now());
+                            }else{
+                                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.MEDIUM, "Profile image filetype was invalid. No changes were saved to the member. Please make sure to provide a valid image file."));
+                            }
+                        }
+
                         memberService.save(retrievedMember);
                         return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member details saved"));
                     }else{
@@ -123,6 +142,23 @@ public class InterpersonalAPI {
             }
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error saving member"));
+        }
+    }
+
+    @GetMapping("/member/profile-image/" + "{memberId}")
+    public ResponseEntity<?> downloadFile(@PathVariable UUID memberId, Principal principal) {
+        try{
+            Member retrievedMember = memberService.findMember(memberId);
+            if(retrievedMember.getAuthor().equals(getCurrentUser(principal))){
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(retrievedMember.getProfileImageType()))
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename= \"" + retrievedMember.getFirstName() + "_" + retrievedMember.getLastName() + "\"")
+                        .body(new ByteArrayResource(retrievedMember.getProfileImageData()));
+            }else{
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Member Not Found", ResponseMessage.Severity.LOW, "Member could not be found in database"));
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Member Not Found", ResponseMessage.Severity.LOW, "Member could not be found in database"));
         }
     }
 
@@ -289,4 +325,6 @@ public class InterpersonalAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error deleting evaluation"));
         }
     }
+
+
 }

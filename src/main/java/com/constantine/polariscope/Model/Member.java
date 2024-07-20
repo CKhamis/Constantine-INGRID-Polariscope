@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,6 +54,13 @@ public class Member {
     @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Evaluation> timeline;
+
+    @Lob
+    @JsonIgnore
+    @Column(columnDefinition = "longblob")
+    private byte[] profileImageData;
+    private String profileImageType;
+    private LocalDateTime profileImageTimestamp;
 
     @Transient
     private List<Evaluation> fullTimeline;
