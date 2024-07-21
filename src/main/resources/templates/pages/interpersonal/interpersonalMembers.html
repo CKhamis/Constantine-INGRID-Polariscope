@@ -30,7 +30,7 @@
                         <img class="square-image" th:src="@{/icons/Filter.svg}" alt="edit" style="width: 30px;"/>
                     </div>
                 </nav>
-                <table class="table table-hover">
+                <table class="table table-hover align-middle">
                     <thead>
                     <tr>
                         <th scope="col">Photo</th>
@@ -174,7 +174,7 @@
             if((!fnCheck || member.firstName.toLowerCase().includes(fn.toLowerCase())) && (!lnCheck || member.lastName.toLowerCase().includes(ln.toLowerCase())) && (!relationshipCheck || relationship === member.relationship) && (!sexualityCheck || sexuality === member.sexuality) && (!sexCheck || sex === member.sex)){
                 tableContents += `
                     <tr>
-                        <th scope="row">1</th>
+                        <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}"></th>
                         <td>${member.firstName} ${member.lastName}</td>
                         <td>${member.relationship}</td>
                         <td>${member.sex}</td>
