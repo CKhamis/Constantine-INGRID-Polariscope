@@ -9,6 +9,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class MemberForm {
     private String id;
     private Integer ageMet;

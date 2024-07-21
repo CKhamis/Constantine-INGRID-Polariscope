@@ -26,6 +26,7 @@ import java.io.File;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -67,7 +68,7 @@ public class InterpersonalAPI {
 
     @PostMapping("/member/save")
     public ResponseEntity<ResponseMessage> saveMember(@ModelAttribute MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
-        try{
+        try{ //todo: with this configuration, image uploading only works. Memberform is not populated with anything for some reason.
             User retrievedUser = getCurrentUser(principal);
 
             if(formElements.getId() != null){
@@ -164,7 +165,7 @@ public class InterpersonalAPI {
             Member retrievedMember = memberService.findMember(memberId);
             if(retrievedMember.getAuthor().equals(getCurrentUser(principal))){
                 return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType(retrievedMember.getProfileImageType()))
+                        .contentType(MediaType.parseMediaType("image/" + retrievedMember.getProfileImageType()))
                         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename= \"" + retrievedMember.getFirstName() + "_" + retrievedMember.getLastName() + "\"")
                         .body(new ByteArrayResource(retrievedMember.getProfileImageData()));
             }else{

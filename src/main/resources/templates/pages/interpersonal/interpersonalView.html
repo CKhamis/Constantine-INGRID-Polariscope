@@ -264,7 +264,7 @@
                 memberDetails = data[1];
                 renderMemberSelect(data[0]);
                 renderBadges();
-                document.querySelector("#profile-image").src = "/member/profile-image/" + memberDetails.id;
+                document.querySelector("#profile-image").src = "/api/interpersonal/member/profile-image/" + memberDetails.id;
                 document.querySelector("#member-name").textContent = memberDetails.firstName + " " + memberDetails.lastName;
                 if(memberDetails.mostRecentEval != null){
                     document.querySelector("#recent-score-modal").textContent = "Most recent cScore: " + memberDetails.mostRecentEval.cscore;
@@ -371,18 +371,18 @@
         const formData = new FormData();
         const imageFile = document.getElementById('pfp-file').files[0];
         formData.append('image', imageFile);
-        formData.append("id", memberDetails.id);
-        formData.append("firstName", document.querySelector("#fnf").value);
-        formData.append("lastName", document.querySelector("#lnf").value);
-        formData.append("middleName", document.querySelector("#mnf").value);
-        formData.append("relationship", document.querySelector("#relationf").value);
-        formData.append("sex", document.querySelector("#sexf").value);
-        formData.append("sexuality", document.querySelector("#sexualityf").value);
-        formData.append("personality", document.querySelector("#mbp").value);
-        formData.append("favoriteColor", document.querySelector("#fcf").value);
-        formData.append("ageMet", document.querySelector("#amf").value);
-        formData.append("birthday", document.querySelector("#bdf").value);
-        formData.append("description", document.querySelector("#df").value);
+        formData.append('id', memberDetails.id);
+        formData.append('firstName', document.querySelector("#fnf").value);
+        formData.append('lastName', document.querySelector("#lnf").value);
+        formData.append('middleName', document.querySelector("#mnf").value);
+        formData.append('relationship', document.querySelector("#relationf").value);
+        formData.append('sex', document.querySelector("#sexf").value);
+        formData.append('sexuality', document.querySelector("#sexualityf").value);
+        formData.append('personality', document.querySelector("#mbp").value);
+        formData.append('favoriteColor', document.querySelector("#fcf").value);
+        formData.append('ageMet', document.querySelector("#amf").value);
+        formData.append('birthday', document.querySelector("#bdf").value);
+        formData.append('description', document.querySelector("#df").value);
 
         let button = document.querySelector("#submit-button");
         button.disabled = true;
