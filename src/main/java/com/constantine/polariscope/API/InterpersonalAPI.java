@@ -66,7 +66,7 @@ public class InterpersonalAPI {
     }
 
     @PostMapping("/member/save")
-    public ResponseEntity<ResponseMessage> saveMember(@Valid @RequestBody MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
+    public ResponseEntity<ResponseMessage> saveMember(@ModelAttribute MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
         try{
             User retrievedUser = getCurrentUser(principal);
 
@@ -137,6 +137,19 @@ public class InterpersonalAPI {
             }else{
                 // Save to new user
                 Member member = new Member(formElements, retrievedUser);
+
+                // Profile image
+                if (file != null && !file.isEmpty()) {
+                    String fileType = FileValidator.getImageFileType(file);
+                    if(!fileType.isEmpty()){
+                        member.setProfileImageType(fileType);
+                        member.setProfileImageData(file.getBytes());
+                        member.setProfileImageTimestamp(LocalDateTime.now());
+                    }else{
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.MEDIUM, "Profile image filetype was invalid. No changes were saved to the member. Please make sure to provide a valid image file."));
+                    }
+                }
+
                 memberService.save(member);
                 return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member saved to Polariscope"));
             }
@@ -325,6 +338,4 @@ public class InterpersonalAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error deleting evaluation"));
         }
     }
-
-
 }

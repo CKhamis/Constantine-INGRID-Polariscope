@@ -21,7 +21,7 @@
 
     <div class="row mt-3">
         <div class="col-md-3 col-lg-2 mb-4" id="left-pane">
-            <img class="square-image" th:src="@{/icons/Logo.svg}" alt="profile image" />
+            <img class="square-image" th:src="@{/icons/Logo.svg}" alt="profile image" id="profile-image" />
             <h2 class="fw-bold text-center mt-3" id="member-name">Test Name</h2>
             <div class="d-flex justify-content-between align-items-center mt-5">
                 <img class="square-image mx-2" th:src="@{/icons/Logo.svg}" id="relation-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Relationship"/>
@@ -46,6 +46,10 @@
                 <div class="tab-pane fade" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab" tabindex="0">
                     <h2 class="fw-bold mt-3">Member Details</h2>
                     <div class="row mt-2">
+                        <div class="col-12 mb-3">
+                            <label for="pfp-file" class="form-label">Upload profile image for member</label>
+                            <input class="form-control" type="file" name="file" id="pfp-file">
+                        </div>
                         <div class="col-md-4 mb-3">
                             <label for="fnf">First name</label>
                             <input type="text" class="form-control" id="fnf" name="firstName" placeholder="First name" required>
@@ -229,6 +233,7 @@
 
 <input type="hidden" th:value="${id}" id="id-form" />
 <div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/Network :: data-upload}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
@@ -259,6 +264,7 @@
                 memberDetails = data[1];
                 renderMemberSelect(data[0]);
                 renderBadges();
+                document.querySelector("#profile-image").src = "/member/profile-image/" + memberDetails.id;
                 document.querySelector("#member-name").textContent = memberDetails.firstName + " " + memberDetails.lastName;
                 if(memberDetails.mostRecentEval != null){
                     document.querySelector("#recent-score-modal").textContent = "Most recent cScore: " + memberDetails.mostRecentEval.cscore;
@@ -362,20 +368,22 @@
     }
 
     function saveMember(){
-        let member = {
-            "id": memberDetails.id,
-            "firstName": document.querySelector("#fnf").value,
-            "lastName": document.querySelector("#lnf").value,
-            "middleName": document.querySelector("#mnf").value,
-            "relationship": document.querySelector("#relationf").value,
-            "sex": document.querySelector("#sexf").value,
-            "sexuality": document.querySelector("#sexualityf").value,
-            "personality": document.querySelector("#mbp").value,
-            "favoriteColor": document.querySelector("#fcf").value,
-            "ageMet": document.querySelector("#amf").value,
-            "birthday": document.querySelector("#bdf").value,
-            "description": document.querySelector("#df").value
-        }
+        const formData = new FormData();
+        const imageFile = document.getElementById('pfp-file').files[0];
+        formData.append('image', imageFile);
+        formData.append("id", memberDetails.id);
+        formData.append("firstName", document.querySelector("#fnf").value);
+        formData.append("lastName", document.querySelector("#lnf").value);
+        formData.append("middleName", document.querySelector("#mnf").value);
+        formData.append("relationship", document.querySelector("#relationf").value);
+        formData.append("sex", document.querySelector("#sexf").value);
+        formData.append("sexuality", document.querySelector("#sexualityf").value);
+        formData.append("personality", document.querySelector("#mbp").value);
+        formData.append("favoriteColor", document.querySelector("#fcf").value);
+        formData.append("ageMet", document.querySelector("#amf").value);
+        formData.append("birthday", document.querySelector("#bdf").value);
+        formData.append("description", document.querySelector("#df").value);
+
         let button = document.querySelector("#submit-button");
         button.disabled = true;
         button.classList.remove("btn-primary");
@@ -383,7 +391,7 @@
         button.textContent = "Saving...";
 
         let toastId = createToast("Saving Member Details");
-        postData("/api/interpersonal/member/save", member)
+        postDataWithFile("/api/interpersonal/member/save", formData)
             .then((message) => {
                 document.getElementById(`${toastId}-title`).innerText = message.title;
                 document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
