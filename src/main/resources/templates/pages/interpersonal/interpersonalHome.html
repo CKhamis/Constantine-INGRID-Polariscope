@@ -36,6 +36,7 @@
                         <a href="/interpersonal/members">All Members ></a>
                     </div>
                     <h3 class="fw-bold">Least Recently Evaluated</h3>
+                    <div class="d-flex flex-row overflow-x-auto mb-3" id="least-recent-eval-container"></div>
                     <h3 class="fw-bold">Highest Evaluation</h3>
                     <h3 class="fw-bold">Lowest Evaluation</h3>
                 </div>
@@ -81,5 +82,44 @@
     }
 </style>
 <div th:replace="~{components/External :: external}"></div>
+<script>
+    let memberList;
+
+    refresh();
+
+    function refresh(){
+        const memberListFetch = fetch("/api/interpersonal/member/all", {});
+        Promise.all([memberListFetch])
+            .then(responses => {
+                return Promise.all([responses[0]]);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                memberList = data[0];
+                renderLeastRecentEval();
+            })
+            .then(() => {
+
+            });
+    }
+
+    function renderLeastRecentEval(){
+        const container = document.querySelector("#least-recent-eval-container");
+        let LREContent = ``;
+        for(let i = 0; i < 15; i++){
+            const member = memberList[i];
+            LREContent += `
+            <a class="border border-1 mx-2" href="/interpersonal/member/view/${member.id}">
+                <img class="square-image img-fluid" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}" />
+                <p class="text-center fw-bold px-2">${member.firstName} ${member.lastName}</p>
+                <p class="text-center px-2 mb-2">${member.relationship}</p>
+            </a>
+            `;
+        }
+        container.innerHTML = LREContent;
+    }
+</script>
 </body>
 </html>
