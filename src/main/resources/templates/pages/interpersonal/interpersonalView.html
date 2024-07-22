@@ -393,9 +393,18 @@
         let toastId = createToast("Saving Member Details");
         postDataWithFile("/api/interpersonal/member/save", formData)
             .then((message) => {
-                document.getElementById(`${toastId}-title`).innerText = message.title;
-                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
-                document.getElementById(`${toastId}-loading`).style.color = "green";
+                message.json()
+                    .then(messageData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(messageData.severity) + messageData.message;
+                        document.getElementById(`${toastId}-title`).innerText =  messageData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "green";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
             })
             .catch((response) => {
                 console.log(response);
