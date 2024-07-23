@@ -31,12 +31,12 @@
                     <h2 class="fw-bold mb-4">Interpersonal Relationships</h2>
                 </div>
                 <div class="tab-pane fade" id="pills-members" role="tabpanel" tabindex="0">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex flex-nowrap mb-4">
                         <h2 class="fw-bold">Interpersonal Members</h2>
                         <a href="/interpersonal/members">All Members ></a>
                     </div>
                     <h3 class="fw-bold">Least Recently Evaluated</h3>
-                    <div class="d-flex flex-row overflow-x-auto mb-3" id="least-recent-eval-container"></div>
+                    <div class="d-flex flex-row-reverse overflow-x-auto mb-3" id="least-recent-eval-container"></div>
                     <h3 class="fw-bold">Highest Evaluation</h3>
                     <h3 class="fw-bold">Lowest Evaluation</h3>
                 </div>
@@ -122,20 +122,21 @@
                 sexualitySrc = "/icons/sexuality/" + member.sexuality + ".svg";
             }
 
+            //todo: the fix to this is float left!
             LREContent += `
-            <a class="px-2 mb-3 text-decoration-none" style="width: 15vw" href="/interpersonal/member/view/${member.id}">
-                <div class="card w-100">
-                    <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">${member.firstName} ${member.lastName}</h5>
+                <a class="mx-2 mb-3 text-decoration-none" href="/interpersonal/member/view/${member.id}">
+                    <div class="card d-flex justify-content-center" style="width: 10rem">
+                        <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-nowrap text-truncate">${member.firstName} ${member.lastName}</h5>
+                        </div>
+                        <div class="d-flex justify-content-evenly align-items-center mb-3">
+                            <img class="square-image mx-1" src="${relationshipSrc}" alt="relationship icon" />
+                            <img class="square-image mx-1" src="${sexSrc}" alt="Sex icon" />
+                            <img class="square-image mx-1" src="${sexualitySrc}" alt="Sexuality icon" />
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-evenly align-items-center mb-3">
-                        <img class="square-image mx-1" src="${relationshipSrc}" alt="relationship icon" />
-                        <img class="square-image mx-1" src="${sexSrc}" alt="Sex icon" />
-                        <img class="square-image mx-1" src="${sexualitySrc}" alt="Sexuality icon" />
-                    </div>
-                </div>
-            </a>
+                </a>
             `;
         }
         container.innerHTML = LREContent;
