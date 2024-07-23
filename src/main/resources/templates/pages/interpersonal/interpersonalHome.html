@@ -123,19 +123,19 @@
             }
 
             LREContent += `
-            <div class="px-2 mb-3" style="width: 15vw">
+            <a class="px-2 mb-3 text-decoration-none" style="width: 15vw" href="/interpersonal/member/view/${member.id}">
                 <div class="card w-100">
                     <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                     <div class="card-body">
                         <h5 class="card-title fw-bold">${member.firstName} ${member.lastName}</h5>
                     </div>
-                    <div class="d-flex justify-content-evenly align-items-center my-3">
+                    <div class="d-flex justify-content-evenly align-items-center mb-3">
                         <img class="square-image mx-1" src="${relationshipSrc}" alt="relationship icon" />
                         <img class="square-image mx-1" src="${sexSrc}" alt="Sex icon" />
                         <img class="square-image mx-1" src="${sexualitySrc}" alt="Sexuality icon" />
                     </div>
                 </div>
-            </div>
+            </a>
             `;
         }
         container.innerHTML = LREContent;
