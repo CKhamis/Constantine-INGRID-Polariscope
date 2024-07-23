@@ -187,7 +187,8 @@
         memberList.forEach((member) => {
             content += `
                 <div class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" onclick="selectMember('${member.id}')">
-                    <h4 class="fw-bold">${member.firstName} ${member.lastName}</h4>
+                    <img class="square-image img-fluid" style="width: 40px; height: 40px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
+                    <h4 class="fw-bold mb-0 ms-2">${member.firstName} ${member.lastName}</h4>
                 </div>
                 `;
         });

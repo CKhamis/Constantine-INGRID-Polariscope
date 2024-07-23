@@ -13,16 +13,19 @@ import com.constantine.polariscope.Util.FileValidator;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -164,14 +167,31 @@ public class InterpersonalAPI {
         try{
             Member retrievedMember = memberService.findMember(memberId);
             if(retrievedMember.getAuthor().equals(getCurrentUser(principal))){
-                return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType("image/" + retrievedMember.getProfileImageType()))
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename= \"" + retrievedMember.getFirstName() + "_" + retrievedMember.getLastName() + "\"")
-                        .body(new ByteArrayResource(retrievedMember.getProfileImageData()));
+                if(retrievedMember.getProfileImageData() == null){
+                    return getDefaultImageResponse();
+                }else{
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.parseMediaType("image/" + retrievedMember.getProfileImageType()))
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename= \"" + retrievedMember.getFirstName() + "_" + retrievedMember.getLastName() + "\"")
+                            .body(new ByteArrayResource(retrievedMember.getProfileImageData()));
+                }
             }else{
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Member Not Found", ResponseMessage.Severity.LOW, "Member could not be found in database"));
+                return getDefaultImageResponse();
             }
         }catch (Exception e){
+            return getDefaultImageResponse();
+        }
+    }
+
+    private ResponseEntity<?> getDefaultImageResponse() {
+        try {
+            Resource resource = new ClassPathResource("static/icons/Default User.svg");
+            byte[] defaultImageData = StreamUtils.copyToByteArray(resource.getInputStream());
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType("image/svg+xml"))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"default_image.svg\"")
+                    .body(new ByteArrayResource(defaultImageData));
+        } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Member Not Found", ResponseMessage.Severity.LOW, "Member could not be found in database"));
         }
     }
