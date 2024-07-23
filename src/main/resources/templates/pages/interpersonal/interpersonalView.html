@@ -48,7 +48,7 @@
                     <div class="row mt-2">
                         <div class="col-12 mb-3">
                             <label for="pfp-file" class="form-label">Upload profile image for member</label>
-                            <input class="form-control" type="file" name="file" id="pfp-file">
+                            <input class="form-control" type="file" name="file" accept="image/*" id="pfp-file">
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="fnf">First name</label>
@@ -264,7 +264,6 @@
                 memberDetails = data[1];
                 renderMemberSelect(data[0]);
                 renderBadges();
-                document.querySelector("#profile-image").src = "/api/interpersonal/member/profile-image/" + memberDetails.id;
                 document.querySelector("#member-name").textContent = memberDetails.firstName + " " + memberDetails.lastName;
                 if(memberDetails.mostRecentEval != null){
                     document.querySelector("#recent-score-modal").textContent = "Most recent cScore: " + memberDetails.mostRecentEval.cscore;
@@ -283,6 +282,9 @@
                         console.error("Error parsing error response:", error);
                     });
             })
+            .finally(() => {
+                document.querySelector("#profile-image").src = "/api/interpersonal/member/profile-image/" + memberDetails.id + "?=" + new Date().getTime();
+            });
     }
 
     function modalSaveEval(){
@@ -316,7 +318,7 @@
                     })
                     .catch(error => {
                         console.error("Error parsing error response:", error);
-                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-body`).innerText = "Profile Image could be too large";
                         document.getElementById(`${toastId}-title`).innerText = "Error";
                         document.getElementById(`${toastId}-loading`).style.color = "red";
                     });

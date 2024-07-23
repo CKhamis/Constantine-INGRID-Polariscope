@@ -31,7 +31,7 @@
                     <h2 class="fw-bold mb-4">Interpersonal Relationships</h2>
                 </div>
                 <div class="tab-pane fade" id="pills-members" role="tabpanel" tabindex="0">
-                    <div class="d-flex flex-nowrap mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="fw-bold">Interpersonal Members</h2>
                         <a href="/interpersonal/members">All Members ></a>
                     </div>
@@ -122,7 +122,6 @@
                 sexualitySrc = "/icons/sexuality/" + member.sexuality + ".svg";
             }
 
-            //todo: the fix to this is float left!
             LREContent += `
                 <a class="mx-2 mb-3 text-decoration-none" href="/interpersonal/member/view/${member.id}">
                     <div class="card d-flex justify-content-center" style="width: 10rem">
