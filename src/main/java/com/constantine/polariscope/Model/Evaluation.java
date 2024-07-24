@@ -2,10 +2,7 @@ package com.constantine.polariscope.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,7 +10,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class Evaluation {
+public class Evaluation implements Comparable<Evaluation>{
 
     @Id
     @GeneratedValue
@@ -42,5 +39,11 @@ public class Evaluation {
         this.member = member;
         created = LocalDateTime.now();
         modified = LocalDateTime.now();
+    }
+
+
+    @Override
+    public int compareTo(@NonNull Evaluation o) {
+        return this.getTimestamp().compareTo(o.getTimestamp());
     }
 }

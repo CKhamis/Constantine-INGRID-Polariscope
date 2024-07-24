@@ -203,6 +203,7 @@ public class InterpersonalAPI {
 
             // Get all users from repository
             List<MemberListItem> members = memberService.allMembers(retrievedUser);
+
             return ResponseEntity.ok(members);
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, e.getMessage()));

@@ -1,5 +1,6 @@
 package com.constantine.polariscope.DTO;
 
+import com.constantine.polariscope.Model.Evaluation;
 import com.constantine.polariscope.Model.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +19,7 @@ public class MemberListItem {
     private String firstName, lastName, middleName;
     private String sex, sexuality, relationship;
     private LocalDateTime created, lastModified;
+    private Evaluation lastEvaluation;
 
     public MemberListItem(Member member){
         id = member.getId();
