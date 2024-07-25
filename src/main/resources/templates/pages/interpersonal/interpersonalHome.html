@@ -4,8 +4,8 @@
 <body class="bg-2 text-1" data-bs-theme="dark">
 <!--<div th:replace="~{components/Navigation :: navigation}"></div>-->
 <main class="container bg-body bevel-lg">
-    <div class="row h-100">
-        <div class="col-lg-2 col-12 bg-body-tertiary h-lg-100 py-4">
+    <div class="row">
+        <div class="col-lg-2 col-12 bg-body-tertiary py-4">
             <ul class="nav nav-pills flex-column nav-fill" id="pills-tab" role="tablist">
                 <a class="d-flex justify-content-center align-items-center navbar-brand mb-4" href="/">
                     <img th:src="@{/icons/Logo.svg}" alt="Logo" width="30" class="d-inline-block align-text-top">
@@ -37,10 +37,11 @@
                     </div>
                     <h3 class="fw-bold">Least Recently Evaluated</h3>
                     <div class="d-flex flex-row overflow-x-auto mb-3" id="least-recent-eval-container"></div>
-                    <h3 class="fw-bold">Highest Evaluation</h3>
+                    <h3 class="fw-bold">Highest Evaluated Members</h3>
                     <div class="d-flex flex-row overflow-x-auto mb-3" id="highest-eval-container"></div>
-                    <h3 class="fw-bold">Lowest Evaluation</h3>
-                    <div class="d-flex flex-row overflow-x-auto mb-3" id="lowest-recent-eval-container"></div>
+                    <h3 class="fw-bold">Lowest Evaluated Members</h3>
+                    <div class="d-flex flex-row overflow-x-auto mb-3" id="lowest-eval-container"></div>
+                    <a href="/interpersonal/members">All Members ></a>
                 </div>
                 <div class="tab-pane fade" id="pills-compare" role="tabpanel" tabindex="0">...</div>
                 <div class="tab-pane fade" id="pills-settings" role="tabpanel" tabindex="0">
@@ -77,13 +78,9 @@
         background-image: url("/backgrounds/stripe.svg");
         background-size: 5px;
     }
-    @media (min-width: 991.98px) {
-        main{
-            height: 100vh
-        }
-    }
 </style>
 <div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/Formatting :: date-formatting}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <script>
     let memberList;
@@ -136,6 +133,7 @@
                         <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                         <div class="card-body">
                             <h5 class="card-title fw-bold text-nowrap text-truncate">${member.firstName} ${member.lastName}</h5>
+                            <p class="text-center">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>
                         </div>
                         <div class="d-flex justify-content-evenly align-items-center mb-3">
                             <img class="square-image mx-1" src="${relationshipSrc}" alt="relationship icon" />
@@ -154,7 +152,7 @@
         let LREContent = ``;
 
         // Sort array
-        memberList.sort((a, b) => new Date(a.lastEvaluation.cscore) - new Date(b.lastEvaluation.cscore));
+        memberList.sort((a, b) => new Date(b.lastEvaluation.cscore) - new Date(a.lastEvaluation.cscore));
 
         for(let i = 0; i < 10; i++){
             const member = memberList[i];
@@ -175,6 +173,7 @@
                         <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                         <div class="card-body">
                             <h5 class="card-title fw-bold text-nowrap text-truncate">${member.firstName} ${member.lastName}</h5>
+                             <p class="">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>
                         </div>
                         <div class="d-flex justify-content-evenly align-items-center mb-3">
                             <img class="square-image mx-1" src="${relationshipSrc}" alt="relationship icon" />
@@ -193,7 +192,7 @@
         let LREContent = ``;
 
         // Sort array
-        memberList.sort((a, b) => new Date(b.lastEvaluation.cscore) - new Date(a.lastEvaluation.cscore));
+        memberList.sort((a, b) => new Date(a.lastEvaluation.cscore) - new Date(b.lastEvaluation.cscore));
 
         for(let i = 0; i < 15; i++){
             const member = memberList[i];
@@ -214,6 +213,7 @@
                         <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                         <div class="card-body">
                             <h5 class="card-title fw-bold text-nowrap text-truncate">${member.firstName} ${member.lastName}</h5>
+                             <p class="">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>
                         </div>
                         <div class="d-flex justify-content-evenly align-items-center mb-3">
                             <img class="square-image mx-1" src="${relationshipSrc}" alt="relationship icon" />
