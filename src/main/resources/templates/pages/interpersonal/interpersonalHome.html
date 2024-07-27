@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xml:th="https://www.thymeleaf.org">
 <head th:replace="~{components/Header :: head('Home')}"></head>
-<body class="bg-2 text-1" data-bs-theme="dark">
+<body class="bg-2 text-1 stripe-white" data-bs-theme="dark">
 <!--<div th:replace="~{components/Navigation :: navigation}"></div>-->
 <main class="container bg-body bevel-lg">
     <div class="row">
@@ -73,12 +73,6 @@
         </div>
     </div>
 </main>
-<style>
-    body{
-        background-image: url("/backgrounds/stripe.svg");
-        background-size: 5px;
-    }
-</style>
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
