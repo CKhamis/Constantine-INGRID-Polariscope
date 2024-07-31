@@ -21,7 +21,7 @@
                 <div>
                     <canvas id="evaluation-history-chart"></canvas>
                 </div>
-                <button type="button" class="btn btn-primary mt-3" onclick="saveEvaluation()">Add Members</button>
+                <button type="button" class="btn btn-primary mt-3" onclick="saveEvaluation()" data-bs-toggle="modal" data-bs-target="#member-modal">Add Members</button>
                 <button type="button" class="btn btn-primary mt-3" onclick="saveEvaluation(true)">Something else</button>
                 <div id="timeline-table-container">
 
@@ -30,6 +30,33 @@
         </div>
     </div>
 </main>
+
+<div class="modal fade" tabindex="-1" aria-labelledby="be" id="member-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="be">Choose Members to Compare</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <p>Batch evaluate allows you to produce evaluations for all registered members at a time. It is highly recommended to add evaluations to your members on this screen in order to be more consistent with scores. Please choose a timestamp for evaluations:</p>
+                    </div>
+                    <div class="col-12">
+                        <label for="date-form-modal" class="form-label">Timestamp for Evaluations</label>
+                        <input type="datetime-local" class="form-control" id="date-form-modal">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateTimestamp()" data-bs-dismiss="modal">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <script>
@@ -71,7 +98,7 @@
             type: 'line',
             data:scores,
             options: {
-                aspectRatio: 5,
+                aspectRatio: 4,
                 responsive: true,
                 plugins: {
                     legend: {
