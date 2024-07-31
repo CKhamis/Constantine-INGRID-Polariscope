@@ -69,6 +69,15 @@ public class FrontEndController {
         return "pages/interpersonal/interpersonalView";
     }
 
+    @GetMapping("/interpersonal/compare")
+    public String getCompare(Model model, Principal principal){
+        model.addAttribute("relationshipTypes", Member.RelationshipType.values());
+        model.addAttribute("sexualityTypes", Member.Sexuality.values());
+        model.addAttribute("sexTypes", Member.Sex.values());
+        model.addAttribute("places", placeService.findAll(getCurrentUser(principal)));
+        return "pages/interpersonal/interpersonalCompare";
+    }
+
     @GetMapping("/interpersonal/batch-evaluate")
     public String getBatchEvaluate() {
         return "pages/interpersonal/BatchEvaluate";

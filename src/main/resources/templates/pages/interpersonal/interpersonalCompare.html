@@ -1,17 +1,94 @@
 <!DOCTYPE html>
 <html xml:th="https://www.thymeleaf.org">
-<head th:replace="~{components/Header :: head('Home')}"></head>
+<head th:replace="~{components/Header :: head('Compare')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: navigation}"></div>
-<main class="container px-4 py-5">
-    <div class="container">
+<main class="bg-2 text-1" data-bs-theme="dark">
+    <div class="container-fluid bg-body">
 
+        <nav class="navbar d-flex justify-content-between align-items-center">
+            <div>
+                <a href="/interpersonal">< Interpersonal Home</a>
+            </div>
+        </nav>
+
+        <div class="row my-3">
+            <div class="col-lg-3 d-none d-lg-block">
+                <canvas id="composition-chart"></canvas>
+            </div>
+            <div class="col-12 col-lg-9 px-3">
+                <h2 class="fw-bold mt-3">Member Compare</h2>
+                <div>
+                    <canvas id="evaluation-history-chart"></canvas>
+                </div>
+                <button type="button" class="btn btn-primary mt-3" onclick="saveEvaluation()">Add Members</button>
+                <button type="button" class="btn btn-primary mt-3" onclick="saveEvaluation(true)">Something else</button>
+                <div id="timeline-table-container">
+
+                </div>
+            </div>
+        </div>
     </div>
 </main>
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <script>
 
+    let memberList;
+
+    createEvalChart();
+    refresh();
+
+    function refresh(){
+        const memberListFetch = fetch("/api/interpersonal/member/all", {});
+        Promise.all([memberListFetch])
+            .then(responses => {
+                return Promise.all([responses[0]]);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                memberList = data[0];
+
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                    });
+            });
+    }
+
+    function createEvalChart(){
+        let canvas = document.querySelector("#evaluation-history-chart");
+        let scores = {datasets: [{data:[]}]};
+        evalChartEval = new Chart(canvas, {
+            type: 'line',
+            data:scores,
+            options: {
+                aspectRatio: 5,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                        }
+                    },
+                },
+            }
+        });
+    }
 </script>
 </body>
 </html>
