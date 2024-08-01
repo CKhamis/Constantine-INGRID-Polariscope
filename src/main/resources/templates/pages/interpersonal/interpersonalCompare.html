@@ -10,6 +10,9 @@
             <div>
                 <a href="/interpersonal">< Interpersonal Home</a>
             </div>
+            <div class="spinner-border d-none" role="status" id="loading-spinner">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </nav>
 
         <div class="row my-3">
@@ -21,7 +24,7 @@
                 <div>
                     <canvas id="evaluation-history-chart"></canvas>
                 </div>
-                <button type="button" class="btn btn-primary mt-3" onclick="saveEvaluation()" data-bs-toggle="modal" data-bs-target="#member-modal">Add Members</button>
+                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#member-modal">Add Members</button>
                 <button type="button" class="btn btn-primary mt-3" onclick="saveEvaluation(true)">Something else</button>
                 <div id="timeline-table-container">
 
@@ -44,14 +47,14 @@
                         <p>This tool allows you to compare and contrast saved member evaluation scores over time. You are able to add as many members as you choose. If you would like to include or remove a member from the graph, simply click on the member's name and press apply.</p>
                     </div>
                     <div class="col-12">
-                        <div class="accordion" id="accordionPanelsStayOpenExample">
+                        <div class="accordion">
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
                                         Included Members
                                     </button>
                                 </h2>
-                                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
+                                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
                                     <div class="list-group" id="member-list-included">
                                     </div>
                                 </div>
@@ -73,7 +76,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="updateTimestamp()" data-bs-dismiss="modal">Continue</button>
+                <button type="button" class="btn btn-primary" onclick="retrieveMemberDetails()" data-bs-dismiss="modal">Apply</button>
             </div>
         </div>
     </div>
@@ -83,12 +86,52 @@
 <div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <script>
-
     let memberList;
+    let memberDetailList;
 
     createEvalChart();
     refresh();
 
+    async function retrieveMemberDetails() {
+        let spinner = document.querySelector("#loading-spinner");
+        spinner.classList.add("d-block");
+        spinner.classList.remove("d-none");
+
+        memberDetailList = [];
+        for (const member of memberList) {
+            if ("included" in member && member.included === true) {
+                await getMemberDetails(member.id);
+            }
+        }
+
+        spinner.classList.remove("d-block");
+        spinner.classList.add("d-none");
+    }
+
+    async function getMemberDetails(id){
+        const memberDetailFetch = fetch("/api/interpersonal/member/view/" + id, {});
+        Promise.all([memberDetailFetch])
+            .then(responses => {
+                return Promise.all([responses[0]]);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                memberDetailList.push(data[0]);
+                console.log(data[0]);
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                    });
+            });
+    }
     function refresh(){
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         Promise.all([memberListFetch])
@@ -139,11 +182,7 @@
 
     function toggleMark(id){
         let member = memberList.find(m => m.id === id);
-        if("included" in member && member.included === true){
-            member.included = false;
-        }else{
-            member.included = true;
-        }
+        member.included = !("included" in member && member.included === true);
         renderMemberModal();
     }
 
