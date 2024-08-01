@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<script th:fragment="gradient">
+    function getColorGradient(value, min, max) {
+        // Ensure value is within bounds
+        value = Math.max(min, Math.min(max, value));
+
+        // Calculate the proportion (0 to 1)
+        let proportion = (value - min) / (max - min);
+
+        let r, g, b;
+        if (proportion <= 0.5) {
+            // From red to yellow
+            proportion *= 2; // Scale to 0-1 within the red to yellow range
+            r = 255;
+            g = Math.round(255 * proportion);
+            b = 0;
+        } else {
+            // From yellow to green
+            proportion = (proportion - 0.5) * 2; // Scale to 0-1 within the yellow to green range
+            r = Math.round(255 * (1 - proportion));
+            g = 255;
+            b = 0;
+        }
+
+        // Return the color in rgb format
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    $(document).ready(function() {
+        let value = 75; // Example number
+        let min = 0;
+        let max = 100;
+
+        let color = getColorGradient(value, min, max);
+        $('#box').css('background-color', color);
+    });
+</script>

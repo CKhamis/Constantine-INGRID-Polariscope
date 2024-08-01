@@ -52,8 +52,7 @@
                                     </button>
                                 </h2>
                                 <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
-                                    <div class="accordion-body">
-                                        <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                                    <div class="list-group" id="member-list-included">
                                     </div>
                                 </div>
                             </div>
@@ -64,8 +63,7 @@
                                     </button>
                                 </h2>
                                 <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
-                                    <div class="accordion-body">
-                                        <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                                    <div class="list-group" id="member-list-not-included">
                                     </div>
                                 </div>
                             </div>
@@ -82,6 +80,7 @@
 </div>
 
 <div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <script>
 
@@ -101,7 +100,7 @@
             })
             .then(data => {
                 memberList = data[0];
-
+                renderMemberModal();
             })
             .catch((response) => {
                 console.log(response);
@@ -113,6 +112,39 @@
                         console.error("Error parsing error response:", error);
                     });
             });
+    }
+
+    function renderMemberModal(){
+        const notIncludedContainer = document.querySelector("#member-list-not-included");
+        const includedContainer = document.querySelector("#member-list-included");
+        let notIncluded = "", included = "";
+        memberList.forEach((member) => {
+            let element = `<button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="toggleMark('${member.id}')">
+                                <div class="d-flex justify-content-start gap-2 align-items-center">
+                                    <img class="square-image img-fluid" style="width: 20px; height: 20px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
+                                    <p class="mb-0 fw-bold ms-2">${member.firstName} ${member.lastName}</p>
+                                </div>
+                                <p class="mb-0 fw-bold" style="color: ${getColorGradient(member.lastEvaluation.cscore, -100, 100)}">${member.lastEvaluation.cscore}</p>
+                            </button>`;
+
+            if("included" in member && member.included === true){
+                included += element;
+            }else{
+                notIncluded += element;
+            }
+        });
+        notIncludedContainer.innerHTML = notIncluded;
+        includedContainer.innerHTML = included;
+    }
+
+    function toggleMark(id){
+        let member = memberList.find(m => m.id === id);
+        if("included" in member && member.included === true){
+            member.included = false;
+        }else{
+            member.included = true;
+        }
+        renderMemberModal();
     }
 
     function createEvalChart(){
