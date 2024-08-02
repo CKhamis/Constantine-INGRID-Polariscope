@@ -89,6 +89,8 @@
     let memberList;
     let memberDetailList;
 
+    let evalChart;
+
     createEvalChart();
     refresh();
 
@@ -106,6 +108,8 @@
 
         spinner.classList.remove("d-block");
         spinner.classList.add("d-none");
+
+        updateChart();
     }
 
     async function getMemberDetails(id){
@@ -131,6 +135,27 @@
                         console.error("Error parsing error response:", error);
                     });
             });
+    }
+
+    function updateChart(){
+        let datasets = [];
+        for(const member of memberDetailList){
+            let chartEntryData = [];
+            member.fullTimeline.forEach((eval) => {
+                chartEntryData.push({x: new Date(eval.timestamp), y: eval.cscore})
+            })
+
+            const chartEntry = {
+                label: member.firstName + ' ' + member.lastName,
+                data: chartEntryData,
+                borderColor: getColorGradient(member.mostRecentEval.cscore, -100, 100)
+            }
+
+            datasets.push(chartEntry);
+        }
+
+        evalChart.data.datasets = datasets;
+        evalChart.update();
     }
     function refresh(){
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
@@ -189,7 +214,7 @@
     function createEvalChart(){
         let canvas = document.querySelector("#evaluation-history-chart");
         let scores = {datasets: [{data:[]}]};
-        evalChartEval = new Chart(canvas, {
+        evalChart = new Chart(canvas, {
             type: 'line',
             data:scores,
             options: {
