@@ -10,9 +10,13 @@
             <div>
                 <a href="/interpersonal">< Interpersonal Home</a>
             </div>
-            <div class="spinner-border d-none" role="status" id="loading-spinner">
-                <span class="visually-hidden">Loading...</span>
+            <div>
+                <div class="spinner-border d-none" role="status" id="loading-spinner">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <img src="/icons/Logo.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
             </div>
+
         </nav>
 
         <div class="row my-3">
@@ -96,45 +100,57 @@
 
     async function retrieveMemberDetails() {
         let spinner = document.querySelector("#loading-spinner");
+        let error = document.querySelector("#error-icon");
         spinner.classList.add("d-block");
         spinner.classList.remove("d-none");
 
+        const fetchArray = memberList
+            .filter(member => member.included === true)
+            .map(member => fetch("/api/interpersonal/member/view/" + member.id, {}));
+
         memberDetailList = [];
-        for (const member of memberList) {
-            if ("included" in member && member.included === true) {
-                await getMemberDetails(member.id);
-            }
-        }
 
-        spinner.classList.remove("d-block");
-        spinner.classList.add("d-none");
-
-        updateChart();
-    }
-
-    async function getMemberDetails(id){
-        const memberDetailFetch = fetch("/api/interpersonal/member/view/" + id, {});
-        Promise.all([memberDetailFetch])
+        Promise.all(fetchArray)
             .then(responses => {
-                return Promise.all([responses[0]]);
+                // Check if all responses are ok
+                responses.forEach(response => {
+                    if (!response.ok) {
+                        error.classList.add("d-block");
+                        error.classList.remove("d-none");
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                });
+                // Convert all responses to JSON
+                return Promise.all(responses.map(response => response.json()));
             })
-            .then(data => {
-                return Promise.all([data[0].json()]);
+            .then(dataArray => {
+                // Handle the array of data objects
+                dataArray.forEach(data => {
+                    memberDetailList.push(data);
+                    console.log(data);
+                });
             })
-            .then(data => {
-                memberDetailList.push(data[0]);
-                console.log(data[0]);
+            .catch(error => {
+                error.classList.add("d-block");
+                error.classList.remove("d-none");
+                console.error("Error:", error);
+                if (error.response) {
+                    error.response.json()
+                        .then(errorData => {
+                            console.log(errorData.message);
+                        })
+                        .catch(parseError => {
+                            console.error("Error parsing error response:", parseError);
+                        });
+                }
             })
-            .catch((response) => {
-                console.log(response);
-                response.json()
-                    .then(errorData => {
-                        console.log(errorData.message);
-                    })
-                    .catch(error => {
-                        console.error("Error parsing error response:", error);
-                    });
+            .finally(() => {
+                spinner.classList.remove("d-block");
+                spinner.classList.add("d-none");
+
+                updateChart();
             });
+
     }
 
     function updateChart(){
@@ -218,11 +234,11 @@
             type: 'line',
             data:scores,
             options: {
-                aspectRatio: 4,
+                aspectRatio: 3,
                 responsive: true,
                 plugins: {
                     legend: {
-                        display: false
+                        display: true
                     }
                 },
                 scales: {
