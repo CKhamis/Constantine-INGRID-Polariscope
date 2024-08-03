@@ -30,8 +30,19 @@
                 </div>
                 <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#member-modal">Add Members</button>
                 <button type="button" class="btn btn-primary mt-3" onclick="saveEvaluation(true)">Something else</button>
-                <div id="timeline-table-container">
-
+                <h3 class="fw-bold mt-3 mb-2">Notes</h3>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Timestamp</th>
+                                <th scope="col">Member</th>
+                                <th scope="col">cScore</th>
+                                <th scope="col">note</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timeline-table-container"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -87,6 +98,7 @@
 </div>
 
 <div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
 <div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <script>
@@ -149,8 +161,41 @@
                 spinner.classList.add("d-none");
 
                 updateChart();
+                updateTable();
             });
 
+    }
+
+    function updateTable(){
+        const tableContainer = document.querySelector("#timeline-table-container");
+        let tableContent = ``;
+
+        const combinedNotes = memberDetailList.flatMap(member =>
+            member.fullTimeline.map(element => ({
+                ...element,
+                firstName: member.firstName,
+                lastName: member.lastName,
+                id: member.id
+            }))
+        );
+        console.log(combinedNotes);
+        const sortedNotes = combinedNotes.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        console.log(sortedNotes);
+
+
+        sortedNotes.filter(eval => eval.note.length > 0).forEach((eval) => {
+            let row = `
+                    <tr>
+                        <td scope="col">${formatDate(eval.timestamp)}</td>
+                        <td scope="col"><a href="/interpersonal/member/view/${eval.id}" class="fw-bold">${eval.firstName} ${eval.lastName}</a></td>
+                        <td scope="col" class="fw-bold" style="color: ${getColorGradient(eval.cscore, -100, 100)}">${eval.cscore}</td>
+                        <td scope="col">${eval.note}</td>
+                    </tr>
+                `;
+            tableContent += row;
+        });
+
+        tableContainer.innerHTML = tableContent;
     }
 
     function updateChart(){
