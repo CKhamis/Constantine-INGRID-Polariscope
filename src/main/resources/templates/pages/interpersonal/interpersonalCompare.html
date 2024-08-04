@@ -16,20 +16,20 @@
                 </div>
                 <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
             </div>
-
         </nav>
 
         <div class="row my-3">
             <div class="col-lg-3 d-none d-lg-block">
-                <canvas id="composition-chart"></canvas>
+                <p class="fs-4 fw-bold text-center mb-4">Demographic Summary</p>
+                <canvas id="composition-canvas"></canvas>
+                <div class="list-group mt-4" id="member-list-side"></div>
             </div>
             <div class="col-12 col-lg-9 px-3">
-                <h2 class="fw-bold mt-3">Member Compare</h2>
+                <h2 class="fw-bold">Member Compare</h2>
                 <div>
                     <canvas id="evaluation-history-chart"></canvas>
                 </div>
                 <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#member-modal">Add Members</button>
-                <button type="button" class="btn btn-primary mt-3" onclick="saveEvaluation(true)">Something else</button>
                 <h3 class="fw-bold mt-3 mb-2">Notes</h3>
                 <div class="table-responsive">
                     <table class="table">
@@ -105,7 +105,7 @@
     let memberList;
     let memberDetailList;
 
-    let evalChart;
+    let evalChart, memberCompositionChart;
 
     createEvalChart();
     refresh();
@@ -163,8 +163,26 @@
 
                 updateChart();
                 updateTable();
+                updateDemographicList();
             });
+    }
 
+    function updateDemographicList(){
+        const listContainer = document.querySelector("#member-list-side");
+        let content = ``;
+        memberDetailList.forEach((member) => {
+            content += `
+                <button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="toggleMark('${member.id}')">
+                    <div class="d-flex justify-content-start gap-2 align-items-center">
+                        <img class="square-image img-fluid" style="width: 40px; height: 40px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
+                        <p class="mb-0 fw-bold ms-2 fs-4">${member.firstName} ${member.lastName}</p>
+                    </div>
+                    <p class="mb-0 fw-bold" style="color: ${getColorGradient(member.mostRecentEval.cscore, -100, 100)}">${member.mostRecentEval.cscore}</p>
+                </button>
+            `;
+        });
+
+        listContainer.innerHTML = content;
     }
 
     function updateTable(){
@@ -216,6 +234,30 @@
 
         evalChart.data.datasets = datasets;
         evalChart.update();
+
+        // Composition Chart
+        const tally = memberDetailList.reduce((acc, obj) => {
+            const type = obj.relationship;
+            if (acc[type]) {
+                acc[type]++;
+            } else {
+                acc[type] = 1;
+            }
+            return acc;
+        }, {});
+
+        const labels = Object.keys(tally);
+        const values = Object.values(tally);
+
+        data = {
+            datasets: [{
+                data:values
+            }],
+            labels:labels
+        };
+
+        memberCompositionChart.data = data;
+        memberCompositionChart.update();
     }
     function refresh(){
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
@@ -293,6 +335,26 @@
                         }
                     },
                 },
+            }
+        });
+
+        canvas = document.querySelector("#composition-canvas");
+        let data = {
+            datasets: [{
+                data:[]
+            }],
+            labels:[]
+        };
+        memberCompositionChart = new Chart(canvas, {
+            type: 'doughnut',
+            data:data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
             }
         });
     }
