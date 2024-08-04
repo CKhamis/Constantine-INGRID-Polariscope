@@ -14,7 +14,7 @@
                 <div class="spinner-border d-none" role="status" id="loading-spinner">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <img src="/icons/Logo.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
+                <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
             </div>
 
         </nav>
@@ -98,7 +98,7 @@
 </div>
 
 <div th:replace="~{components/External :: external}"></div>
-<div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
+<div th:replace="~{components/Formatting :: date-formatting}"></div>
 <div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <script>
@@ -119,6 +119,7 @@
         const fetchArray = memberList
             .filter(member => member.included === true)
             .map(member => fetch("/api/interpersonal/member/view/" + member.id, {}));
+
 
         memberDetailList = [];
 
@@ -178,10 +179,8 @@
                 id: member.id
             }))
         );
-        console.log(combinedNotes);
-        const sortedNotes = combinedNotes.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        const sortedNotes = combinedNotes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         console.log(sortedNotes);
-
 
         sortedNotes.filter(eval => eval.note.length > 0).forEach((eval) => {
             let row = `
