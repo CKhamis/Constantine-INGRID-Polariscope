@@ -71,7 +71,7 @@ public class InterpersonalAPI {
 
     @PostMapping("/member/save")
     public ResponseEntity<ResponseMessage> saveMember(@ModelAttribute MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
-        try{ //todo: with this configuration, image uploading only works. Memberform is not populated with anything for some reason.
+        try{
             User retrievedUser = getCurrentUser(principal);
 
             if(formElements.getId() != null){

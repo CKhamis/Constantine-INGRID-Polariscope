@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Model;
 
+import com.constantine.polariscope.Config.Encrypt;
 import com.constantine.polariscope.DTO.MemberForm;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -24,15 +25,21 @@ public class Member {
     @GeneratedValue
     private UUID id;
     @NonNull
+    @Convert(converter = Encrypt.class)
     private String firstName;
     @NonNull
+    @Convert(converter = Encrypt.class)
     private String lastName;
+    @Convert(converter = Encrypt.class)
     private String middleName;
     private RelationshipType relationship;
     private Sexuality sexuality;
+    @Convert(converter = Encrypt.class)
     private String personality;
+    @Convert(converter = Encrypt.class)
     private String favoriteColor;
     @Column(columnDefinition="text")
+    @Convert(converter = Encrypt.class)
     private String description;
     private Sex sex;
     private Integer ageMet;
@@ -58,7 +65,9 @@ public class Member {
     @Lob
     @JsonIgnore
     @Column(columnDefinition = "longblob")
+    //@Convert(converter = Encrypt.class)
     private byte[] profileImageData;
+    @Convert(converter = Encrypt.class)
     private String profileImageType;
     private LocalDateTime profileImageTimestamp;
 
