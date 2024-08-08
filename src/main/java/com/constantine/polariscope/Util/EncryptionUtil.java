@@ -1,4 +1,4 @@
-package com.constantine.polariscope.Config;
+package com.constantine.polariscope.Util;
 
 import org.springframework.stereotype.Component;
 import java.util.Base64;

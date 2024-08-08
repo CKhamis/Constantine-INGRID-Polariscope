@@ -4,10 +4,7 @@ import com.constantine.polariscope.Config.Encrypt;
 import com.constantine.polariscope.DTO.MemberForm;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
@@ -19,6 +16,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 public class Member {
     @Id
     @NonNull
@@ -83,8 +81,14 @@ public class Member {
     @Transient
     private int timelineSize;
 
-    public Member(){
+    @PrePersist
+    protected void onCreate(){
         created = LocalDateTime.now();
+        lastModified = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate(){
         lastModified = LocalDateTime.now();
     }
 
@@ -109,8 +113,6 @@ public class Member {
     }
 
     public Member(MemberForm form, @NonNull User user){
-        created = LocalDateTime.now();
-        lastModified = LocalDateTime.now();
         ageMet = form.getAgeMet();
         birthday = form.getBirthday();
         favoriteColor = form.getFavoriteColor();

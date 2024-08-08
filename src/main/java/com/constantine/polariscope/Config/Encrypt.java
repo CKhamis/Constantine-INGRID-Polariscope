@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Config;
 
+import com.constantine.polariscope.Util.EncryptionUtil;
 import jakarta.persistence.AttributeConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

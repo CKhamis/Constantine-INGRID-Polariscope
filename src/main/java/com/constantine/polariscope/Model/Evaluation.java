@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Model;
 
+import com.constantine.polariscope.Config.Encrypt;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,13 +19,26 @@ public class Evaluation implements Comparable<Evaluation>{
     private LocalDateTime timestamp;
     private LocalDateTime created;
     private LocalDateTime modified;
+    private LocalDateTime lastModified;
     @Column(columnDefinition="text")
+    @Convert(converter = Encrypt.class)
     private String note;
     private Integer cScore;
 
     @JsonIgnore
     @ManyToOne
     private Member member;
+
+    @PrePersist
+    protected void onCreate(){
+        created = LocalDateTime.now();
+        lastModified = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate(){
+        lastModified = LocalDateTime.now();
+    }
 
     public Evaluation(){
         created = LocalDateTime.now();

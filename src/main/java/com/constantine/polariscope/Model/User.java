@@ -1,10 +1,7 @@
 package com.constantine.polariscope.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,8 +17,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 public class User implements UserDetails {
-    //todo: profile icon?
     @Id
     @GeneratedValue
     private UUID id;
@@ -36,6 +33,8 @@ public class User implements UserDetails {
     private boolean isEnabled;
     @NonNull
     private LocalDateTime created;
+    @NonNull
+    private LocalDateTime lastModified;
 
     @JsonIgnore
     @OneToMany(mappedBy = "author")
@@ -45,8 +44,15 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "author")
     private List<Place> places;
 
-    public User(){
+    @PrePersist
+    protected void onCreate(){
         created = LocalDateTime.now();
+        lastModified = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate(){
+        lastModified = LocalDateTime.now();
     }
 
     @Override
