@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Model;
 
+import com.constantine.polariscope.Util.EncryptUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,9 +42,19 @@ public class Evaluation implements Comparable<Evaluation>{
         modified = LocalDateTime.now();
     }
 
-
     @Override
     public int compareTo(@NonNull Evaluation o) {
         return this.getTimestamp().compareTo(o.getTimestamp());
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void encrypt() {
+        this.note = EncryptUtil.encrypt(this.note, this.id, this.member.getAuthor().getPassword());
+    }
+
+    @PostLoad
+    private void decrypt() {
+        this.note = EncryptUtil.decrypt(this.note, this.id, this.member.getAuthor().getPassword());
     }
 }
