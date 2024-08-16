@@ -1,6 +1,7 @@
 package com.constantine.polariscope.Model;
 
 import com.constantine.polariscope.DTO.MemberForm;
+import com.constantine.polariscope.Util.EncryptUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -123,6 +124,30 @@ public class Member {
 
         author = user;
     }
+
+    @PrePersist
+    @PreUpdate
+    private void encrypt() {
+        this.firstName = EncryptUtil.encryptString(this.firstName, this.id, this.getAuthor().getPassword());
+        this.lastName = EncryptUtil.encryptString(this.lastName, this.id, this.getAuthor().getPassword());
+        this.middleName = EncryptUtil.encryptString(this.middleName, this.id, this.getAuthor().getPassword());
+        this.personality = EncryptUtil.encryptString(this.personality, this.id, this.getAuthor().getPassword());
+        this.favoriteColor = EncryptUtil.encryptString(this.favoriteColor, this.id, this.getAuthor().getPassword());
+        this.description = EncryptUtil.encryptString(this.description, this.id, this.getAuthor().getPassword());
+        this.description = EncryptUtil.encryptString(this.description, this.id, this.getAuthor().getPassword());
+    }
+
+    @PostLoad
+    private void decrypt() {
+        this.firstName = EncryptUtil.decryptString(this.firstName, this.id, this.getAuthor().getPassword());
+        this.lastName = EncryptUtil.decryptString(this.lastName, this.id, this.getAuthor().getPassword());
+        this.middleName = EncryptUtil.decryptString(this.middleName, this.id, this.getAuthor().getPassword());
+        this.personality = EncryptUtil.decryptString(this.personality, this.id, this.getAuthor().getPassword());
+        this.favoriteColor = EncryptUtil.decryptString(this.favoriteColor, this.id, this.getAuthor().getPassword());
+        this.description = EncryptUtil.decryptString(this.description, this.id, this.getAuthor().getPassword());
+        this.description = EncryptUtil.decryptString(this.description, this.id, this.getAuthor().getPassword());
+    }
+
     public enum Sex{
         MALE,
         FEMALE,

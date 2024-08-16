@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.UUID;
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -16,9 +15,9 @@ import javax.crypto.spec.SecretKeySpec;
 public class EncryptUtil {
     private static final String ALGORITHM = "AES";
     private static final int KEY_SIZE = 128;
-    private static final int ITERATION_COUNT = 65536;
+    private static final int ITERATION_COUNT = 5;
 
-    public static String encrypt(String data, UUID id, String password) {
+    public static String encryptString(String data, UUID id, String password) {
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, generateKey(password, id));
@@ -29,7 +28,7 @@ public class EncryptUtil {
         }
     }
 
-    public static String decrypt(String data, UUID id, String password) {
+    public static String decryptString(String data, UUID id, String password) {
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, generateKey(password, id));

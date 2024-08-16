@@ -50,11 +50,11 @@ public class Evaluation implements Comparable<Evaluation>{
     @PrePersist
     @PreUpdate
     private void encrypt() {
-        this.note = EncryptUtil.encrypt(this.note, this.id, this.member.getAuthor().getPassword());
+        this.note = EncryptUtil.encryptString(this.note, this.id, this.member.getAuthor().getPassword());
     }
 
     @PostLoad
     private void decrypt() {
-        this.note = EncryptUtil.decrypt(this.note, this.id, this.member.getAuthor().getPassword());
+        this.note = EncryptUtil.decryptString(this.note, this.id, this.member.getAuthor().getPassword());
     }
 }
