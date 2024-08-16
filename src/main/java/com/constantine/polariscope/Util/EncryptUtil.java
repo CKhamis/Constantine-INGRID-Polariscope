@@ -15,6 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Component
 public class EncryptUtil {
+    // todo: SI PE
     private static final String ALGORITHM = "AES";
     private static final int KEY_SIZE = 128;
     private static final int ITERATION_COUNT = 5;
@@ -47,7 +48,8 @@ public class EncryptUtil {
             try {
                 Cipher cipher = Cipher.getInstance(ALGORITHM);
                 cipher.init(Cipher.ENCRYPT_MODE, generateKey(password, id));
-                return cipher.doFinal(data);
+                byte[] encryptedBytes = cipher.doFinal(data);
+                return Base64.getEncoder().encode(encryptedBytes);
             } catch (Exception e) {
                 throw new RuntimeException("Error encrypting data", e);
             }
@@ -60,8 +62,9 @@ public class EncryptUtil {
             try {
                 Cipher cipher = Cipher.getInstance(ALGORITHM);
                 cipher.init(Cipher.DECRYPT_MODE, generateKey(password, id));
-                byte[] decodedBytes = Base64.getDecoder().decode(data); //todo: this line currently does not work when adding a profile image.
-                return cipher.doFinal(decodedBytes);
+                byte[] decodedBytes = Base64.getDecoder().decode(data);
+                byte[] decryptedBytes = cipher.doFinal(decodedBytes);
+                return decryptedBytes;
             } catch (Exception e) {
                 throw new RuntimeException("Error decrypting data", e);
             }
