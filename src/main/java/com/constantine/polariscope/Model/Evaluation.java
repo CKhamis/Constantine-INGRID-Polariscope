@@ -51,10 +51,12 @@ public class Evaluation implements Comparable<Evaluation>{
     @PreUpdate
     private void encrypt() {
         this.note = EncryptUtil.encryptString(this.note, this.id, this.member.getAuthor().getPassword());
+        this.cScore = EncryptUtil.encryptInteger(this.cScore, this.id, this.member.getAuthor().getPassword());
     }
 
     @PostLoad
     private void decrypt() {
         this.note = EncryptUtil.decryptString(this.note, this.id, this.member.getAuthor().getPassword());
+        this.cScore = EncryptUtil.decryptInteger(this.cScore, this.id, this.member.getAuthor().getPassword());
     }
 }

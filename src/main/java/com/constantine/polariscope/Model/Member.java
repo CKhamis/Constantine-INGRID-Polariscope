@@ -123,6 +123,7 @@ public class Member {
         }
 
         author = user;
+        profileImageType = "";
     }
 
     @PrePersist
@@ -135,6 +136,9 @@ public class Member {
         this.favoriteColor = EncryptUtil.encryptString(this.favoriteColor, this.id, this.getAuthor().getPassword());
         this.description = EncryptUtil.encryptString(this.description, this.id, this.getAuthor().getPassword());
         this.description = EncryptUtil.encryptString(this.description, this.id, this.getAuthor().getPassword());
+        this.profileImageData = EncryptUtil.encryptBytes(this.profileImageData, this.id, this.getAuthor().getPassword());
+        this.profileImageType = EncryptUtil.encryptString(this.profileImageType, this.id, this.getAuthor().getPassword());
+        this.ageMet = EncryptUtil.encryptInteger(this.ageMet, this.id, this.getAuthor().getPassword());
     }
 
     @PostLoad
@@ -146,6 +150,9 @@ public class Member {
         this.favoriteColor = EncryptUtil.decryptString(this.favoriteColor, this.id, this.getAuthor().getPassword());
         this.description = EncryptUtil.decryptString(this.description, this.id, this.getAuthor().getPassword());
         this.description = EncryptUtil.decryptString(this.description, this.id, this.getAuthor().getPassword());
+        this.profileImageData = EncryptUtil.decryptBytes(this.profileImageData, this.id, this.getAuthor().getPassword());
+        this.profileImageType = EncryptUtil.decryptString(this.profileImageType, this.id, this.getAuthor().getPassword());
+        this.ageMet = EncryptUtil.decryptInteger(this.ageMet, this.id, this.getAuthor().getPassword());
     }
 
     public enum Sex{
