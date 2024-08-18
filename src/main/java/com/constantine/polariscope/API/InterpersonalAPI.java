@@ -19,6 +19,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +44,6 @@ public class InterpersonalAPI {
     private final UserService userService;
     private final EvaluationService evaluationService;
     private final PlaceService placeService;
-    private final int MAX_EVALUATIONS = 300;
 
     private User getCurrentUser(Principal principal) throws Exception{
         if(principal == null){
@@ -71,7 +73,7 @@ public class InterpersonalAPI {
 
     @PostMapping("/member/save")
     public ResponseEntity<ResponseMessage> saveMember(@ModelAttribute MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
-        try{ //todo: with this configuration, image uploading only works. Memberform is not populated with anything for some reason.
+        try{
             User retrievedUser = getCurrentUser(principal);
 
             if(formElements.getId() != null){
