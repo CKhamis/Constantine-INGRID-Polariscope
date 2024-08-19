@@ -139,6 +139,7 @@ public class Member {
         this.profileImageData = EncryptUtil.encryptBytes(this.profileImageData, this.id);
         this.profileImageType = EncryptUtil.encryptString(this.profileImageType, this.id);
         this.ageMet = EncryptUtil.encryptInteger(this.ageMet, this.id);
+        this.birthday = EncryptUtil.encryptDate(birthday, this.id);
     }
 
     @PostLoad
@@ -153,6 +154,7 @@ public class Member {
         this.profileImageData = EncryptUtil.decryptBytes(this.profileImageData, this.id);
         this.profileImageType = EncryptUtil.decryptString(this.profileImageType, this.id);
         this.ageMet = EncryptUtil.decryptInteger(this.ageMet, this.id);
+        this.birthday = EncryptUtil.decryptDate(this.birthday, this.id);
     }
 
     public enum Sex{

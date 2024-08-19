@@ -8,6 +8,7 @@ import org.springframework.web.context.annotation.SessionScope;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.util.Base64;
 import java.util.UUID;
 import javax.crypto.Cipher;
@@ -24,6 +25,32 @@ public class EncryptUtil {
     private static final String ALGORITHM = "AES";
     private static final int KEY_SIZE = 128;
     private static final int ITERATION_COUNT = 5;
+
+    public static LocalDate encryptDate(LocalDate date, UUID id){
+        if(date == null){
+            return null;
+        }else{
+            int key = Math.abs(generateIntegerKey(hashedPassword, id));
+            if(key > 10000000){
+                key = key % 100000;
+            }
+            System.out.println("Original: " + date + " + " + key + " days ->\t" + date.plusDays(key));
+            return date.plusDays(key);
+        }
+    }
+
+    public static LocalDate decryptDate(LocalDate date, UUID id){
+        if(date == null){
+            return null;
+        }else{
+            int key = Math.abs(generateIntegerKey(hashedPassword, id));
+            if(key > 10000000){
+                key = key % 100000;
+            }
+            System.out.println("Cypher: " + date + " - " + key + " days ->\t" + date.minusDays(key));
+            return date.minusDays(key);
+        }
+    }
 
     public static String encryptString(String data, UUID id) {
         try {
