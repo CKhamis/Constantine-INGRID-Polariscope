@@ -129,30 +129,30 @@ public class Member {
     @PrePersist
     @PreUpdate
     private void encrypt() {
-        this.firstName = EncryptUtil.encryptString(this.firstName, this.id, this.getAuthor().getPassword());
-        this.lastName = EncryptUtil.encryptString(this.lastName, this.id, this.getAuthor().getPassword());
-        this.middleName = EncryptUtil.encryptString(this.middleName, this.id, this.getAuthor().getPassword());
-        this.personality = EncryptUtil.encryptString(this.personality, this.id, this.getAuthor().getPassword());
-        this.favoriteColor = EncryptUtil.encryptString(this.favoriteColor, this.id, this.getAuthor().getPassword());
-        this.description = EncryptUtil.encryptString(this.description, this.id, this.getAuthor().getPassword());
-        this.description = EncryptUtil.encryptString(this.description, this.id, this.getAuthor().getPassword());
-        this.profileImageData = EncryptUtil.encryptBytes(this.profileImageData, this.id, this.getAuthor().getPassword());
-        this.profileImageType = EncryptUtil.encryptString(this.profileImageType, this.id, this.getAuthor().getPassword());
-        this.ageMet = EncryptUtil.encryptInteger(this.ageMet, this.id, this.getAuthor().getPassword());
+        this.firstName = EncryptUtil.encryptString(this.firstName, this.id);
+        this.lastName = EncryptUtil.encryptString(this.lastName, this.id);
+        this.middleName = EncryptUtil.encryptString(this.middleName, this.id);
+        this.personality = EncryptUtil.encryptString(this.personality, this.id);
+        this.favoriteColor = EncryptUtil.encryptString(this.favoriteColor, this.id);
+        this.description = EncryptUtil.encryptString(this.description, this.id);
+        this.description = EncryptUtil.encryptString(this.description, this.id);
+        this.profileImageData = EncryptUtil.encryptBytes(this.profileImageData, this.id);
+        this.profileImageType = EncryptUtil.encryptString(this.profileImageType, this.id);
+        this.ageMet = EncryptUtil.encryptInteger(this.ageMet, this.id);
     }
 
     @PostLoad
     private void decrypt() {
-        this.firstName = EncryptUtil.decryptString(this.firstName, this.id, this.getAuthor().getPassword());
-        this.lastName = EncryptUtil.decryptString(this.lastName, this.id, this.getAuthor().getPassword());
-        this.middleName = EncryptUtil.decryptString(this.middleName, this.id, this.getAuthor().getPassword());
-        this.personality = EncryptUtil.decryptString(this.personality, this.id, this.getAuthor().getPassword());
-        this.favoriteColor = EncryptUtil.decryptString(this.favoriteColor, this.id, this.getAuthor().getPassword());
-        this.description = EncryptUtil.decryptString(this.description, this.id, this.getAuthor().getPassword());
-        this.description = EncryptUtil.decryptString(this.description, this.id, this.getAuthor().getPassword());
-        this.profileImageData = EncryptUtil.decryptBytes(this.profileImageData, this.id, this.getAuthor().getPassword());
-        this.profileImageType = EncryptUtil.decryptString(this.profileImageType, this.id, this.getAuthor().getPassword());
-        this.ageMet = EncryptUtil.decryptInteger(this.ageMet, this.id, this.getAuthor().getPassword());
+        this.firstName = EncryptUtil.decryptString(this.firstName, this.id);
+        this.lastName = EncryptUtil.decryptString(this.lastName, this.id);
+        this.middleName = EncryptUtil.decryptString(this.middleName, this.id);
+        this.personality = EncryptUtil.decryptString(this.personality, this.id);
+        this.favoriteColor = EncryptUtil.decryptString(this.favoriteColor, this.id);
+        this.description = EncryptUtil.decryptString(this.description, this.id);
+        this.description = EncryptUtil.decryptString(this.description, this.id);
+        this.profileImageData = EncryptUtil.decryptBytes(this.profileImageData, this.id);
+        this.profileImageType = EncryptUtil.decryptString(this.profileImageType, this.id);
+        this.ageMet = EncryptUtil.decryptInteger(this.ageMet, this.id);
     }
 
     public enum Sex{

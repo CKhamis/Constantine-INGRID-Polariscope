@@ -1,6 +1,9 @@
 package com.constantine.polariscope.Util;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.SessionScope;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -14,16 +17,18 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 @Component
+@SessionScope
 public class EncryptUtil {
-    // todo: SI PE
+    private static String hashedPassword;
+
     private static final String ALGORITHM = "AES";
     private static final int KEY_SIZE = 128;
     private static final int ITERATION_COUNT = 5;
 
-    public static String encryptString(String data, UUID id, String password) {
+    public static String encryptString(String data, UUID id) {
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, generateKey(password, id));
+            cipher.init(Cipher.ENCRYPT_MODE, generateKey(hashedPassword, id));
             byte[] encryptedBytes = cipher.doFinal(data.getBytes());
             return Base64.getEncoder().encodeToString(encryptedBytes);
         } catch (Exception e) {
@@ -31,10 +36,10 @@ public class EncryptUtil {
         }
     }
 
-    public static String decryptString(String data, UUID id, String password) {
+    public static String decryptString(String data, UUID id) {
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, generateKey(password, id));
+            cipher.init(Cipher.DECRYPT_MODE, generateKey(hashedPassword, id));
             byte[] decodedBytes = Base64.getDecoder().decode(data);
             byte[] decryptedBytes = cipher.doFinal(decodedBytes);
             return new String(decryptedBytes);
@@ -43,11 +48,11 @@ public class EncryptUtil {
         }
     }
 
-    public static byte[] encryptBytes(byte[] data, UUID id, String password) {
+    public static byte[] encryptBytes(byte[] data, UUID id) {
         if(data != null){
             try {
                 Cipher cipher = Cipher.getInstance(ALGORITHM);
-                cipher.init(Cipher.ENCRYPT_MODE, generateKey(password, id));
+                cipher.init(Cipher.ENCRYPT_MODE, generateKey(hashedPassword, id));
                 byte[] encryptedBytes = cipher.doFinal(data);
                 return Base64.getEncoder().encode(encryptedBytes);
             } catch (Exception e) {
@@ -57,11 +62,11 @@ public class EncryptUtil {
         return null;
     }
 
-    public static byte[] decryptBytes(byte[] data, UUID id, String password) {
+    public static byte[] decryptBytes(byte[] data, UUID id) {
         if(data != null){
             try {
                 Cipher cipher = Cipher.getInstance(ALGORITHM);
-                cipher.init(Cipher.DECRYPT_MODE, generateKey(password, id));
+                cipher.init(Cipher.DECRYPT_MODE, generateKey(hashedPassword, id));
                 byte[] decodedBytes = Base64.getDecoder().decode(data);
                 byte[] decryptedBytes = cipher.doFinal(decodedBytes);
                 return decryptedBytes;
@@ -72,18 +77,18 @@ public class EncryptUtil {
         return null;
     }
 
-    public static Integer encryptInteger(Integer num, UUID id, String password){
+    public static Integer encryptInteger(Integer num, UUID id){
         if(num == null){
             return null;
         }
-        return num + generateIntegerKey(password, id);
+        return num + generateIntegerKey(hashedPassword, id);
     }
 
-    public static Integer decryptInteger(Integer num, UUID id, String password){
+    public static Integer decryptInteger(Integer num, UUID id){
         if(num == null){
             return null;
         }
-        return num - generateIntegerKey(password, id);
+        return num - generateIntegerKey(hashedPassword, id);
     }
 
     private static SecretKey generateKey(String password, UUID uuid) {
@@ -127,4 +132,7 @@ public class EncryptUtil {
         }
     }
 
+    public void setHashedPassword(String password){
+        hashedPassword = password;
+    }
 }
