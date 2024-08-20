@@ -11,7 +11,7 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
-public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
+public class PolariscopeAuthenticationProvider extends DaoAuthenticationProvider {
 
     @Autowired
     private EncryptUtil encryptUtil;
@@ -28,7 +28,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         String hashedPassword = generatePBKDF2Hash(plaintextPassword);
         encryptUtil.setHashedPassword(hashedPassword);
 
-        System.out.println("real password: " + plaintextPassword + "\thash: " + hashedPassword);
+        //System.out.println("real password: " + plaintextPassword + "\thash: " + hashedPassword);
 
         // Proceed with authentication process
         Authentication auth = super.authenticate(authentication);

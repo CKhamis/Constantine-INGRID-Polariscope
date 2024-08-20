@@ -11,9 +11,14 @@
             <a href="/interpersonal">< Interpersonal Home</a>
         </div>
         <div>
+            <div class="spinner-border d-none" role="status" id="loading-spinner">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
+        </div>
+        <div>
             <div class="input-group">
-                <select class="form-select" id="member-select">
-                </select>
+                <select class="form-select" id="member-select"></select>
                 <button class="btn btn-primary bevel-sm" type="button" onclick="changeUser()">Change</button>
             </div>
         </div>
@@ -42,7 +47,10 @@
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
-                <div class="tab-pane fade show active" id="nav-overview" role="tabpanel" aria-labelledby="nav-overview-tab" tabindex="0">Home</div>
+                <div class="tab-pane fade show active" id="nav-overview" role="tabpanel" aria-labelledby="nav-overview-tab" tabindex="0">
+                    <h2 class="fw-bold mt-3">Member Summary</h2>
+                    <div class="row mt-2" id="member-chips"></div>
+                </div>
                 <div class="tab-pane fade" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab" tabindex="0">
                     <h2 class="fw-bold mt-3">Member Details</h2>
                     <div class="row mt-2">
@@ -249,6 +257,11 @@
 
     function refresh(){
         let memberId = document.querySelector("#id-form").value;
+        let spinner = document.querySelector("#loading-spinner");
+        spinner.classList.add("d-block");
+        spinner.classList.remove("d-none");
+        let errorIcon = document.querySelector("#error-icon");
+
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         const memberDetailFetch = fetch("/api/interpersonal/member/view/" + memberId, {});
         Promise.all([memberListFetch, memberDetailFetch])
@@ -268,12 +281,16 @@
                 if(memberDetails.mostRecentEval != null){
                     document.querySelector("#recent-score-modal").textContent = "Most recent cScore: " + memberDetails.mostRecentEval.cscore;
                 }
+                renderOverviewTab();
                 renderInfoTab();
                 updateEvalChart();
                 renderEvaluationTable();
             })
             .catch((response) => {
                 console.log(response);
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
+
                 response.json()
                     .then(errorData => {
                         console.log(errorData.message);
@@ -284,12 +301,20 @@
             })
             .finally(() => {
                 document.querySelector("#profile-image").src = "/api/interpersonal/member/profile-image/" + memberDetails.id + "?=" + new Date().getTime();
+                spinner.classList.remove("d-block");
+                spinner.classList.add("d-none");
             });
     }
 
     function modalSaveEval(){
         const idField = document.querySelector("#id-evaluation-modal").value;
         let id = null;
+
+        let spinner = document.querySelector("#loading-spinner");
+        spinner.classList.add("d-block");
+        spinner.classList.remove("d-none");
+        let errorIcon = document.querySelector("#error-icon");
+
         if(idField.length > 0){
             id = idField;
         }
@@ -310,6 +335,8 @@
                 document.getElementById(`${toastId}-loading`).style.color = "green";
             })
             .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
                 response.json()
                     .then(errorData => {
                         document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
@@ -325,6 +352,9 @@
             })
             .finally(() => {
                 refresh();
+                spinner.classList.remove("d-block");
+                spinner.classList.add("d-none");
+
                 document.querySelector("#id-evaluation-modal").value = "";
             });
     }
@@ -353,6 +383,30 @@
                     });
             })
             .then(refresh);
+    }
+
+    function renderOverviewTab(){
+
+        memberDetails.fullTimeline.forEach((evaluation) => {
+
+        });
+
+        let memberChipHTML = `
+            <div class="col-12 col-lg-3">
+                test
+            </div>
+            <div class="col-12 col-lg-3">
+                test
+            </div>
+            <div class="col-12 col-lg-3">
+                test
+            </div>
+            <div class="col-12 col-lg-3">
+                test
+            </div>
+            `;
+
+        document.querySelector("#member-chips").innerHTML = memberChipHTML;
     }
 
     function renderInfoTab(){

@@ -112,7 +112,7 @@
 
     async function retrieveMemberDetails() {
         let spinner = document.querySelector("#loading-spinner");
-        let error = document.querySelector("#error-icon");
+        let errorIcon = document.querySelector("#error-icon");
         spinner.classList.add("d-block");
         spinner.classList.remove("d-none");
 
@@ -128,8 +128,8 @@
                 // Check if all responses are ok
                 responses.forEach(response => {
                     if (!response.ok) {
-                        error.classList.add("d-block");
-                        error.classList.remove("d-none");
+                        errorIcon.classList.add("d-block");
+                        errorIcon.classList.remove("d-none");
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                 });
@@ -144,8 +144,8 @@
                 });
             })
             .catch(error => {
-                error.classList.add("d-block");
-                error.classList.remove("d-none");
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
                 console.error("Error:", error);
                 if (error.response) {
                     error.response.json()

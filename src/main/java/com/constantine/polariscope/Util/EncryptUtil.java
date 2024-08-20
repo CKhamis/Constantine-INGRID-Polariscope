@@ -35,7 +35,7 @@ public class EncryptUtil {
             if(key > 10000000){
                 key = key % 100000;
             }
-            System.out.println("Original: " + date + " + " + key + " days ->\t" + date.plusDays(key));
+            //System.out.println("Original: " + date + " + " + key + " days ->\t" + date.plusDays(key));
             return date.plusDays(key);
         }
     }
@@ -48,7 +48,7 @@ public class EncryptUtil {
             if(key > 10000000){
                 key = key % 100000;
             }
-            System.out.println("Cypher: " + date + " - " + key + " days ->\t" + date.minusDays(key));
+            //System.out.println("Cypher: " + date + " - " + key + " days ->\t" + date.minusDays(key));
             return date.minusDays(key);
         }
     }
@@ -58,7 +58,7 @@ public class EncryptUtil {
             return null;
         }else{
             int key = Math.abs(generateIntegerKey(hashedPassword, id));
-            System.out.println("Original: " + date + " + " + key + " days ->\t" + date.plusSeconds(key));
+            //System.out.println("Original: " + date + " + " + key + " days ->\t" + date.plusSeconds(key));
             return date.plusSeconds(key);
         }
     }
@@ -68,7 +68,7 @@ public class EncryptUtil {
             return null;
         }else{
             int key = Math.abs(generateIntegerKey(hashedPassword, id));
-            System.out.println("Cypher: " + date + " - " + key + " days ->\t" + date.minusSeconds(key));
+            //System.out.println("Cypher: " + date + " - " + key + " days ->\t" + date.minusSeconds(key));
             return date.minusSeconds(key);
         }
     }
