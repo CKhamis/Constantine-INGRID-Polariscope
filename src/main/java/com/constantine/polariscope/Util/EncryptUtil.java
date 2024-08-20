@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.UUID;
 import javax.crypto.Cipher;
@@ -49,6 +50,26 @@ public class EncryptUtil {
             }
             System.out.println("Cypher: " + date + " - " + key + " days ->\t" + date.minusDays(key));
             return date.minusDays(key);
+        }
+    }
+
+    public static LocalDateTime encryptDateTime(LocalDateTime date, UUID id){
+        if(date == null){
+            return null;
+        }else{
+            int key = Math.abs(generateIntegerKey(hashedPassword, id));
+            System.out.println("Original: " + date + " + " + key + " days ->\t" + date.plusSeconds(key));
+            return date.plusSeconds(key);
+        }
+    }
+
+    public static LocalDateTime decryptDateTime(LocalDateTime date, UUID id){
+        if(date == null){
+            return null;
+        }else{
+            int key = Math.abs(generateIntegerKey(hashedPassword, id));
+            System.out.println("Cypher: " + date + " - " + key + " days ->\t" + date.minusSeconds(key));
+            return date.minusSeconds(key);
         }
     }
 
