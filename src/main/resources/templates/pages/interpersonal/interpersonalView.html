@@ -245,6 +245,7 @@
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
+<div th:replace="~{components/Formatting :: time-interval}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
 <script>
     let memberList;
@@ -391,18 +392,46 @@
 
         });
 
+        let rhBackground;
+        if(memberDetails.mostRecentEval.cscore > 100 || memberDetails.mostRecentEval.cscore < -100){
+            rhBackground = "light";
+        }else if(memberDetails.mostRecentEval.cscore >= 99){
+            rhBackground = "primary";
+        }else if(memberDetails.mostRecentEval.cscore >= 80){
+            rhBackground = "info";
+        }else if(memberDetails.mostRecentEval.cscore >= 30){
+            rhBackground = "success";
+        }else if(memberDetails.mostRecentEval.cscore >= -30){
+            rhBackground = "warning";
+        }else{
+            rhBackground = "danger";
+        }
+
+
         let memberChipHTML = `
             <div class="col-12 col-lg-3">
-                test
+                <div class="mx-2 alert alert-${rhBackground}">
+                    <h6 class="text-center fw-bold">Current Evaluation</h6>
+                    <p class="text-center fs-2 mb-0">${memberDetails.mostRecentEval.cscore}</p>
+                </div>
             </div>
             <div class="col-12 col-lg-3">
-                test
+                <div class="mx-2 alert alert-secondary">
+                    <h6 class="text-center fw-bold">Personality Type</h6>
+                    <p class="text-center fs-2 mb-0">${memberDetails.personality}</p>
+                </div>
             </div>
             <div class="col-12 col-lg-3">
-                test
+                <div class="mx-2 alert alert-secondary">
+                    <h6 class="text-center fw-bold">cScore Entries</h6>
+                    <p class="text-center fs-2 mb-0">${memberDetails.fullTimeline.length}</p>
+                </div>
             </div>
             <div class="col-12 col-lg-3">
-                test
+                <div class="mx-2 alert alert-secondary">
+                    <h6 class="text-center fw-bold">Record Age</h6>
+                    <p class="text-center fs-2 mb-0">${timeSince(memberDetails.created)}</p>
+                </div>
             </div>
             `;
 
