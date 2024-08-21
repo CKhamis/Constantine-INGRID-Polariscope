@@ -50,6 +50,9 @@
                 <div class="tab-pane fade show active" id="nav-overview" role="tabpanel" aria-labelledby="nav-overview-tab" tabindex="0">
                     <h2 class="fw-bold mt-3">Member Summary</h2>
                     <div class="row mt-2" id="member-chips"></div>
+                    <canvas id="evaluation-history-chart-home"></canvas>
+                    <h3 class="fw-bold mt-3">Note History</h3>
+                    <div id="note-list-home"></div>
                 </div>
                 <div class="tab-pane fade" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab" tabindex="0">
                     <h2 class="fw-bold mt-3">Member Details</h2>
@@ -245,13 +248,15 @@
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
+<div th:replace="~{components/Formatting :: date-formatting}"></div>
 <div th:replace="~{components/Formatting :: time-interval}"></div>
+<div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
 <script>
     let memberList;
     let memberDetails;
 
-    let evalChartEval;
+    let evalChartEval, evalChartEvalHome;
 
     refresh();
     createEvalChart();
@@ -387,10 +392,20 @@
     }
 
     function renderOverviewTab(){
-
+        let noteContent = "";
         memberDetails.fullTimeline.forEach((evaluation) => {
-
+            if(evaluation.note.length > 0){
+                noteContent += `
+                <div class="d-flex justify-content-start alert alert-secondary mb-2">
+                    <p class="mb-0 fw-bold">${formatDate(evaluation.timestamp)}</p>
+                    <p class="mb-0 mx-3" style="color: ${getColorGradient(evaluation.cscore, -100, 100)}">${evaluation.cscore}</p>
+                    <p class="mb-0">${evaluation.note}</p>
+                </div>
+                `;
+            }
         });
+
+        document.querySelector("#note-list-home").innerHTML = noteContent;
 
         let rhBackground;
         if(memberDetails.mostRecentEval.cscore > 100 || memberDetails.mostRecentEval.cscore < -100){
@@ -640,7 +655,7 @@
         let scores = {datasets: [{data:[]}]};
         evalChartEval = new Chart(canvas, {
             type: 'line',
-            data:scores,
+            data: scores,
             options: {
                 aspectRatio: 5,
                 responsive: true,
@@ -654,9 +669,39 @@
                         type: 'time',
                         time: {
                             unit: 'day',
+                            tooltipFormat: 'MM/dd/yyyy',
+                            displayFormats: {
+                                day: 'MM/dd/yyyy'
+                            }
                         }
-                    },
+                    }
+                }
+            }
+        });
+        let canvas2 = document.querySelector("#evaluation-history-chart-home");
+        evalChartEval = new Chart(canvas2, {
+            type: 'line',
+            data: scores,
+            options: {
+                aspectRatio: 3,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                            tooltipFormat: 'MM/dd/yyyy',
+                            displayFormats: {
+                                day: 'MM/dd/yyyy'
+                            }
+                        }
+                    }
+                }
             }
         });
     }
