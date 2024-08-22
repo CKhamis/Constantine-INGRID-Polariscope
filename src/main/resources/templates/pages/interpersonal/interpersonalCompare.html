@@ -29,7 +29,7 @@
                 <div>
                     <canvas id="evaluation-history-chart"></canvas>
                 </div>
-                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#member-modal">Add Members</button>
+                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#member-modal">Select Members</button>
                 <h3 class="fw-bold mt-3 mb-2">Notes</h3>
                 <div class="table-responsive">
                     <table class="table">
@@ -109,6 +109,11 @@
 
     createEvalChart();
     refresh();
+
+    document.addEventListener("DOMContentLoaded", function() {
+        let myModal = new bootstrap.Modal(document.getElementById('member-modal'));
+        myModal.show();
+    });
 
     async function retrieveMemberDetails() {
         let spinner = document.querySelector("#loading-spinner");
@@ -226,7 +231,6 @@
             const chartEntry = {
                 label: member.firstName + ' ' + member.lastName,
                 data: chartEntryData,
-                borderColor: getColorGradient(member.mostRecentEval.cscore, -100, 100)
             }
 
             datasets.push(chartEntry);
@@ -332,6 +336,9 @@
                         type: 'time',
                         time: {
                             unit: 'day',
+                            displayFormats: {
+                                day: 'MM/dd/yyyy'
+                            }
                         }
                     },
                 },

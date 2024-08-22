@@ -648,6 +648,10 @@
         evalChartEval.data.datasets.pop();
         evalChartEval.data.datasets.push(newScores);
         evalChartEval.update();
+
+        evalChartEvalHome.data.datasets.pop();
+        evalChartEvalHome.data.datasets.push(newScores);
+        evalChartEvalHome.update();
     }
 
     function createEvalChart(){
@@ -669,7 +673,6 @@
                         type: 'time',
                         time: {
                             unit: 'day',
-                            tooltipFormat: 'MM/dd/yyyy',
                             displayFormats: {
                                 day: 'MM/dd/yyyy'
                             }
@@ -679,7 +682,7 @@
             }
         });
         let canvas2 = document.querySelector("#evaluation-history-chart-home");
-        evalChartEval = new Chart(canvas2, {
+        evalChartEvalHome = new Chart(canvas2, {
             type: 'line',
             data: scores,
             options: {
