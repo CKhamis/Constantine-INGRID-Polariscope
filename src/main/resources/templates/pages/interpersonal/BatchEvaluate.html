@@ -5,25 +5,19 @@
 <div th:replace="~{components/Navigation :: vertical}"></div>
 <main class="pt-3" style="margin-left: 60px">
 <div class="container-fluid px-4">
-
-    <nav class="navbar d-flex justify-content-between align-items-center">
-        <div>
-            <a href="/interpersonal">< Interpersonal Home</a>
-        </div>
-        <div>
-            <input type="datetime-local" class="form-control" id="evaluation-date" name="evaluation date">
-        </div>
-    </nav>
-
     <div class="row mt-3">
         <div class="col-md-3 col-lg-2 mb-4" id="left-pane">
         </div>
         <div class="col-md-9 col-lg-10 px-3 mb-4" id="right-pane">
             <div class="d-flex justify-content-between align-items-center">
                 <h2 class="fw-bold mb-2">Batch Evaluation</h2>
-                <div id="queue-button">
-
+                <div>
+                    <div class="spinner-border d-none" role="status" id="loading-spinner">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
                 </div>
+                <div id="queue-button" class="d-flex align-items-center"></div>
             </div>
             <canvas id="score-canvas" class="mb-5"></canvas>
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -106,6 +100,11 @@
 
     refresh();
     function refresh(){
+        let spinner = document.querySelector("#loading-spinner");
+        let errorIcon = document.querySelector("#error-icon");
+        spinner.classList.add("d-block");
+        spinner.classList.remove("d-none");
+
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         Promise.all([memberListFetch])
             .then(responses => {
@@ -122,6 +121,8 @@
                 }
             })
             .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
                 console.log(response);
                 response.json()
                     .then(errorData => {
@@ -130,10 +131,19 @@
                     .catch(error => {
                         console.error("Error parsing error response:", error);
                     });
+            })
+            .finally(() => {
+                spinner.classList.remove("d-block");
+                spinner.classList.add("d-none");
             });
     }
 
     function selectMember(id) {
+        let spinner = document.querySelector("#loading-spinner");
+        let errorIcon = document.querySelector("#error-icon");
+        spinner.classList.add("d-block");
+        spinner.classList.remove("d-none");
+
         const evaluationFetch = fetch("/api/interpersonal/evaluation/all/" + id, {});
         Promise.all([evaluationFetch])
             .then(responses => {
@@ -148,6 +158,8 @@
                 renderMemberInfo(id);
             })
             .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
                 console.log(response);
                 response.json()
                     .then(errorData => {
@@ -156,6 +168,10 @@
                     .catch(error => {
                         console.error("Error parsing error response:", error);
                     });
+            })
+            .finally(() => {
+                spinner.classList.remove("d-block");
+                spinner.classList.add("d-none");
             });
 
         function renderEvaluations(){
@@ -208,7 +224,7 @@
         document.querySelector("#member-date-created").textContent = formatDate(member.created);
         document.querySelector("#member-sex").textContent = member.sex;
         document.querySelector("#id-form").value = member.id;
-        document.querySelector("#queue-button").innerHTML = `<button type="button" class="btn btn-secondary mt-3" onclick="dequeue('${id}')">Dequeue</button>`;
+        document.querySelector("#queue-button").innerHTML = `<input type="datetime-local" class="form-control me-3" id="evaluation-date" name="evaluation date"> <button type="button" class="btn btn-secondary" onclick="dequeue('${id}')">Dequeue</button>`;
     }
 
     function dequeue(id){
