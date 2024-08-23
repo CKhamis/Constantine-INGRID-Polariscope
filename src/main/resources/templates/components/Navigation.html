@@ -32,3 +32,52 @@
         </div>
     </nav>
 </div>
+<div th:fragment="vertical" class="position-fixed d-flex flex-column flex-shrink-0 bg-body-tertiary" style="height:100vh; z-index: 99">
+    <a href="/" class="d-block p-2 link-body-emphasis text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Icon-only">
+        <img src="/icons/Logo.svg" alt="Logo" width="45" class="d-inline-block align-text-top">
+    </a>
+    <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
+        <li class="nav-item">
+            <a href="/interpersonal" class="nav-link py-3 border-bottom rounded-0" aria-current="page" data-bs-toggle="tooltip" data-bs-placement="right" aria-label="Home" data-bs-original-title="Home">
+                <img src="/icons/Dashboard.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/interpersonal/batch-evaluate" class="nav-link py-3 border-bottom rounded-0" aria-current="page" data-bs-toggle="tooltip" data-bs-placement="right" aria-label="Home" data-bs-original-title="Home">
+                <img src="/icons/Batch Evaluate.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            </a>
+        </li>
+        <li>
+            <a href="/interpersonal/interpersonal/members" class="nav-link py-3 border-bottom rounded-0" data-bs-toggle="tooltip" data-bs-placement="right" aria-label="Dashboard" data-bs-original-title="Dashboard">
+                <img src="/icons/All.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            </a>
+        </li>
+        <li>
+            <a href="/interpersonal/compare" class="nav-link py-3 border-bottom rounded-0" data-bs-toggle="tooltip" data-bs-placement="right" aria-label="Orders" data-bs-original-title="Orders">
+                <img src="/icons/Compare.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            </a>
+        </li>
+        <li>
+            <a href="/interpersonal/new" class="nav-link py-3 border-bottom rounded-0" data-bs-toggle="tooltip" data-bs-placement="right" aria-label="Products" data-bs-original-title="Products">
+                <img src="/icons/New.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            </a>
+        </li>
+        <li>
+            <a href="#" class="nav-link py-3 border-bottom rounded-0" data-bs-toggle="tooltip" data-bs-placement="right" aria-label="Customers" data-bs-original-title="Customers">
+                <img src="/icons/Settings.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            </a>
+        </li>
+    </ul>
+    <div class="dropdown border-top">
+        <a href="#" class="d-flex align-items-center justify-content-center p-2 link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://github.com/mdo.png" alt="mdo" width="24" height="24" class="rounded-circle">
+        </a>
+        <ul class="dropdown-menu text-small shadow" style="">
+            <li><a class="dropdown-item" href="#">New project...</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Sign out</a></li>
+        </ul>
+    </div>
+</div>
