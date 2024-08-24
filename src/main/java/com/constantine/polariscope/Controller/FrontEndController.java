@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.security.Principal;
 
@@ -40,6 +39,11 @@ public class FrontEndController {
     @GetMapping("/interpersonal")
     public String getInterpersonalHome() {
         return "pages/interpersonal/interpersonalHome";
+    }
+
+    @GetMapping("/interpersonal/settings")
+    public String getInterpersonalSettings() {
+        return "pages/interpersonal/interpersonalSettings";
     }
 
     @GetMapping("/interpersonal/members")
