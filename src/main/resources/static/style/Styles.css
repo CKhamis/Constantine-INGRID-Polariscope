@@ -27,3 +27,18 @@
     background-image: url("/backgrounds/stripe.svg");
     background-size: 5px;
 }
+
+.calendar{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    column-gap: 5px;
+    row-gap: 5px;
+    align-items: stretch;
+    justify-items: stretch;
+}
+
+.calendar-cell{
+    background: red;
+    aspect-ratio: 1 / 1;
+}
