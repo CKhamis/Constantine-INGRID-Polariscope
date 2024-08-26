@@ -4,33 +4,33 @@
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
 <main class="px-4 pt-2" style="margin-left: 60px">
-    <nav class="navbar d-flex justify-content-between align-items-center">
-        <div>
-            <a href="/interpersonal">< Interpersonal Home</a>
-        </div>
-        <div>
-            <h2 class="fw-bold text-center">All Members</h2>
-        </div>
-        <div></div>
-    </nav>
-    <div class="row mt-3">
+    <div class="row">
         <div class="col-md-3 col-lg-2 mb-4" id="left-pane">
             <p class="fs-4 fw-bold text-center mb-4">Member Composition</p>
             <canvas id="composition-canvas"></canvas>
 <!--            <p class="fs-4 fw-bold text-center mb-4">Member Composition</p>-->
         </div>
         <div class="col-md-9 col-lg-10 px-3" id="right-pane">
-            <div class="container-fluid table-responsive">
-                <nav class="navbar d-flex justify-content-start align-items-center">
-                    <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2 me-2" role="button" onclick="refresh()">
-                        <img class="square-image" th:src="@{/icons/Refresh.svg}" alt="refresh" style="width: 30px;"/>
+            <div class="container-fluid">
+                <nav class="navbar d-flex justify-content-between align-items-center">
+                    <h2 class="fw-bold">All Members</h2>
+                    <div>
+                        <div class="spinner-border d-none" role="status" id="loading-spinner">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
                     </div>
-                    <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button" data-bs-toggle="modal" data-bs-target="#filterModal">
-                        <p class="mb-0 mx-2 fs-5 fw-bold">Filter</p>
-                        <img class="square-image" th:src="@{/icons/Filter.svg}" alt="edit" style="width: 30px;"/>
+                    <div class="d-flex justify-content-start align-items-center">
+                        <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2 me-2" role="button" onclick="refresh()">
+                            <img class="square-image" th:src="@{/icons/Refresh.svg}" alt="refresh" style="width: 30px;"/>
+                        </div>
+                        <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button" data-bs-toggle="modal" data-bs-target="#filterModal">
+                            <p class="mb-0 mx-2 fs-5 fw-bold">Filter</p>
+                            <img class="square-image" th:src="@{/icons/Filter.svg}" alt="edit" style="width: 30px;"/>
+                        </div>
                     </div>
                 </nav>
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle table-responsive">
                     <thead>
                     <tr>
                         <th scope="col">Photo</th>
@@ -131,6 +131,11 @@
     refresh();
     setupGraph();
     function refresh(){
+        let spinner = document.querySelector("#loading-spinner");
+        let errorIcon = document.querySelector("#error-icon");
+        spinner.classList.add("d-block");
+        spinner.classList.remove("d-none");
+
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         Promise.all([memberListFetch])
             .then(responses => {
@@ -146,6 +151,8 @@
                 updateGraph();
             })
             .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
                 console.log(response);
                 response.json()
                     .then(errorData => {
@@ -155,6 +162,10 @@
                         console.error("Error parsing error response:", error);
                     });
             })
+            .finally(() => {
+                spinner.classList.remove("d-block");
+                spinner.classList.add("d-none");
+            });
     }
     function renderTable(){
         let tableContents = '';
