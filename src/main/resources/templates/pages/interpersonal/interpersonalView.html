@@ -2,13 +2,13 @@
 <html xml:th="https://www.thymeleaf.org">
 <head th:replace="~{components/Header :: head('View Member')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
-<div th:replace="~{components/Navigation :: navigation}"></div>
-<main class="pt-3">
+<div th:replace="~{components/Navigation :: vertical}"></div>
+<main class="pt-3" style="margin-left: 60px">
 <div class="container-fluid px-4">
 
     <nav class="navbar d-flex justify-content-between align-items-center">
         <div>
-            <a href="/interpersonal">< Interpersonal Home</a>
+            <h2 class="fw-bold">Member Records</h2>
         </div>
         <div>
             <div class="spinner-border d-none" role="status" id="loading-spinner">
@@ -48,14 +48,14 @@
             </nav>
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active" id="nav-overview" role="tabpanel" aria-labelledby="nav-overview-tab" tabindex="0">
-                    <h2 class="fw-bold mt-3">Member Summary</h2>
+                    <h3 class="fw-bold mt-3">General Ovreview</h3>
                     <div class="row mt-2" id="member-chips"></div>
                     <canvas id="evaluation-history-chart-home"></canvas>
                     <h3 class="fw-bold mt-3">Note History</h3>
                     <div id="note-list-home"></div>
                 </div>
                 <div class="tab-pane fade" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab" tabindex="0">
-                    <h2 class="fw-bold mt-3">Member Details</h2>
+                    <h3 class="fw-bold mt-3">Member Information</h3>
                     <div class="row mt-2">
                         <div class="col-12 mb-3">
                             <label for="pfp-file" class="form-label">Upload profile image for member</label>
@@ -135,7 +135,7 @@
                     <button type="submit" class="btn btn-primary" onclick="saveMember()" id="submit-button">Submit</button>
                 </div>
                 <div class="tab-pane fade" id="nav-evaluation" role="tabpanel" aria-labelledby="nav-evaluation-tab" tabindex="0">
-                    <h2 class="fw-bold mt-3">Evaluation Records</h2>
+                    <h3 class="fw-bold mt-3">Evaluation Records</h3>
                     <div>
                         <canvas id="evaluation-history-chart"></canvas>
                     </div>
@@ -150,7 +150,7 @@
                     <div id="eval-table-container"></div>
                 </div>
                 <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
-                    <h2 class="fw-bold mt-3">Member Settings</h2>
+                    <h3 class="fw-bold mt-3">Member Settings</h3>
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title fw-bold">Delete Member</h5>
