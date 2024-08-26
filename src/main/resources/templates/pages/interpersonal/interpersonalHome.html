@@ -75,20 +75,23 @@
 <div th:replace="~{components/External :: tooltips}"></div>
 <script>
     let memberList;
+    let userInfo;
 
     refresh();
 
     function refresh(){
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
-        Promise.all([memberListFetch])
+        const accountFetch = fetch("/api/account/info/current", {});
+        Promise.all([memberListFetch, accountFetch])
             .then(responses => {
-                return Promise.all([responses[0]]);
+                return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json()]);
+                return Promise.all([data[0].json(), data[1].json()]);
             })
             .then(data => {
                 memberList = data[0];
+                userInfo = data[1];
                 renderQuickStats();
                 renderLeastRecentEval();
                 renderHighestEval();
