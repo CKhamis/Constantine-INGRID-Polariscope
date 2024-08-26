@@ -11,6 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 public class Evaluation implements Comparable<Evaluation>{
 
     @Id
@@ -26,12 +27,6 @@ public class Evaluation implements Comparable<Evaluation>{
     @JsonIgnore
     @ManyToOne
     private Member member;
-
-    public Evaluation(){
-        created = LocalDateTime.now();
-        modified = LocalDateTime.now();
-    }
-
     public Evaluation(UUID id, LocalDateTime timestamp, String note, Integer cScore, Member member) {
         this.id = id;
         this.timestamp = timestamp;
@@ -50,6 +45,7 @@ public class Evaluation implements Comparable<Evaluation>{
     @PrePersist
     @PreUpdate
     private void encrypt() {
+        this.modified = LocalDateTime.now();
         this.note = EncryptUtil.encryptString(this.note, this.id);
         this.cScore = EncryptUtil.encryptInteger(this.cScore, this.id);
         //this.timestamp = EncryptUtil.encryptDateTime(this.timestamp, this.id);
