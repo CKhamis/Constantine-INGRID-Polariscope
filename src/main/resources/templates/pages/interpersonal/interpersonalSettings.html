@@ -5,24 +5,12 @@
 <div th:replace="~{components/Navigation :: vertical}"></div>
 
 <main class="container" style="padding-left: 60px">
-    <h1 class="fw-bold mt-2">Polariscope Settings</h1>
-    <p class="text-center fw-bold">Please choose a settings category you would like to see.</p>
+    <h1 class="fw-bold mt-2" id="title" onclick="displayMainMenu()" role="button">Polariscope Settings</h1>
     <div class="row">
         <div class="col-lg-2 d-none d-lg-block"></div>
         <div class="col-lg-8 col-12">
-            <div class="row">
-                <div class="col-lg-6 px-5">
-                    <div class="bg-body-tertiary bevel-lg d-flex align-items-center flex-column p-3">
-                        <img class="card-img-top square-image mt-2" alt="inspect members" src="/icons/Inspect.svg">
-                        <h3 class="fw-bold text-center mt-3">Member Settings</h3>
-                    </div>
-                </div>
-                <div class="col-lg-6 px-5">
-                    <div class="bg-body-tertiary bevel-lg d-flex align-items-center flex-column p-3">
-                        <img class="card-img-top square-image mt-2" alt="inspect members" src="/icons/Wrench.svg">
-                        <h3 class="fw-bold text-center mt-3">User Settings</h3>
-                    </div>
-                </div>
+            <div class="row" id="main-content">
+
             </div>
         </div>
     </div>
@@ -31,5 +19,41 @@
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
+<script>
+    displayMainMenu();
+    function displayMainMenu(){
+        document.querySelector("#title").textContent = `Polariscope Settings`;
+        document.querySelector("#main-content").innerHTML = `
+        <div class="col-lg-6 px-5" onclick="displayMemberSettings()" role="button">
+            <div class="bg-body-tertiary bevel-lg d-flex align-items-center flex-column p-3">
+                <img class="card-img-top square-image mt-2" alt="inspect members" src="/icons/Inspect.svg">
+                <h3 class="fw-bold text-center mt-3">Member Settings</h3>
+            </div>
+        </div>
+        <div class="col-lg-6 px-5" onclick="displayUserSettings()" role="button">
+            <div class="bg-body-tertiary bevel-lg d-flex align-items-center flex-column p-3">
+                <img class="card-img-top square-image mt-2" alt="inspect members" src="/icons/Wrench.svg">
+                <h3 class="fw-bold text-center mt-3">User Settings</h3>
+            </div>
+        </div>
+        `;
+    }
+
+    function displayMemberSettings(){
+        document.querySelector("#main-content").innerHTML = `
+        <a class="col-md-6 col-lg-4 mb-4 px-3" href="/interpersonal/import">
+            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                <p class="fs-4 fs-bold text-center m-0">Import Members</p>
+            </div>
+        </a>
+        `;
+        document.querySelector("#title").textContent = `Polariscope Settings > Member Settings`;
+    }
+
+    function displayUserSettings(){
+        document.querySelector("#main-content").innerHTML = `<p onclick="displayMainMenu()">Back to main menu</p>`;
+        document.querySelector("#title").textContent = `Polariscope Settings > User Settings`;
+    }
+</script>
 </body>
 </html>
