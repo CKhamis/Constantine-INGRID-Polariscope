@@ -4,6 +4,7 @@ import com.constantine.polariscope.DTO.MemberForm;
 import com.constantine.polariscope.DTO.ResponseMessage;
 import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
+import com.constantine.polariscope.Service.ActivityLogService;
 import com.constantine.polariscope.Service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -11,16 +12,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
+import java.time.LocalDate;
 
 @Controller
 @AllArgsConstructor
 @RequestMapping("/api/account")
 public class AccountAPI {
     private final UserService userService;
+    private final ActivityLogService activityLogService;
 
     private User getCurrentUser(Principal principal) throws Exception{
         if(principal == null){
@@ -39,6 +43,26 @@ public class AccountAPI {
         try{
             User retrievedUser = getCurrentUser(principal);
             return ResponseEntity.ok(retrievedUser);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving User", ResponseMessage.Severity.LOW, e.getMessage()));
+        }
+    }
+
+    @GetMapping("/activity/all")
+    public ResponseEntity<?> getAllActivity(Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+            return ResponseEntity.ok(activityLogService.findAll(retrievedUser));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving User", ResponseMessage.Severity.LOW, e.getMessage()));
+        }
+    }
+
+    @GetMapping("/activity/after/{date}")
+    public ResponseEntity<?> getAllActivity(@PathVariable LocalDate date, Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+            return ResponseEntity.ok(activityLogService.findAllAfter(retrievedUser, date.atStartOfDay()));
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving User", ResponseMessage.Severity.LOW, e.getMessage()));
         }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @AllArgsConstructor
 @Service
@@ -23,7 +22,7 @@ public class ActivityLogService {
         return activityLogRepository.findAllByUserAndCreatedAfter(user, after);
     }
 
-    public ActivityLog createLog(ActivityLog log){
+    public ActivityLog save(ActivityLog log){
         return activityLogRepository.save(log);
     }
 

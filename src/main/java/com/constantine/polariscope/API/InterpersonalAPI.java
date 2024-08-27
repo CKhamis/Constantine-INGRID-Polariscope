@@ -1,14 +1,8 @@
 package com.constantine.polariscope.API;
 
 import com.constantine.polariscope.DTO.*;
-import com.constantine.polariscope.Model.Evaluation;
-import com.constantine.polariscope.Model.Member;
-import com.constantine.polariscope.Model.Place;
-import com.constantine.polariscope.Model.User;
-import com.constantine.polariscope.Service.EvaluationService;
-import com.constantine.polariscope.Service.MemberService;
-import com.constantine.polariscope.Service.PlaceService;
-import com.constantine.polariscope.Service.UserService;
+import com.constantine.polariscope.Model.*;
+import com.constantine.polariscope.Service.*;
 import com.constantine.polariscope.Util.FileValidator;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -44,6 +38,7 @@ public class InterpersonalAPI {
     private final UserService userService;
     private final EvaluationService evaluationService;
     private final PlaceService placeService;
+    private final ActivityLogService activityLogService;
 
     private User getCurrentUser(Principal principal) throws Exception{
         if(principal == null){
@@ -65,6 +60,8 @@ public class InterpersonalAPI {
             // Construct new user
             Member member = new Member(formElements, retrievedUser);
             memberService.save(member);
+
+            activityLogService.save(new ActivityLog(ActivityLog.ActivityType.MEMBER_CREATED, retrievedUser));
             return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member saved to Polariscope"));
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error saving member"));
@@ -131,6 +128,8 @@ public class InterpersonalAPI {
                         }
 
                         memberService.save(retrievedMember);
+
+                        activityLogService.save(new ActivityLog(ActivityLog.ActivityType.MEMBER_MODIFIED, retrievedUser));
                         return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member details saved"));
                     }else{
                         // Throw the same error
@@ -157,6 +156,7 @@ public class InterpersonalAPI {
                 }
 
                 memberService.save(member);
+                activityLogService.save(new ActivityLog(ActivityLog.ActivityType.MEMBER_CREATED, retrievedUser));
                 return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member saved to Polariscope"));
             }
         }catch(Exception e){
@@ -309,6 +309,7 @@ public class InterpersonalAPI {
                             existing.setModified(LocalDateTime.now());
 
                             evaluationService.save(existing);
+                            activityLogService.save(new ActivityLog(ActivityLog.ActivityType.EVALUATION_MODIFIED, retrievedUser));
                             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Evaluation Edited", ResponseMessage.Severity.INFORMATIONAL, "Modified values of existing evaluation"));
                         }
                     }
@@ -319,6 +320,7 @@ public class InterpersonalAPI {
                     // Create new eval
                     Evaluation newEval = new Evaluation(null, form.getTimestamp(), form.getNote(), form.getCscore(), member);
                     evaluationService.save(newEval);
+                    activityLogService.save(new ActivityLog(ActivityLog.ActivityType.EVALUATION_CREATED, retrievedUser));
                     return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Evaluation Saved", ResponseMessage.Severity.INFORMATIONAL, "Evaluation has been saved to member"));
                 }else{
                     // Member author does not match logged in user
@@ -349,6 +351,7 @@ public class InterpersonalAPI {
 
                 if(member.getAuthor().getId().equals(user.getId())){
                     evaluationService.delete(evaluation);
+                    activityLogService.save(new ActivityLog(ActivityLog.ActivityType.EVALUATION_DELETED, user));
                     return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Evaluation Saved", ResponseMessage.Severity.INFORMATIONAL, "Evaluation has been saved to member"));
                 }else{
                     // Member author does not match with logged in user

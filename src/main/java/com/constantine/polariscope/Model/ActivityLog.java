@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Model;
 
+import com.constantine.polariscope.Service.ActivityLogService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,16 +35,21 @@ public class ActivityLog{
     @PrePersist
     private void create(){
         this.created = LocalDateTime.now();
+        this.modified = LocalDateTime.now();
     }
 
-    private enum ActivityType{
+    public ActivityLog(@NonNull ActivityType type, User user){
+        this.activityType = type;
+        this.user = user;
+    }
+
+    public enum ActivityType{
         MEMBER_CREATED,
         MEMBER_MODIFIED,
         MEMBER_DELETED,
         EVALUATION_CREATED,
         EVALUATION_MODIFIED,
         EVALUATION_DELETED,
-        USER_LOGIN,
 
     }
 }
