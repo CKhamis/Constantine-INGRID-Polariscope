@@ -15,11 +15,11 @@ public class ActivityLogService {
     private ActivityLogRepository activityLogRepository;
 
     public List<ActivityLog> findAll(User user){
-        return activityLogRepository.findAllByUser(user);
+        return activityLogRepository.findAllByUserOrderByCreatedAsc(user);
     }
 
     public List<ActivityLog> findAllAfter(User user, LocalDateTime after){
-        return activityLogRepository.findAllByUserAndCreatedAfter(user, after);
+        return activityLogRepository.findAllByUserAndCreatedAfterOrderByCreatedAsc(user, after);
     }
 
     public ActivityLog save(ActivityLog log){

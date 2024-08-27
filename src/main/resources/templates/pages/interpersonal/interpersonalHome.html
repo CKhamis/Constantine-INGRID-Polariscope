@@ -85,22 +85,30 @@
 <script>
     let memberList;
     let userInfo;
+    let activityList;
 
     refresh();
 
     function refresh(){
+        const day = new Date();
+
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         const accountFetch = fetch("/api/account/info/current", {});
-        Promise.all([memberListFetch, accountFetch])
+        const activityFetch = fetch("/api/account/activity/after/" +
+            day.getFullYear() + "-" +
+            String(day.getMonth() + 1).padStart(2, '0') + "-01");
+
+        Promise.all([memberListFetch, accountFetch, activityFetch])
             .then(responses => {
                 return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json(), data[1].json()]);
+                return Promise.all([data[0].json(), data[1].json(), data[2].json()]);
             })
             .then(data => {
                 memberList = data[0];
                 userInfo = data[1];
+                activityList = data[2];
                 renderQuickStats();
                 renderLeastRecentEval();
                 renderHighestEval();
@@ -112,11 +120,7 @@
     }
 
     function renderQuickStats(){
-        let noteContent = "";
-
-
-
-        let memberChipHTML = `
+        document.querySelector("#member-chips").innerHTML = `
             <div class="col-12 col-lg-6">
                 <div class="mx-2 alert alert-secondary">
                     <h6 class="text-center fw-bold">Member Count</h6>
@@ -130,8 +134,6 @@
                 </div>
             </div>
             `;
-
-        document.querySelector("#member-chips").innerHTML = memberChipHTML;
     }
 
     function renderLeastRecentEval(){

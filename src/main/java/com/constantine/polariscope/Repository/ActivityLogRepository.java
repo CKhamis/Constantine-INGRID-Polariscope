@@ -12,6 +12,6 @@ import java.util.UUID;
 
 @Repository
 public interface ActivityLogRepository extends JpaRepository<ActivityLog, UUID> {
-    List<ActivityLog> findAllByUserAndCreatedAfter(User user, LocalDateTime after);
-    List<ActivityLog> findAllByUser(User user);
+    List<ActivityLog> findAllByUserAndCreatedAfterOrderByCreatedAsc(User user, LocalDateTime after);
+    List<ActivityLog> findAllByUserOrderByCreatedAsc(User user);
 }
