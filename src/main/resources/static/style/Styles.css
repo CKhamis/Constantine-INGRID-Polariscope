@@ -26,6 +26,7 @@
 .stripe-white{
     background-image: url("/backgrounds/stripe.svg");
     background-size: 5px;
+    background-attachment: fixed;
 }
 
 .calendar{
