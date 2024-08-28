@@ -130,8 +130,7 @@
             });
     }
 
-    function renderCalendarWidget(){
-        const today = new Date();
+    function renderCalendarWidget(today = new Date()){
         const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const dayOfWeek = firstDayOfMonth.getDay();
         const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -145,7 +144,12 @@
             container.appendChild(cell);
         }
 
-        let dayCount = 0, arrayIndex = 0, day = new Date();
+        let dayCount = 0, arrayIndex = 0, day = new Date(today);
+        while(arrayIndex < activityList.length && new Date(activityList[arrayIndex].created) < firstDayOfMonth){
+            arrayIndex++;
+        }
+
+
         for(let i = 0; i < lastDay; i++){
             let cell = document.createElement('div');
             day.setDate(i+1);
