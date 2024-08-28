@@ -34,43 +34,52 @@
                             <option value="3">Three</option>
                         </select>
                     </div>
-                    <div class="calendar">
+                    <div class="row mt-3">
+                        <div class="col text-center fw-bold">S</div>
+                        <div class="col text-center fw-bold">M</div>
+                        <div class="col text-center fw-bold">T</div>
+                        <div class="col text-center fw-bold">W</div>
+                        <div class="col text-center fw-bold">T</div>
+                        <div class="col text-center fw-bold">F</div>
+                        <div class="col text-center fw-bold">S</div>
+                    </div>
+                    <div class="calendar" id="calendar-widget-content">
                         <!-- 35 cells for the calendar -->
-                        <div class="calendar-cell">1</div>
-                        <div class="calendar-cell">2</div>
-                        <div class="calendar-cell">3</div>
-                        <div class="calendar-cell">4</div>
-                        <div class="calendar-cell">5</div>
-                        <div class="calendar-cell">6</div>
-                        <div class="calendar-cell">7</div>
-                        <div class="calendar-cell">8</div>
-                        <div class="calendar-cell">9</div>
-                        <div class="calendar-cell">10</div>
-                        <div class="calendar-cell">11</div>
-                        <div class="calendar-cell">12</div>
-                        <div class="calendar-cell">13</div>
-                        <div class="calendar-cell">14</div>
-                        <div class="calendar-cell">15</div>
-                        <div class="calendar-cell">16</div>
-                        <div class="calendar-cell">17</div>
-                        <div class="calendar-cell">18</div>
-                        <div class="calendar-cell">19</div>
-                        <div class="calendar-cell">20</div>
-                        <div class="calendar-cell">21</div>
-                        <div class="calendar-cell">22</div>
-                        <div class="calendar-cell">23</div>
-                        <div class="calendar-cell">24</div>
-                        <div class="calendar-cell">25</div>
-                        <div class="calendar-cell">26</div>
-                        <div class="calendar-cell">27</div>
-                        <div class="calendar-cell">28</div>
-                        <div class="calendar-cell">29</div>
-                        <div class="calendar-cell">30</div>
-                        <div class="calendar-cell">31</div>
-                        <div class="calendar-cell">32</div>
-                        <div class="calendar-cell">33</div>
-                        <div class="calendar-cell">34</div>
-                        <div class="calendar-cell">35</div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
+                        <div class="calendar-cell"></div>
                     </div>
                 </div>
             </div>
@@ -80,6 +89,7 @@
 
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
+<div th:replace="~{components/Gradient :: gradient-2}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Formatting :: time-interval}"></div>
 <script>
@@ -113,10 +123,52 @@
                 renderLeastRecentEval();
                 renderHighestEval();
                 renderLowestEval();
+                renderCalendarWidget();
             })
             .then(() => {
 
             });
+    }
+
+    function renderCalendarWidget(){
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const dayOfWeek = firstDayOfMonth.getDay();
+        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        const lastDay = lastDayOfMonth.getDate();
+
+        const container = document.querySelector("#calendar-widget-content");
+        container.innerHTML = "";
+
+        for (let i = 0; i < dayOfWeek; i++) {
+            let cell = document.createElement('div');
+            container.appendChild(cell);
+        }
+
+        let dayCount = 0, arrayIndex = 0, day = new Date();
+        for(let i = 0; i < lastDay; i++){
+            let cell = document.createElement('div');
+            day.setDate(i+1);
+            dayCount = 0;
+
+            for(let j = arrayIndex; j < activityList.length; j++){
+                if(new Date(activityList[j].created) < day){
+                    dayCount++;
+                    arrayIndex++;
+                }else{
+                    break;
+                }
+            }
+
+            if(today.getDate() === day.getDate()){
+                cell.classList.add('fw-bold');
+            }
+
+            cell.textContent = day.getDate() + '';
+            cell.style.backgroundColor = greyToGreenGradient(0, 10, dayCount);
+            cell.classList.add('calendar-cell');
+            container.appendChild(cell);
+        }
     }
 
     function renderQuickStats(){

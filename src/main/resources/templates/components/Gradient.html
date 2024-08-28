@@ -26,3 +26,22 @@
         return `rgb(${r}, ${g}, ${b})`;
     }
 </script>
+<script th:fragment="gradient-2">
+    function greyToGreenGradient(min, max, num) {
+        // Clamp num to be within the range of min and max
+        num = Math.max(min, Math.min(max, num));
+
+        // Calculate the proportion of num within the range
+        const scale = (num - min) / (max - min);
+
+        // Ensure the scale is between 0 and 1
+        const clampedScale = Math.min(1, Math.max(0, scale));
+
+        const grey = 30;
+
+        let green = grey + clampedScale * (200 - grey);
+
+        // Return the RGB string
+        return `rgb(${grey}, ${green}, ${grey})`;
+    }
+</script>

@@ -40,6 +40,7 @@
 }
 
 .calendar-cell{
-    background: red;
     aspect-ratio: 1 / 1;
+    padding: 1rem;
+    text-align: center;
 }
