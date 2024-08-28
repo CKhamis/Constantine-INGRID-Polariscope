@@ -193,13 +193,19 @@
 
     function renderQuickStats(){
         document.querySelector("#member-chips").innerHTML = `
-            <div class="col-12 col-lg-6">
+            <div class="col-12 col-lg-4">
                 <div class="mx-2 alert alert-secondary">
                     <h6 class="text-center fw-bold">Member Count</h6>
                     <p class="text-center fs-3 mb-0">${memberList.length}</p>
                 </div>
             </div>
-            <div class="col-12 col-lg-6">
+            <div class="col-12 col-lg-4">
+                <div class="mx-2 alert alert-secondary">
+                    <h6 class="text-center fw-bold">Activity Score</h6>
+                    <p class="text-center fs-3 mb-0">${activityList.length}</p>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
                 <div class="mx-2 alert alert-secondary">
                     <h6 class="text-center fw-bold">Account Age</h6>
                     <p class="text-center fs-3 mb-0">${timeSince(userInfo.created)}</p>
