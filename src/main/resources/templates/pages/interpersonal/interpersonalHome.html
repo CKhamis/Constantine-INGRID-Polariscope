@@ -26,15 +26,14 @@
             <div class="col-lg-4 p-2 d-none d-md-block">
                 <div class="bg-body-tertiary p-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="fw-bold">Activity</h3>
-                        <select class="form-select" aria-label="Default select example">
-                            <option selected>Open this select menu</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
-                        </select>
+                        <h3 class="fw-bold" id="activity-widget-title">Activity</h3>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <button type="button" onclick="resetCalendar()" class="btn btn-dark p-1"><img class="square-image" src="/icons/Refresh.svg" alt="refresh" style="width: 28px;"></button>
+                            <button type="button" class="btn btn-dark" onclick="prevMonth()"><</button>
+                            <button type="button" class="btn btn-dark" onclick="nextMonth()">></button>
+                        </div>
                     </div>
-                    <div class="row mt-3">
+                    <div class="row mt-3 mx-1">
                         <div class="col text-center fw-bold">S</div>
                         <div class="col text-center fw-bold">M</div>
                         <div class="col text-center fw-bold">T</div>
@@ -44,7 +43,6 @@
                         <div class="col text-center fw-bold">S</div>
                     </div>
                     <div class="calendar" id="calendar-widget-content">
-                        <!-- 35 cells for the calendar -->
                         <div class="calendar-cell"></div>
                         <div class="calendar-cell"></div>
                         <div class="calendar-cell"></div>
@@ -97,6 +95,8 @@
     let userInfo;
     let activityList;
 
+    let activityDate = new Date();
+
     refresh();
 
     function refresh(){
@@ -130,7 +130,30 @@
             });
     }
 
-    function renderCalendarWidget(today = new Date()){
+    function getMonthName(date) {
+        return date.toLocaleString('default', { month: 'long' });
+    }
+
+    function resetCalendar(){
+        activityDate = new Date();
+        renderCalendarWidget();
+    }
+
+    function nextMonth(){
+        activityDate.setMonth(activityDate.getMonth() + 1);
+        renderCalendarWidget();
+    }
+
+    function prevMonth(){
+        activityDate.setMonth(activityDate.getMonth() - 1);
+        renderCalendarWidget();
+    }
+
+    function renderCalendarWidget(){
+        let today = activityDate;
+
+        document.querySelector("#activity-widget-title").innerText = getMonthName(today) + " " + today.getFullYear()
+
         const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const dayOfWeek = firstDayOfMonth.getDay();
         const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -215,7 +238,7 @@
             LREContent += `
                 <a class="mx-2 mb-3 text-decoration-none" href="/interpersonal/member/view/${member.id}">
                     <div class="card d-flex justify-content-center" style="width: 10rem">
-                        <img class="card-img-top square-image mt-2" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
+                        <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                         <div class="card-body">
                             <h5 class="card-title fw-bold text-nowrap text-truncate">${member.firstName} ${member.lastName}</h5>
                             <p class="text-center">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>
@@ -255,7 +278,7 @@
             LREContent += `
                 <a class="mx-2 mb-3 text-decoration-none" href="/interpersonal/member/view/${member.id}">
                     <div class="card d-flex justify-content-center" style="width: 10rem">
-                        <img class="card-img-top square-image mt-2" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
+                        <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                         <div class="card-body">
                             <h5 class="card-title fw-bold text-nowrap text-truncate">${member.firstName} ${member.lastName}</h5>
                              <p class="">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>
@@ -295,7 +318,7 @@
             LREContent += `
                 <a class="mx-2 mb-3 text-decoration-none" href="/interpersonal/member/view/${member.id}">
                     <div class="card d-flex justify-content-center" style="width: 10rem">
-                        <img class="card-img-top square-image mt-2" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
+                        <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                         <div class="card-body">
                             <h5 class="card-title fw-bold text-nowrap text-truncate">${member.firstName} ${member.lastName}</h5>
                              <p class="">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>
