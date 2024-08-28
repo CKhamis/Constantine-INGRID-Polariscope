@@ -100,13 +100,14 @@
     refresh();
 
     function refresh(){
-        const day = new Date();
+        // const day = new Date();
 
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         const accountFetch = fetch("/api/account/info/current", {});
-        const activityFetch = fetch("/api/account/activity/after/" +
-            day.getFullYear() + "-" +
-            String(day.getMonth() + 1).padStart(2, '0') + "-01");
+        // const activityFetch = fetch("/api/account/activity/after/" +
+        //     day.getFullYear() + "-" +
+        //     String(day.getMonth() + 1).padStart(2, '0') + "-01");
+        const activityFetch = fetch('/api/account/activity/all')
 
         Promise.all([memberListFetch, accountFetch, activityFetch])
             .then(responses => {
@@ -151,7 +152,6 @@
 
     function renderCalendarWidget(){
         let today = activityDate;
-
         document.querySelector("#activity-widget-title").innerText = getMonthName(today) + " " + today.getFullYear()
 
         const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -167,32 +167,25 @@
             container.appendChild(cell);
         }
 
-        let dayCount = 0, arrayIndex = 0, day = new Date(today);
-        while(arrayIndex < activityList.length && new Date(activityList[arrayIndex].created) < firstDayOfMonth){
-            arrayIndex++;
-        }
+        const heatmapData = new Array(lastDay).fill(0);
+        activityList.forEach(activity => {
+            const createdDate = new Date(activity.created);
 
+            if (createdDate.getMonth() === today.getMonth() && createdDate.getFullYear() === today.getFullYear()) {
+                const day = createdDate.getDate();
+                heatmapData[day - 1]++;
+            }
+        });
 
         for(let i = 0; i < lastDay; i++){
             let cell = document.createElement('div');
-            day.setDate(i+1);
-            dayCount = 0;
 
-            for(let j = arrayIndex; j < activityList.length; j++){
-                if(new Date(activityList[j].created) < day){
-                    dayCount++;
-                    arrayIndex++;
-                }else{
-                    break;
-                }
-            }
-
-            if(today.getDate() === day.getDate()){
+            if(today.getDate() === i+1){
                 cell.classList.add('fw-bold');
             }
 
-            cell.textContent = day.getDate() + '';
-            cell.style.backgroundColor = greyToGreenGradient(0, 10, dayCount);
+            cell.textContent = i + 1 + '';
+            cell.style.backgroundColor = greyToGreenGradient(0, 10, heatmapData[i]);
             cell.classList.add('calendar-cell');
             container.appendChild(cell);
         }

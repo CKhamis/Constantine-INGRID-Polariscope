@@ -17,7 +17,10 @@
                     </div>
                     <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
                 </div>
-                <div id="queue-button" class="d-flex align-items-center"></div>
+                <div class="d-flex align-items-center">
+                    <input type="datetime-local" class="form-control me-3" id="evaluation-date" name="evaluation date">
+                    <button type="button" class="btn btn-secondary" onclick="dequeue()">Dequeue</button>
+                </div>
             </div>
             <canvas id="score-canvas" class="mb-5"></canvas>
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -97,6 +100,8 @@
     let evalList;
 
     let evalChartEval;
+
+    let currentId;
 
     refresh();
     function refresh(){
@@ -204,6 +209,7 @@
             content += `
                 <div class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" onclick="selectMember('${member.id}')">
                     <img class="square-image img-fluid" style="width: 40px; height: 40px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
+                    <img class="square-image img-fluid" style="width: 40px; height: 40px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
                     <h4 class="fw-bold mb-0 ms-2">${member.firstName} ${member.lastName}</h4>
                 </div>
                 `;
@@ -224,10 +230,9 @@
         document.querySelector("#member-date-created").textContent = formatDate(member.created);
         document.querySelector("#member-sex").textContent = member.sex;
         document.querySelector("#id-form").value = member.id;
-        document.querySelector("#queue-button").innerHTML = `<input type="datetime-local" class="form-control me-3" id="evaluation-date" name="evaluation date"> <button type="button" class="btn btn-secondary" onclick="dequeue('${id}')">Dequeue</button>`;
     }
 
-    function dequeue(id){
+    function dequeue(id = currentId){
         memberList = memberList.filter(obj => obj.id !== id);
         renderMemberList();
         if(memberList.length > 0){
