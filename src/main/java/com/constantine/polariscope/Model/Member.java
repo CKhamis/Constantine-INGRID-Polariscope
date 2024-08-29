@@ -151,7 +151,6 @@ public class Member {
         this.personality = EncryptUtil.decryptString(this.personality, this.id);
         this.favoriteColor = EncryptUtil.decryptString(this.favoriteColor, this.id);
         this.description = EncryptUtil.decryptString(this.description, this.id);
-        this.description = EncryptUtil.decryptString(this.description, this.id);
         this.profileImageData = EncryptUtil.decryptBytes(this.profileImageData, this.id);
         this.profileImageType = EncryptUtil.decryptString(this.profileImageType, this.id);
         this.ageMet = EncryptUtil.decryptInteger(this.ageMet, this.id);

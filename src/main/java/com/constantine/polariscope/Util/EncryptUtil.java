@@ -74,6 +74,10 @@ public class EncryptUtil {
     }
 
     public static String encryptString(String data, UUID id) {
+        if(data == null){
+            data = "";
+        }
+
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, generateKey(hashedPassword, id));
@@ -85,6 +89,10 @@ public class EncryptUtil {
     }
 
     public static String decryptString(String data, UUID id) {
+        if(data == null){
+            data = "";
+        }
+
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, generateKey(hashedPassword, id));

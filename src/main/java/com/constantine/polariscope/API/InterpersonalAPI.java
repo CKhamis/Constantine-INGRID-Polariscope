@@ -52,22 +52,6 @@ public class InterpersonalAPI {
         throw new Exception("Invalid user");
     }
 
-    @PostMapping("/member/new")
-    public ResponseEntity<ResponseMessage> newMember(@Valid @RequestBody MemberForm formElements, Principal principal){
-        try{
-            User retrievedUser = getCurrentUser(principal);
-
-            // Construct new user
-            Member member = new Member(formElements, retrievedUser);
-            memberService.save(member);
-
-            activityLogService.save(new ActivityLog(ActivityLog.ActivityType.MEMBER_CREATED, retrievedUser));
-            return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member saved to Polariscope"));
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error saving member"));
-        }
-    }
-
     @PostMapping("/member/save")
     public ResponseEntity<ResponseMessage> saveMember(@ModelAttribute MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
         try{
@@ -225,6 +209,7 @@ public class InterpersonalAPI {
         }
     }
 
+
     @GetMapping("/member/view/{id}")
     public ResponseEntity<?> viewMember(@PathVariable UUID id, Principal principal){
         try{
@@ -272,7 +257,7 @@ public class InterpersonalAPI {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Error Retrieving Evaluations", ResponseMessage.Severity.LOW, "Member not found"));
             }
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Evaluations", ResponseMessage.Severity.LOW, e.getMessage()));
         }
     }
 
