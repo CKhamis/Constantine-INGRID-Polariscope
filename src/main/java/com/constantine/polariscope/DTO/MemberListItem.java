@@ -20,6 +20,8 @@ public class MemberListItem {
     private String sex, sexuality, relationship;
     private LocalDateTime created, lastModified;
     private Evaluation lastEvaluation;
+    private boolean scoreHold;
+    private boolean archive;
 
     public MemberListItem(Member member){
         id = member.getId();
@@ -31,5 +33,7 @@ public class MemberListItem {
         relationship = member.getRelationship().name();
         created = member.getCreated();
         lastModified = member.getLastModified();
+        scoreHold = member.isScoreHold();
+        archive = member.isArchive();
     }
 }

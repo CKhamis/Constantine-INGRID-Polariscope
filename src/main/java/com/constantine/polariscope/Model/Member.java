@@ -39,6 +39,9 @@ public class Member {
     private Integer ageMet;
     private LocalDate birthday;
 
+    private boolean scoreHold;
+    private boolean archive;
+
     @NonNull
     private LocalDateTime created;
     @NonNull
@@ -93,11 +96,16 @@ public class Member {
         this.sex = sex;
         this.ageMet = ageMet;
         this.birthday = birthday;
+
         this.created = created;
         this.lastModified = lastModified;
+
         this.author = author;
         this.placeMet = placeMet;
         this.timeline = timeline;
+
+        this.archive = false;
+        this.scoreHold = false;
     }
 
     public Member(MemberForm form, @NonNull User user){
@@ -129,12 +137,12 @@ public class Member {
     @PrePersist
     @PreUpdate
     private void encrypt() {
+        this.lastModified = LocalDateTime.now();
         this.firstName = EncryptUtil.encryptString(this.firstName, this.id);
         this.lastName = EncryptUtil.encryptString(this.lastName, this.id);
         this.middleName = EncryptUtil.encryptString(this.middleName, this.id);
         this.personality = EncryptUtil.encryptString(this.personality, this.id);
         this.favoriteColor = EncryptUtil.encryptString(this.favoriteColor, this.id);
-        this.description = EncryptUtil.encryptString(this.description, this.id);
         this.description = EncryptUtil.encryptString(this.description, this.id);
         this.profileImageData = EncryptUtil.encryptBytes(this.profileImageData, this.id);
         this.profileImageType = EncryptUtil.encryptString(this.profileImageType, this.id);

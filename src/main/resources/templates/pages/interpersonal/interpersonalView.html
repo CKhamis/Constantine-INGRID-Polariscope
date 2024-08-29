@@ -153,6 +153,22 @@
                     <h3 class="fw-bold mt-3">Member Settings</h3>
                     <div class="card">
                         <div class="card-body">
+                            <h5 class="card-title fw-bold">Score Hold</h5>
+                            <p class="card-text">This will remove the member's appearance in the Batch Evaluate feature. Use this option if you do not anticipate not updating evaluations as frequently.</p>
+                            <input type="checkbox" class="btn-check" id="score-hold-check" autocomplete="off">
+                            <label class="btn btn-primary" for="score-hold-check" onclick="scoreHold()">Score Hold</label>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Archive Member</h5>
+                            <p class="card-text">Removes appearances of member from all menus except for the all members feature. Does not delete the member.</p>
+                            <input type="checkbox" class="btn-check" id="archive-member-check" autocomplete="off">
+                            <label class="btn btn-primary" for="archive-member-check" onclick="archive()">Archive Member</label>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-body">
                             <h5 class="card-title fw-bold">Delete Member</h5>
                             <p class="card-text">Deletes a member from database permanently. This procedure deletes the member as well as associated data such as evaluations. Not recommended for almost any scenario</p>
                             <button class="btn btn-danger bevel-sm" onclick="">Delete Member</button>
@@ -474,8 +490,20 @@
         document.querySelector("#amf").value = memberDetails.ageMet;
         document.querySelector("#bdf").value = new Date(memberDetails.birthday).toISOString().slice(0, 10);
         document.querySelector("#df").value = memberDetails.description;
+
+        document.querySelector("#archive-member-check").checked = memberDetails.archive;
+        document.querySelector("#score-hold-check").checked = memberDetails.scoreHold;
     }
 
+    function scoreHold(){
+        memberDetails.scoreHold = !memberDetails.scoreHold;
+        saveMember();
+    }
+
+    function archive(){
+        memberDetails.archive = !memberDetails.archive;
+        saveMember();
+    }
     function saveMember(){
         const formData = new FormData();
         const imageFile = document.getElementById('pfp-file').files[0];
@@ -492,6 +520,9 @@
         formData.append('ageMet', document.querySelector("#amf").value);
         formData.append('birthday', document.querySelector("#bdf").value);
         formData.append('description', document.querySelector("#df").value);
+
+        formData.append('archive', memberDetails.archive);
+        formData.append('scoreHold', memberDetails.scoreHold);
 
         let button = document.querySelector("#submit-button");
         button.disabled = true;

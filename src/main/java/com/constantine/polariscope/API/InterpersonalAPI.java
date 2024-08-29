@@ -51,7 +51,7 @@ public class InterpersonalAPI {
 
 
     @PostMapping("/member/save")
-    public ResponseEntity<ResponseMessage> saveMember(@Valid @RequestBody MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
+    public ResponseEntity<ResponseMessage> saveMember(@Valid @ModelAttribute MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
         try{
             User retrievedUser = getCurrentUser(principal);
 
@@ -108,6 +108,9 @@ public class InterpersonalAPI {
                                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.MEDIUM, "Profile image filetype was invalid. No changes were saved to the member. Please make sure to provide a valid image file."));
                             }
                         }
+
+                        retrievedMember.setArchive(formElements.isArchive());
+                        retrievedMember.setScoreHold(formElements.isScoreHold());
 
                         memberService.save(retrievedMember);
 

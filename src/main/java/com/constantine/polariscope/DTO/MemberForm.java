@@ -25,4 +25,7 @@ public class MemberForm {
     private String relationship;
     private String sex;
     private String sexuality;
+
+    private boolean archive;
+    private boolean scoreHold;
 }
