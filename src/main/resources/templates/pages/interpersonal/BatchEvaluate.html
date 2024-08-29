@@ -205,13 +205,17 @@
 
     function renderMemberList(){
         let content = "";
-        memberList.forEach((member) => {
-            content += `
+        memberList.forEach((member, i) => {
+            if(!member.scoreHold){
+                content += `
                 <div class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" onclick="selectMember('${member.id}')">
                     <img class="square-image img-fluid" style="width: 40px; height: 40px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
                     <h4 class="fw-bold mb-0 ms-2">${member.firstName} ${member.lastName}</h4>
                 </div>
                 `;
+            }else{
+                memberList.splice(i, 1);
+            }
         });
         content += `
             <a class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" href="/interpersonal/new">

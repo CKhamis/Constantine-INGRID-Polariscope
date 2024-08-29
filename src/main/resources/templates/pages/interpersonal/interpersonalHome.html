@@ -221,8 +221,15 @@
         // Order the member list
         memberList.sort((a, b) => new Date(a.lastEvaluation.timestamp) - new Date(b.lastEvaluation.timestamp));
 
-        for(let i = 0; i < memberList.length && i < 10; i++){
+        let count = 10;
+        for(let i = 0; i < memberList.length && i < count; i++){
             const member = memberList[i];
+
+            if(member.archive){
+                count++;
+                continue;
+            }
+
             let relationshipSrc = "/icons/Unknown.svg", sexSrc = "/icons/Unknown.svg", sexualitySrc = "/icons/Unknown.svg";
             if(member.relationship.length > 0){
                 relationshipSrc = "/icons/relations/" + member.relationship + ".svg";
@@ -262,8 +269,15 @@
         // Sort array
         memberList.sort((a, b) => new Date(b.lastEvaluation.cscore) - new Date(a.lastEvaluation.cscore));
 
-        for(let i = 0; i < memberList.length && i < 10; i++){
+        let count = 10;
+        for(let i = 0; i < memberList.length && i < count; i++){
             const member = memberList[i];
+
+            if(member.archive){
+                count++;
+                continue;
+            }
+
             let relationshipSrc = "/icons/Unknown.svg", sexSrc = "/icons/Unknown.svg", sexualitySrc = "/icons/Unknown.svg";
             if(member.relationship.length > 0){
                 relationshipSrc = "/icons/relations/" + member.relationship + ".svg";
@@ -304,8 +318,15 @@
         // Sort array
         memberList.sort((a, b) => new Date(a.lastEvaluation.cscore) - new Date(b.lastEvaluation.cscore));
 
-        for(let i = 0; i < memberList.length && i < 15; i++){
+        let count = 10;
+        for(let i = 0; i < memberList.length && i < count; i++){
             const member = memberList[i];
+
+            if(member.archive){
+                count++;
+                continue;
+            }
+
             let relationshipSrc = "/icons/Unknown.svg", sexSrc = "/icons/Unknown.svg", sexualitySrc = "/icons/Unknown.svg";
             if(member.relationship.length > 0){
                 relationshipSrc = "/icons/relations/" + member.relationship + ".svg";
