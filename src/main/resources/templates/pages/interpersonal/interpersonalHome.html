@@ -234,13 +234,14 @@
                 sexualitySrc = "/icons/sexuality/" + member.sexuality + ".svg";
             }
 
+            const info = member.lastEvaluation == null? `<p class="text-center">No Evaluations</p>` : `<p class="text-center">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>`;
             LREContent += `
                 <a class="mx-2 mb-3 text-decoration-none" href="/interpersonal/member/view/${member.id}">
                     <div class="card d-flex justify-content-center" style="width: 10rem">
                         <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                         <div class="card-body">
                             <h5 class="card-title fw-bold text-nowrap text-truncate">${member.firstName} ${member.lastName}</h5>
-                            <p class="text-center">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>
+                            ${info}
                         </div>
                         <div class="d-flex justify-content-evenly align-items-center mb-3">
                             <img class="square-image mx-1" src="${relationshipSrc}" alt="relationship icon" />
@@ -274,13 +275,15 @@
                 sexualitySrc = "/icons/sexuality/" + member.sexuality + ".svg";
             }
 
+            const info = member.lastEvaluation == null? `<p class="text-center">No Evaluations</p>` : `<p class="text-center">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>`;
+
             LREContent += `
                 <a class="mx-2 mb-3 text-decoration-none" href="/interpersonal/member/view/${member.id}">
                     <div class="card d-flex justify-content-center" style="width: 10rem">
                         <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                         <div class="card-body">
                             <h5 class="card-title fw-bold text-nowrap text-truncate">${member.firstName} ${member.lastName}</h5>
-                             <p class="">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>
+                             ${info}
                         </div>
                         <div class="d-flex justify-content-evenly align-items-center mb-3">
                             <img class="square-image mx-1" src="${relationshipSrc}" alt="relationship icon" />
@@ -314,13 +317,15 @@
                 sexualitySrc = "/icons/sexuality/" + member.sexuality + ".svg";
             }
 
+            const info = member.lastEvaluation == null? `<p class="text-center">No Evaluations</p>` : `<p class="text-center">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>`;
+
             LREContent += `
                 <a class="mx-2 mb-3 text-decoration-none" href="/interpersonal/member/view/${member.id}">
                     <div class="card d-flex justify-content-center" style="width: 10rem">
                         <img class="card-img-top square-image" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                         <div class="card-body">
                             <h5 class="card-title fw-bold text-nowrap text-truncate">${member.firstName} ${member.lastName}</h5>
-                             <p class="">${formatDate(member.lastEvaluation.timestamp)} • ${member.lastEvaluation.cscore}</p>
+                             ${info}
                         </div>
                         <div class="d-flex justify-content-evenly align-items-center mb-3">
                             <img class="square-image mx-1" src="${relationshipSrc}" alt="relationship icon" />
