@@ -35,6 +35,8 @@
                     <tr>
                         <th scope="col">Photo</th>
                         <th scope="col">Name</th>
+                        <th scope="col" class="text-center">Archive</th>
+                        <th scope="col" class="text-center">Hold</th>
                         <th scope="col">Relationship</th>
                         <th scope="col">Sex</th>
                         <th scope="col">Sexuality</th>
@@ -187,6 +189,8 @@
                     <tr>
                         <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}"></th>
                         <td>${member.firstName} ${member.lastName}</td>
+                        <td class="text-center">${member.archive? "A" : ""}</td>
+                        <td class="text-center">${member.scoreHold? "H" : ""}</td>
                         <td>${member.relationship}</td>
                         <td>${member.sex}</td>
                         <td>${member.sexuality}</td>

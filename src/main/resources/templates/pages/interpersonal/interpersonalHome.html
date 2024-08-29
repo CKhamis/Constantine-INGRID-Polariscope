@@ -219,7 +219,17 @@
         let LREContent = ``;
 
         // Order the member list
-        memberList.sort((a, b) => new Date(a.lastEvaluation.timestamp) - new Date(b.lastEvaluation.timestamp));
+        memberList.sort((a, b) => {
+            const dateA = a.lastEvaluation ? new Date(a.lastEvaluation.timestamp) : null;
+            const dateB = b.lastEvaluation ? new Date(b.lastEvaluation.timestamp) : null;
+
+            if (dateA === null && dateB === null) return 0;
+            if (dateA === null) return 1;
+            if (dateB === null) return -1;
+
+            return dateA - dateB;
+        });
+
 
         let count = 10;
         for(let i = 0; i < memberList.length && i < count; i++){
@@ -267,7 +277,17 @@
         let LREContent = ``;
 
         // Sort array
-        memberList.sort((a, b) => new Date(b.lastEvaluation.cscore) - new Date(a.lastEvaluation.cscore));
+        memberList.sort((a, b) => {
+            const dateA = a.lastEvaluation ? a.lastEvaluation.cscore : null;
+            const dateB = b.lastEvaluation ? b.lastEvaluation.cscore : null;
+
+            if (dateA === null && dateB === null) return 0;
+            if (dateA === null) return 1;
+            if (dateB === null) return -1;
+
+            return dateB - dateA;
+        });
+
 
         let count = 10;
         for(let i = 0; i < memberList.length && i < count; i++){
@@ -316,7 +336,16 @@
         let LREContent = ``;
 
         // Sort array
-        memberList.sort((a, b) => new Date(a.lastEvaluation.cscore) - new Date(b.lastEvaluation.cscore));
+        memberList.sort((a, b) => {
+            const dateA = a.lastEvaluation ? a.lastEvaluation.cscore : null;
+            const dateB = b.lastEvaluation ? b.lastEvaluation.cscore : null;
+
+            if (dateA === null && dateB === null) return 0;
+            if (dateA === null) return 1;
+            if (dateB === null) return -1;
+
+            return dateA - dateB;
+        });
 
         let count = 10;
         for(let i = 0; i < memberList.length && i < count; i++){
