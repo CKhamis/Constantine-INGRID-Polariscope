@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.security.Principal;
@@ -17,7 +18,7 @@ import java.security.Principal;
 public class FrontEndController {
     private final UserService userService;
     private final PlaceService placeService;
-    private static final String VERSION = "0.0.2";
+    private static final String VERSION = "0.9.5";
 
     private User getCurrentUser(Principal principal){
         if(principal == null){
@@ -25,6 +26,11 @@ public class FrontEndController {
         }
         String username = principal.getName();;
         return (User) userService.loadUserByUsername(username);
+    }
+
+    @ModelAttribute
+    public void addCommonAttributes(Model model, Principal principal) {
+        model.addAttribute("version", VERSION);
     }
 
     @GetMapping("/")

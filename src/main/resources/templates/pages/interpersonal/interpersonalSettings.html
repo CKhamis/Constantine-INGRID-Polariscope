@@ -4,16 +4,22 @@
 <body class="stripe-white" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
 
-<main class="container" style="padding-left: 60px">
-    <h1 class="fw-bold mt-2" id="title" onclick="displayMainMenu()" role="button">Polariscope Settings</h1>
-    <div class="row">
-        <div class="col-lg-2 d-none d-lg-block"></div>
-        <div class="col-lg-8 col-12">
-            <div class="row" id="main-content">
-
+<main class="bg-body px-0 d-flex flex-column" style="height:100vh;margin-left:60px;">
+    <nav class="bg-success-subtle p-4">
+        <a onclick="displayMainMenu()" class="mt-5 text-success-emphasis">Main Menu</a>
+        <h1 class="fw-bold mb-0 text-success-emphasis" id="title">Constantine [IN]GRID Transfer Tool</h1>
+    </nav>
+    <div class="p-4 flex-grow-1 overflow-auto" id="main-content">
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
+        <h3 class="text-center fw-bold">Please Wait</h3>
     </div>
+    <nav style="bottom: 0; width: 100%" class="p-2 bg-body-tertiary d-flex flex-row align-items-center">
+        <p th:text="${'Constantine [IN]GRID Polariscope Version: ' + version}" class="text-center mb-0"></p>
+    </nav>
 </main>
 
 <div th:replace="~{components/External :: external}"></div>
@@ -24,16 +30,19 @@
     function displayMainMenu(){
         document.querySelector("#title").textContent = `Polariscope Settings`;
         document.querySelector("#main-content").innerHTML = `
-        <div class="col-lg-6 px-5" onclick="displayMemberSettings()" role="button">
-            <div class="bg-body-tertiary bevel-lg d-flex align-items-center flex-column p-3">
-                <img class="card-img-top square-image mt-2" alt="inspect members" src="/icons/Inspect.svg">
-                <h3 class="fw-bold text-center mt-3">Member Settings</h3>
+        <div class="row">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-4 px-5 mb-3" onclick="displayMemberSettings()" role="button">
+                <div class="bg-body-tertiary bevel-lg d-flex align-items-center flex-column p-3">
+                    <img class="card-img-top square-image mt-2" alt="inspect members" src="/icons/Inspect.svg">
+                    <h3 class="fw-bold text-center mt-3">Member Settings</h3>
+                </div>
             </div>
-        </div>
-        <div class="col-lg-6 px-5" onclick="displayUserSettings()" role="button">
-            <div class="bg-body-tertiary bevel-lg d-flex align-items-center flex-column p-3">
-                <img class="card-img-top square-image mt-2" alt="inspect members" src="/icons/Wrench.svg">
-                <h3 class="fw-bold text-center mt-3">User Settings</h3>
+            <div class="col-lg-4 px-5" onclick="displayUserSettings()" role="button">
+                <div class="bg-body-tertiary bevel-lg d-flex align-items-center flex-column p-3">
+                    <img class="card-img-top square-image mt-2" alt="inspect members" src="/icons/Wrench.svg">
+                    <h3 class="fw-bold text-center mt-3">User Settings</h3>
+                </div>
             </div>
         </div>
         `;
@@ -41,17 +50,50 @@
 
     function displayMemberSettings(){
         document.querySelector("#main-content").innerHTML = `
-        <a class="col-md-6 col-lg-4 mb-4 px-3" href="/interpersonal/import">
-            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
-                <p class="fs-4 fs-bold text-center m-0">Import Members</p>
+        <div class="col-lg-2 d-none d-lg-block"></div>
+        <div class="col-lg-8 col-12">
+            <div class="row">
+                <a class="col-md-6 col-lg-4 mb-4 px-3" href="/interpersonal/import">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                        <p class="fs-4 fs-bold text-center m-0">Import Members</p>
+                    </div>
+                </a>
             </div>
-        </a>
+        </div>
+
         `;
         document.querySelector("#title").textContent = `Polariscope Settings > Member Settings`;
     }
 
     function displayUserSettings(){
-        document.querySelector("#main-content").innerHTML = `<p onclick="displayMainMenu()">Back to main menu</p>`;
+        document.querySelector("#main-content").innerHTML = `
+        <div class="col-lg-2 d-none d-lg-block"></div>
+        <div class="col-lg-8 col-12">
+            <div class="row">
+                <a class="col-md-6 col-lg-4 mb-4 px-3" onclick="displayActivity()">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                        <p class="fs-4 fs-bold text-center m-0">User Activity</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        `;
+        document.querySelector("#title").textContent = `Polariscope Settings > User Settings`;
+    }
+
+    function displayActivity(){
+        document.querySelector("#main-content").innerHTML = `
+        <div class="col-lg-2 d-none d-lg-block"></div>
+        <div class="col-lg-8 col-12">
+            <div class="row">
+                <a class="col-md-6 col-lg-4 mb-4 px-3" onclick="">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                        <p class="fs-4 fs-bold text-center m-0">User Activity</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        `;
         document.querySelector("#title").textContent = `Polariscope Settings > User Settings`;
     }
 </script>
