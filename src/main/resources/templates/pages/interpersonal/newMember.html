@@ -91,24 +91,26 @@
 <script>
     function submit(){
         let member = {
-            "firstName": document.querySelector("#fnf").value,
-            "lastName": document.querySelector("#lnf").value,
-            "middleName": document.querySelector("#mnf").value,
-            "relationship": document.querySelector("#relationf").value,
-            "sex": document.querySelector("#sexf").value,
-            "sexuality": document.querySelector("#sexualityf").value,
-            "personality": document.querySelector("#mbp").value,
-            "favoriteColor": document.querySelector("#fcf").value,
-            "ageMet": document.querySelector("#amf").value,
-            "birthday": document.querySelector("#bdf").value
+            firstName: document.querySelector("#fnf").value,
+            lastName: document.querySelector("#lnf").value,
+            middleName: document.querySelector("#mnf").value,
+            relationship: document.querySelector("#relationf").value,
+            sex: document.querySelector("#sexf").value,
+            sexuality: document.querySelector("#sexualityf").value,
+            personality: document.querySelector("#mbp").value,
+            favoriteColor: document.querySelector("#fcf").value,
+            ageMet: document.querySelector("#amf").value,
+            birthday: document.querySelector("#bdf").value,
+            description: document.querySelector("#df").value
         }
+
         let button = document.querySelector("#submit-button");
         button.disabled = true;
         button.classList.remove("btn-primary");
         button.classList.add("btn-disabled");
         button.textContent = "Saving...";
 
-        postData("/api/interpersonal/member/new", member)
+        postData("/api/interpersonal/member/save", member)
             .then(() => {
                 button.disabled = false;
                 button.classList.remove("btn-disabled");

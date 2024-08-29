@@ -25,10 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @AllArgsConstructor
@@ -52,8 +49,9 @@ public class InterpersonalAPI {
         throw new Exception("Invalid user");
     }
 
+
     @PostMapping("/member/save")
-    public ResponseEntity<ResponseMessage> saveMember(@ModelAttribute MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
+    public ResponseEntity<ResponseMessage> saveMember(@Valid @RequestBody MemberForm formElements, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
         try{
             User retrievedUser = getCurrentUser(principal);
 

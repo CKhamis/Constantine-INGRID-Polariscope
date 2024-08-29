@@ -25,7 +25,11 @@ public class MemberService {
 
         for (Member member : members) {
             MemberListItem listItem = new MemberListItem(member);
-            listItem.setLastEvaluation(evaluationRepository.findAllByMemberOrderByTimestampDesc(member).get(0));
+            List<Evaluation> allEvals = evaluationRepository.findAllByMemberOrderByTimestampDesc(member);
+            if(!allEvals.isEmpty()){
+                listItem.setLastEvaluation(allEvals.get(0));
+            }
+
             memberListItems.add(listItem);
         }
 

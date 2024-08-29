@@ -392,7 +392,16 @@
     }
 
     function renderOverviewTab(){
+        if(memberDetails.fullTimeline == null || memberDetails.mostRecentEval == null){
+            document.querySelector("#member-chips").innerHTML = `
+            <div class="alert alert-primary mx-3" role="alert">
+              <h4 class="text-center fw-bold mb-0">Add evaluations to see stats</h4>
+            </div>
+            `;
+            return;
+        }
         let noteContent = "";
+
         memberDetails.fullTimeline.forEach((evaluation) => {
             if(evaluation.note.length > 0){
                 noteContent += `
@@ -587,6 +596,8 @@
         const noteHas = document.querySelector("#keyword-filter-modal").value;
 
 
+        if(memberDetails.fullTimeline == null){return;}
+
         memberDetails.fullTimeline.forEach((eval) => {
             if((!beforeFilterEnable || beforeForm > new Date(eval.timestamp)) && (!afterFilterEnable || afterForm < new Date(eval.timestamp)) && (!filterByKeywordEnable || eval.note.includes(noteHas))){
                 tableHTML += `
@@ -641,6 +652,9 @@
 
     function updateEvalChart(){
         let newScores = {data:[]};
+
+        if(memberDetails.fullTimeline == null){return;}
+
         memberDetails.fullTimeline.forEach((eval) =>{
             newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore});
         });
