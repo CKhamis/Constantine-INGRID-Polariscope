@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<div th:fragment="dark">
+    <div style="width:100vw; height:100vh; position: fixed; top:0; left:0; z-index: 99; display: none" class="bg-dark" id="privacy-dark"></div>
+    <script>
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                displayScreen();
+            }else if (event.key === 'Enter') {
+                hideScreen();
+            }
+        });
+
+        function displayScreen() {
+            document.querySelector("#privacy-dark").style.display = "block";
+        }
+
+        function hideScreen() {
+            document.querySelector("#privacy-dark").style.display = "none";
+        }
+    </script>
+</div>
