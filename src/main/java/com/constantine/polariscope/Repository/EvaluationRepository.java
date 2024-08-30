@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface EvaluationRepository extends JpaRepository<Evaluation, UUID> {
     List<Evaluation> findAllByMemberOrderByTimestampDesc(Member member);
     int countAllByMember(Member member);
+
+    void deleteAllByMember(Member member);
 }

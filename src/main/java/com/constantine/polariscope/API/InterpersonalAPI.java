@@ -149,6 +149,27 @@ public class InterpersonalAPI {
         }
     }
 
+    @PostMapping("/member/delete")
+    public ResponseEntity<ResponseMessage> deleteMember(@RequestBody UUID id, Principal principal){
+        try{
+            User user = getCurrentUser(principal);
+
+            // Get id of member
+            Member member = memberService.findMember(id);
+
+            if(member.getAuthor().getId().equals(user.getId())){
+                memberService.deleteMember(member);
+                activityLogService.save(new ActivityLog(ActivityLog.ActivityType.MEMBER_DELETED, user));
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Member Deleted", ResponseMessage.Severity.INFORMATIONAL, "Member and associated evaluations have been permanently deleted from member repository"));
+            }else{
+                // Member author does not match with logged-in user
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Member", ResponseMessage.Severity.LOW, "Please log in using correct id"));
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Member", ResponseMessage.Severity.LOW, "Error deleting evaluation"));
+        }
+    }
+
     @GetMapping("/member/profile-image/" + "{memberId}")
     public ResponseEntity<?> downloadFile(@PathVariable UUID memberId, Principal principal) {
         try{

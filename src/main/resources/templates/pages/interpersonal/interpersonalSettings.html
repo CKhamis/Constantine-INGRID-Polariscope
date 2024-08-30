@@ -6,7 +6,7 @@
 
 <main class="bg-body px-0 d-flex flex-column" style="height:100vh;margin-left:60px;">
     <nav class="bg-success-subtle p-4">
-        <a onclick="displayMainMenu()" class="mt-5 text-success-emphasis">Main Menu</a>
+        <a onclick="displayMainMenu()" class="mt-5 text-success-emphasis">< Main Menu</a>
         <h1 class="fw-bold mb-0 text-success-emphasis" id="title">Constantine [IN]GRID Transfer Tool</h1>
     </nav>
     <div class="p-4 flex-grow-1 overflow-auto" id="main-content">
@@ -18,13 +18,14 @@
         <h3 class="text-center fw-bold">Please Wait</h3>
     </div>
     <nav style="bottom: 0; width: 100%" class="p-2 bg-body-tertiary d-flex flex-row align-items-center">
-        <p th:text="${'Constantine [IN]GRID Polariscope Version: ' + version}" class="text-center mb-0"></p>
+        <p th:text="${'Constantine Polariscope Version: ' + version}" class="text-center mb-0"></p>
     </nav>
 </main>
 
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
+<div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
 <script>
     displayMainMenu();
     function displayMainMenu(){
@@ -82,19 +83,59 @@
     }
 
     function displayActivity(){
-        document.querySelector("#main-content").innerHTML = `
-        <div class="col-lg-2 d-none d-lg-block"></div>
-        <div class="col-lg-8 col-12">
-            <div class="row">
-                <a class="col-md-6 col-lg-4 mb-4 px-3" onclick="">
-                    <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
-                        <p class="fs-4 fs-bold text-center m-0">User Activity</p>
+        document.querySelector("#title").textContent = `Polariscope Settings > User Settings > Activity`;
+        const activityFetch = fetch('/api/account/activity/all')
+
+        let content = "";
+        Promise.all([activityFetch])
+            .then(responses => {
+                return Promise.all(responses);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                let tableContent = "";
+
+                data[0].forEach((log) => {
+                    console.log(log)
+                    tableContent += `
+                    <tr>
+                        <th>${formatTimestamp(new Date(log.created))}</th>
+                        <td>${log.activityType}</td>
+                    </tr>
+                    `;
+                });
+
+                content = `
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a onclick="displayUserSettings()" class="text-decoration-underline">< Back to User Settings</a>
                     </div>
-                </a>
-            </div>
-        </div>
-        `;
-        document.querySelector("#title").textContent = `Polariscope Settings > User Settings`;
+                    <div class="col-md-9">
+                        <table class="table table-responsive">
+                          <thead>
+                            <tr>
+                              <th scope="col">Date</th>
+                              <th scope="col">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            ${tableContent}
+                          </tbody>
+                        </table>
+                    </div>
+                </div>
+                `;
+            })
+            .catch(() => {
+                content =  `
+                <h2 class="text-center">OOPS! There was an error :(</h2>
+                `;
+            })
+            .finally(() => {
+                document.querySelector("#main-content").innerHTML = content;
+            });
     }
 </script>
 </body>

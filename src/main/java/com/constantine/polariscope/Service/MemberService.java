@@ -6,6 +6,7 @@ import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
 import com.constantine.polariscope.Repository.EvaluationRepository;
 import com.constantine.polariscope.Repository.MemberRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -53,5 +54,11 @@ public class MemberService {
 
     public List<Evaluation> findEvaluationByMember(Member member){
         return evaluationRepository.findAllByMemberOrderByTimestampDesc(member);
+    }
+
+    @Transactional
+    public void deleteMember(Member member){
+        evaluationRepository.deleteAllByMember(member);
+        memberRepository.delete(member);
     }
 }

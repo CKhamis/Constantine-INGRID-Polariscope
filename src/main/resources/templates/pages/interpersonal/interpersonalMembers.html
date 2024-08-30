@@ -5,12 +5,12 @@
 <div th:replace="~{components/Navigation :: vertical}"></div>
 <main class="px-4 pt-2" style="margin-left: 60px">
     <div class="row">
-        <div class="col-md-3 col-lg-2 mb-4" id="left-pane">
+        <div class="col-md-3 col-lg-2 mb-4 d-none d-md-block" id="left-pane">
             <p class="fs-4 fw-bold text-center mb-4">Member Composition</p>
             <canvas id="composition-canvas"></canvas>
 <!--            <p class="fs-4 fw-bold text-center mb-4">Member Composition</p>-->
         </div>
-        <div class="col-md-9 col-lg-10 px-3" id="right-pane">
+        <div class="col-md-9 col-lg-10 px-lg-3" id="right-pane">
             <div class="container-fluid">
                 <nav class="navbar d-flex justify-content-between align-items-center">
                     <h2 class="fw-bold">All Members</h2>
@@ -30,21 +30,23 @@
                         </div>
                     </div>
                 </nav>
-                <table class="table table-hover align-middle table-responsive">
-                    <thead>
-                    <tr>
-                        <th scope="col">Photo</th>
-                        <th scope="col">Name</th>
-                        <th scope="col" class="text-center">Archive</th>
-                        <th scope="col" class="text-center">Hold</th>
-                        <th scope="col">Relationship</th>
-                        <th scope="col">Sex</th>
-                        <th scope="col">Sexuality</th>
-                        <th scope="col">View</th>
-                    </tr>
-                    </thead>
-                    <tbody id="table-body"></tbody>
-                </table>
+                <div class="table-responsive px-0">
+                    <table class="table table-hover align-middle table-responsive">
+                        <thead>
+                        <tr>
+                            <th scope="col">Photo</th>
+                            <th scope="col">Name</th>
+                            <th scope="col" class="text-center">Archive</th>
+                            <th scope="col" class="text-center">Hold</th>
+                            <th scope="col">Relationship</th>
+                            <th scope="col">Sex</th>
+                            <th scope="col">Sexuality</th>
+                            <th scope="col">View</th>
+                        </tr>
+                        </thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

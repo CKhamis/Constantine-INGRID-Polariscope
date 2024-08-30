@@ -156,7 +156,7 @@
                             <h5 class="card-title fw-bold">Score Hold</h5>
                             <p class="card-text">This will remove the member's appearance in the Batch Evaluate feature. Use this option if you do not anticipate not updating evaluations as frequently.</p>
                             <input type="checkbox" class="btn-check" id="score-hold-check" autocomplete="off">
-                            <label class="btn btn-primary" for="score-hold-check" onclick="scoreHold()">Score Hold</label>
+                            <label class="btn btn-primary" for="score-hold-check" onclick="scoreHold()" id="hold-label">Score Hold</label>
                         </div>
                     </div>
                     <div class="card mt-3">
@@ -164,14 +164,14 @@
                             <h5 class="card-title fw-bold">Archive Member</h5>
                             <p class="card-text">Removes appearances of member from all menus except for the all members feature. Does not delete the member.</p>
                             <input type="checkbox" class="btn-check" id="archive-member-check" autocomplete="off">
-                            <label class="btn btn-primary" for="archive-member-check" onclick="archive()">Archive Member</label>
+                            <label class="btn btn-primary" for="archive-member-check" onclick="archive()" id="archive-label">Archive Member</label>
                         </div>
                     </div>
                     <div class="card mt-3">
                         <div class="card-body">
                             <h5 class="card-title fw-bold">Delete Member</h5>
                             <p class="card-text">Deletes a member from database permanently. This procedure deletes the member as well as associated data such as evaluations. Not recommended for almost any scenario</p>
-                            <button class="btn btn-danger bevel-sm" onclick="">Delete Member</button>
+                            <button class="btn btn-danger bevel-sm" data-bs-toggle="modal" data-bs-target="#deleteMemberModal">Delete Member</button>
                         </div>
                     </div>
                 </div>
@@ -211,6 +211,24 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" onclick="modalSaveEval()" data-bs-dismiss="modal">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteMemberModal" tabindex="-1" aria-labelledby="dmm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="dmm">Delete Member & Evaluations?</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>This action cannot be undone unless a backup was made and restored. This will delete all evaluations and member details permanently. It is highly recommended to archive and hold rather than delete members. If you have read this warning and would still like to delete the member, use the button below.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="deleteMember()" data-bs-dismiss="modal">Save changes</button>
             </div>
         </div>
     </div>
@@ -367,7 +385,48 @@
                     })
                     .catch(error => {
                         console.error("Error parsing error response:", error);
-                        document.getElementById(`${toastId}-body`).innerText = "Profile Image could be too large";
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to save evaluation";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => {
+                refresh();
+                spinner.classList.remove("d-block");
+                spinner.classList.add("d-none");
+
+                document.querySelector("#id-evaluation-modal").value = "";
+            });
+    }
+
+    function deleteMember(){
+        let id = memberDetails.id;
+
+        let spinner = document.querySelector("#loading-spinner");
+        spinner.classList.add("d-block");
+        spinner.classList.remove("d-none");
+        let errorIcon = document.querySelector("#error-icon");
+
+        let toastId = createToast("Deleting Member");
+        postData("/api/interpersonal/member/delete", id)
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to delete member";
                         document.getElementById(`${toastId}-title`).innerText = "Error";
                         document.getElementById(`${toastId}-loading`).style.color = "red";
                     });
@@ -492,7 +551,9 @@
         document.querySelector("#df").value = memberDetails.description;
 
         document.querySelector("#archive-member-check").checked = memberDetails.archive;
+        document.querySelector("#archive-label").textContent = (memberDetails.archive? "Archived" : "Archive Member")
         document.querySelector("#score-hold-check").checked = memberDetails.scoreHold;
+        document.querySelector("#hold-label").textContent = (memberDetails.scoreHold? "On Hold" : "Hold Member")
     }
 
     function scoreHold(){
