@@ -36,7 +36,7 @@
             return;
         }
 
-        document.querySelector("#progress-bar").style.width = (index / screens.length) * 100 + '%';
+        document.querySelector("#progress-bar").style.width = (index / (screens.length-1)) * 100 + '%';
         document.querySelector("#content-container").innerHTML = screens[index];
     }
 
@@ -51,6 +51,10 @@
             currentPage--;
             showPage(currentPage);
         }
+    }
+
+    function closeTutorial(){
+
     }
 </script>
 
