@@ -8,13 +8,11 @@ import com.constantine.polariscope.Service.ActivityLogService;
 import com.constantine.polariscope.Service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -65,6 +63,17 @@ public class AccountAPI {
             return ResponseEntity.ok(activityLogService.findAllAfter(retrievedUser, date.atStartOfDay()));
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving User", ResponseMessage.Severity.LOW, e.getMessage()));
+        }
+    }
+
+    @PostMapping("/dismiss-tutorial")
+    public ResponseEntity<?> dismissTutorial(Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+            retrievedUser.setTutorialNeeded(false);
+            return ResponseEntity.ok().body(new ResponseMessage("User Data saved", ResponseMessage.Severity.INFORMATIONAL, "Tutorial is now dismissed"));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Unable to dismiss tutorial", ResponseMessage.Severity.LOW, e.getMessage()));
         }
     }
 }
