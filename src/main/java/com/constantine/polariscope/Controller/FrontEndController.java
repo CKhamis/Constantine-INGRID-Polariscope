@@ -41,7 +41,10 @@ public class FrontEndController {
     public String getLogin() {
         return "pages/main/login";
     }
-
+    @GetMapping("/tutorial")
+    public String getTutorial() {
+        return "pages/main/tutorial";
+    }
     @GetMapping("/interpersonal")
     public String getInterpersonalHome() {
         return "pages/interpersonal/interpersonalHome";

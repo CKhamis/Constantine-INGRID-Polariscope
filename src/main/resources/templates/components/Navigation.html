@@ -33,7 +33,7 @@
     </nav>
 </div>
 <div th:fragment="vertical" class="position-fixed d-flex flex-column flex-shrink-0 bg-body-tertiary" style="height:100vh; z-index: 99; box-sizing: border-box; top:0;">
-    <a href="/" class="d-block p-2 link-body-emphasis text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Polariscope">
+    <a href="/interpersonal" class="d-block p-2 link-body-emphasis text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Polariscope">
         <img src="/icons/Logo.svg" alt="Logo" width="45" class="d-inline-block align-text-top">
     </a>
     <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
@@ -42,14 +42,14 @@
                 <img src="/icons/Dashboard.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
             </a>
         </li>
-        <li class="nav-item">
-            <a href="/interpersonal/batch-evaluate" class="nav-link py-3 border-bottom rounded-0" aria-current="page" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Batch Evaluate">
-                <img src="/icons/Batch Evaluate.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
-            </a>
-        </li>
         <li>
             <a href="/interpersonal/members" class="nav-link py-3 border-bottom rounded-0" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="All Members">
                 <img src="/icons/All.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/interpersonal/batch-evaluate" class="nav-link py-3 border-bottom rounded-0" aria-current="page" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Batch Evaluate">
+                <img src="/icons/Batch Evaluate.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
             </a>
         </li>
         <li>
@@ -70,7 +70,7 @@
     </ul>
     <div class="dropdown border-top">
         <a href="#" class="d-flex align-items-center justify-content-center p-2 link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://github.com/mdo.png" alt="mdo" width="24" height="24" class="rounded-circle">
+            <img src="/icons/Default User.svg" alt="mdo" width="24" height="24" class="rounded-circle">
         </a>
         <ul class="dropdown-menu text-small shadow" style="">
             <li><a class="dropdown-item" href="/interpersonal/settings">Settings</a></li>

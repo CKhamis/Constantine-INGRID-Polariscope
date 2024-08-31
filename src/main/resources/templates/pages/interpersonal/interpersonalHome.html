@@ -125,6 +125,10 @@
                 renderHighestEval();
                 renderLowestEval();
                 renderCalendarWidget();
+
+                if(userInfo.tutorialNeeded){
+                    window.location.href = "/tutorial";
+                }
             })
             .then(() => {
 

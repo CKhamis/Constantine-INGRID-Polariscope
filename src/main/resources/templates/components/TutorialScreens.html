@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<script th:fragment="tutorial-screns">
+    const screens = [
+        `
+        <h1 class="fw-bold">Introduction</h1>
+        <p class="fs-5">If you are seeing this message, it means you have successfully set up your instance of Constantine Polariscope and logged in. This short tutorial will introduce you to the basic features of this utility.</p>
+        <p class="fs-5">After completing this tutorial, it will no longer appear unless you specifically navigate to /tutorial.</p>
+        <p class="fs-5">To continue, please press the <strong>Next button</strong></p>
+        `,
+        `
+        <h1 class="fw-bold">About Polariscope</h1>
+        <p class="fs-5">Constantine Polariscope is a journaling program focused mainly on your interpersonal relationships. This can include family, friends, coworkers, and other people you have a connection to.</p>
+        <p class="fs-5">With this tool, you can track a person's basic information like their names, profile image, birthday, and others. However, Polariscope can track more advanced relationship features.</p>
+        <p class="fs-5">More specifically, Polariscope allows you to write evaluations about individuals. These evaluations include a timestamp, score, and an optional note.</p>
+        <p class="fs-5">Depending on how you choose to use evaluations, an accumulation of them can provide you with an accurate timeline of your relationship with others, help you relive earlier moments of that relationship, or something as simple as tracking gift exchanges. You choose how you would like to use evaluations.</p>
+        `,
+        `
+        <h1 class="fw-bold">Data Security & You</h1>
+        <p class="fs-5">Because this is a journaling program, a large focus on its design is to keep it secure. There are many security practices that are in place to protect your data. Please read through this entire page carefully before continuing.</p>
+        <h3 class="fw-bold">Database-level Encryption</h3>
+        <p class="fs-5">Constantine Polariscope takes security extremely seriously. Identifying data is kept highly encrypted for the people you enter. This includes specifically:</p>
+        <h5 class="fw-bold">Member Information:</h5>
+        <ul>
+            <li><p class="fs-5">First Name</p></li>
+            <li><p class="fs-5">Middle Name</p></li>
+            <li><p class="fs-5">Last Name</p></li>
+            <li><p class="fs-5">Personality Type</p></li>
+            <li><p class="fs-5">Favorite Color</p></li>
+            <li><p class="fs-5">Description</p></li>
+            <li><p class="fs-5">Profile Image Data</p></li>
+            <li><p class="fs-5">Profile Image File Type></li>
+            <li><p class="fs-5">Profile Image Upload Timestamp></li>
+            <li><p class="fs-5">Age Met</p></li>
+            <li><p class="fs-5">Birthday</p></li>
+        </ul>
+        <h5 class="fw-bold">Evaluation Information:</h5>
+        <ul>
+            <li><p class="fs-5">Score</p></li>
+            <li><p class="fs-5">Note</p></li>
+        </ul>
+        <p class="fs-5 mt-3">You may assume anything not listed above is stored unencrypted. This includes:</p>
+        <h5 class="fw-bold">Member Information:</h5>
+        <ul>
+            <li><p class="fs-5">Randomized ID</p></li>
+            <li><p class="fs-5">Created/Modified Timestamp</p></li>
+            <li><p class="fs-5">Archived & Hold flags</p></li>
+            <li><p class="fs-5">Relationship Type</p></li>
+            <li><p class="fs-5">Sex</p></li>
+            <li><p class="fs-5">Sexuality</p></li>
+            <li><p class="fs-5">Author ID</p></li>
+        </ul>
+        <h5 class="fw-bold">Evaluation Information:</h5>
+        <ul>
+            <li><p class="fs-5">Timestamp</p></li>
+            <li><p class="fs-5">Created/Modified Timestamp</p></li>
+            <li><p class="fs-5">Randomized ID</p></li>
+            <li><p class="fs-5">ID of Member</p></li>
+        </ul>
+        <h3 class="fw-bold mt-3">Encryption Strategy</h3>
+        <p class="fs-5">Constantine Polariscope uses an advanced strategy of encrypting information on the database that is extremely difficult to solve.</p>
+        <p class="fs-5">Your password is never stored inside the database. Instead, a hash of it is stored. It is impossible to discover the original password from the hash because of BCrypt's secure algorithm. Every time you log in, your entered password is run through the same algorithm to check if it matches the one in the database.</p>
+        <p class="fs-5">Using this idea, the storage of the encrypted information above uses a combination of a different hash of your password, the randomized ID of the item you are saving, and of course, the thing you are trying to encrypt.</p>
+        <p class="fs-5">This combination of security features will make it extremely difficult to decode. <strong>The encryption of this program is so strong, I cannot decrypt data you enter.</strong> That being said, I am still a young developer and I am not responsible for any data loss or leakage that may occur.</p>
+
+        <h3 class="fw-bold mt-3">Secure Server</h3>
+        <p class="fs-5">A secure server is assumed to be running this program. The above precautions are only necessary in the event a hacker takes over the server and attempts to process information.</p>
+
+        <h3 class="fw-bold mt-3">User Password</h3>
+        <p class="fs-5">In summary, it is far easier for a hacker to guess the password you input than for them to steal the database from the server and decrypt the contents. Please make sure you are using a secure password before continuing.</p>
+        `,
+        `
+        <h1 class="fw-bold">Data Privacy & You</h1>
+        <p class="fs-5">The data stored using this program is understandably very personal and private. This is why there are many security layers implemented into this program.</p>
+        <p class="fs-5">Your data <strong>is never and will never be sent to any other database</strong>. Future updates to Polariscope may add in IP banning, but the data you enter about your personal relationships will never be used for any other projects</p>
+        <h3 class="fw-bold mt-3">Screen Peaking</h3>
+        <p class="fs-5">In order to combat screen peaking, Polariscope has a feature implemented in almost every page to prevent it. This feature covers everything you see on screen with a grey box such that nobody would be able to see what you are doing. It may look like a page is loading or broken.</p>
+        <p class="fs-5">To activate this feature, simply press the ESC key on your keyboard and ENTER to close it. The buttons are mapped differently in order to further confuse keyboard peaking. Please try this feature now before continuing.</p>
+        `,
+        `
+        `
+    ];
+</script>

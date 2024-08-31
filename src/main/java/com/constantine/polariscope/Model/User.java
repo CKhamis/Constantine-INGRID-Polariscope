@@ -36,6 +36,7 @@ public class User implements UserDetails {
     private LocalDateTime created;
     @NonNull
     private LocalDateTime modified;
+    private boolean tutorialNeeded;
 
     @JsonIgnore
     @OneToMany(mappedBy = "author")
@@ -49,6 +50,7 @@ public class User implements UserDetails {
     protected void onCreate(){
         this.created = LocalDateTime.now();
         this.modified = LocalDateTime.now();
+        tutorialNeeded = true;
     }
 
     @PreUpdate

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xml:th="https://www.thymeleaf.org">
+<head th:replace="~{components/Header :: head('Home')}"></head>
+<body class="stripe-white" data-bs-theme="dark">
+<div th:replace="~{components/FakeError :: dark}"></div>
+<main class="container bg-body px-0 d-flex flex-column" style="height:100vh">
+    <nav class="bg-primary-subtle p-4">
+        <p class="mb-0 text-primary-emphasis" th:text="${'Version: ' + version}">v</p>
+        <h1 class="fw-bold mb-0 text-primary-emphasis">Welcome to Constantine Polariscope</h1>
+    </nav>
+    <div class="p-4 flex-grow-1 overflow-auto" id="content-container">
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <h3 class="text-center fw-bold">Please Wait</h3>
+    </div>
+    <nav style="bottom: 0; width: 100%" class="p-4 bg-body-tertiary d-flex flex-row align-items-center">
+        <div class="pe-4">
+            <button type="submit" class="btn btn-primary" onclick="prevPage()" id="prev-button">Previous</button>
+            <button type="submit" class="btn btn-primary" onclick="nextPage()" id="next-button">Next</button>
+        </div>
+        <div class="progress flex-grow-1" role="progressbar" aria-label="Progress bar" aria-valuemin="0" aria-valuemax="100" style="height: 20px">
+            <div class="progress-bar" style="width: 0; transition: width 2s ease, background-color 2s ease;" id="progress-bar"></div>
+        </div>
+    </nav>
+</main>
+<script th:replace="~{components/TutorialScreens :: tutorial-screns}"></script>
+<script>
+    let currentPage = 0;
+    showPage(currentPage);
+
+    function showPage(index){
+        if (index >= screens.length && index < 0) {
+            return;
+        }
+
+        document.querySelector("#progress-bar").style.width = (index / screens.length) * 100 + '%';
+        document.querySelector("#content-container").innerHTML = screens[index];
+    }
+
+    function nextPage() {
+        if (currentPage < screens.length - 1) {
+            currentPage++;
+            showPage(currentPage);
+        }
+    }
+    function prevPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            showPage(currentPage);
+        }
+    }
+</script>
+
+</body>
+</html>
