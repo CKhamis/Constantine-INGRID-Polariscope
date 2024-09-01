@@ -19,7 +19,7 @@ public class SecurityConfig {
     SecurityFilterChain web(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/**").authenticated()
+                        .requestMatchers("/", "/tutorial", "/interpersonal/**").authenticated()
                         .requestMatchers("/api/interpersonal/**").hasAuthority(User.Role.Owner.toString())
                         .anyRequest().permitAll()
                 )

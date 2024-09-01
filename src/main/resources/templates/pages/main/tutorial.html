@@ -27,6 +27,7 @@
     </nav>
 </main>
 <script th:replace="~{components/TutorialScreens :: tutorial-screns}"></script>
+<div th:replace="~{components/Network :: network}"></div>
 <script>
     let currentPage = 0;
     showPage(currentPage);
@@ -54,7 +55,22 @@
     }
 
     function closeTutorial(){
-
+        postData("/api/account/dismiss-tutorial", {})
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`error-message`).innerText = message.title + ": " + message.message;
+                window.location.href = "/interpersonal";
+            })
+            .catch((response) => {
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`error-message`).innerText = errorData.title + ": " + errorData.message;
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`error-message`).innerText = "There was an unknown error dismissing tutorial";
+                    });
+            });
     }
 </script>
 

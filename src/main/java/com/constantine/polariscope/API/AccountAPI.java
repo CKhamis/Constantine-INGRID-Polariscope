@@ -71,6 +71,7 @@ public class AccountAPI {
         try{
             User retrievedUser = getCurrentUser(principal);
             retrievedUser.setTutorialNeeded(false);
+            userService.save(retrievedUser);
             return ResponseEntity.ok().body(new ResponseMessage("User Data saved", ResponseMessage.Severity.INFORMATIONAL, "Tutorial is now dismissed"));
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Unable to dismiss tutorial", ResponseMessage.Severity.LOW, e.getMessage()));
