@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  web:
+    restart: always
+    image: polariscope
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      - POLARI_USERNAME=costi
+      - POLARI_PASSWORD=1234
+  db:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: polariscope
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - "3306:3306"
