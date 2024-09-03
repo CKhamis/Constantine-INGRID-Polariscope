@@ -43,7 +43,7 @@ public class InterpersonalAPI {
         }
         String username = principal.getName();;
         User user = (User) userService.loadUserByUsername(username);
-        if(user.getRole().equals(User.Role.Owner)){
+        if(user.getRole().equals(User.Role.Owner) || user.getRole().equals(User.Role.ADMIN)){
             return user;
         }
         throw new Exception("Invalid user");

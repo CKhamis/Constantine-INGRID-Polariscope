@@ -20,7 +20,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/", "/tutorial", "/interpersonal/**").authenticated()
-                        .requestMatchers("/api/interpersonal/**").hasAuthority(User.Role.Owner.toString())
+                        .requestMatchers("/api/interpersonal/**").hasAnyAuthority(User.Role.Owner.toString(), User.Role.ADMIN.toString())
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form

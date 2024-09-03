@@ -96,6 +96,7 @@ public class User implements UserDetails {
 
     public enum Role{
         Owner,
+        ADMIN,
         Observer
     }
 }

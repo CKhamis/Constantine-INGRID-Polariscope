@@ -26,6 +26,8 @@
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
+<div th:replace="~{components/Toast :: toast}"></div>
+<div th:replace="~{components/Network :: network}"></div>
 <script>
     displayMainMenu();
     function displayMainMenu(){
@@ -67,23 +69,55 @@
     }
 
     function displayUserSettings(){
-        document.querySelector("#main-content").innerHTML = `
-        <div class="col-lg-2 d-none d-lg-block"></div>
-        <div class="col-lg-8 col-12">
-            <div class="row">
-                <a class="col-md-6 col-lg-4 mb-4 px-3" onclick="displayActivity()">
-                    <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
-                        <p class="fs-4 fs-bold text-center m-0">User Activity</p>
+        let content = "";
+        const userFetch = fetch('/api/account/info/current')
+        Promise.all([userFetch])
+            .then(responses => {
+                return Promise.all(responses);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                let ownerSettings = "";
+                if(data[0].authorities[0].authority === "Owner"){
+                    ownerSettings = `
+                        <a class="col-md-6 col-lg-4 mb-4 px-3" onclick="displayNewUser()">
+                            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                                <p class="fs-4 fs-bold text-center m-0">New User</p>
+                            </div>
+                        </a>
+                    `
+                }
+                content = `
+                <div class="col-lg-2 d-none d-lg-block"></div>
+                <div class="col-lg-8 col-12">
+                    <div class="row">
+                        <a class="col-md-6 col-lg-4 mb-4 px-3" onclick="displayActivity()">
+                            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                                <p class="fs-4 fs-bold text-center m-0">User Activity</p>
+                            </div>
+                        </a>
+                        <a class="col-md-6 col-lg-4 mb-4 px-3" href="/tutorial">
+                            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                                <p class="fs-4 fs-bold text-center m-0">Tutorial</p>
+                            </div>
+                        </a>
+                        ${ownerSettings}
                     </div>
-                </a>
-                <a class="col-md-6 col-lg-4 mb-4 px-3" href="/tutorial">
-                    <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
-                        <p class="fs-4 fs-bold text-center m-0">Tutorial</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-        `;
+                </div>
+                `;
+            })
+            .catch(() => {
+                content =  `
+                <h2 class="text-center">OOPS! There was an error :(</h2>
+                `;
+            })
+            .finally(() => {
+                document.querySelector("#main-content").innerHTML = content;
+            });
+
+        document.querySelector("#main-content").innerHTML
         document.querySelector("#title").textContent = `Polariscope Settings > User Settings`;
     }
 
@@ -140,6 +174,63 @@
             })
             .finally(() => {
                 document.querySelector("#main-content").innerHTML = content;
+            });
+    }
+
+    function displayNewUser(){
+        document.querySelector("#main-content").innerHTML = `
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a onclick="displayUserSettings()" class="text-decoration-underline">< Back to User Settings</a>
+                    </div>
+                    <div class="col-md-9">
+                        <h2 class="fw-bold">Create New User</h2>
+                        <div class="row mt-2">
+                            <div class="col-12 mb-3">
+                                <label for="username-form">Username</label>
+                                <input type="text" class="form-control" id="username-form" required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" id="password" required>
+                            </div>
+                            <p id="status-text"></p>
+                            <button type="submit" class="btn btn-primary" onclick="saveNewUser()" id="submit-button">Save</button>
+                        </div>
+                    </div>
+                </div>
+                `;
+    }
+
+    function saveNewUser(){
+        const form = {
+            username: document.querySelector("#username-form").value,
+            password: document.querySelector("#password").value
+        }
+
+        let toastId = createToast("Saving User");
+        postData("/api/account/new", form)
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+                document.getElementById("#status-text").innerText = message.title + " " + message.body;
+            })
+            .catch((response) => {
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                        document.getElementById("#status-text").innerText = errorData.title + " " + errorData.body;
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
             });
     }
 </script>

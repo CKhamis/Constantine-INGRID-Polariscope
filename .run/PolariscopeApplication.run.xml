@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="PolariscopeApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <envs>
-      <env name="POLARI_USERNAME" value="Costi" />
       <env name="POLARI_PASSWORD" value="1234" />
+      <env name="POLARI_USERNAME" value="Groovyak" />
     </envs>
     <module name="polariscope.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.constantine.polariscope.PolariscopeApplication" />
