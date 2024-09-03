@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ public class MemberListItem {
     private Evaluation lastEvaluation;
     private boolean scoreHold;
     private boolean archive;
+    private LocalDate birthday;
 
     public MemberListItem(Member member){
         id = member.getId();
@@ -35,5 +37,6 @@ public class MemberListItem {
         lastModified = member.getLastModified();
         scoreHold = member.isScoreHold();
         archive = member.isArchive();
+        birthday = member.getBirthday();
     }
 }

@@ -18,7 +18,7 @@ import java.security.Principal;
 public class FrontEndController {
     private final UserService userService;
     private final PlaceService placeService;
-    private static final String VERSION = "1.0.0";
+    private static final String VERSION = "1.1.0";
 
     private User getCurrentUser(Principal principal){
         if(principal == null){

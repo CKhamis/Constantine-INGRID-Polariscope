@@ -208,9 +208,9 @@
         memberList.forEach((member, i) => {
             if(!member.scoreHold){
                 content += `
-                <div class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" onclick="selectMember('${member.id}')">
+                <div class="border border-1 d-flex justify-content-start align-items-center p-3 mb-3" role="button" onclick="selectMember('${member.id}')">
                     <img class="square-image img-fluid" style="width: 40px; height: 40px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
-                    <h4 class="fw-bold mb-0 ms-2">${member.firstName} ${member.lastName}</h4>
+                    <h5 class="fw-bold mb-0 ms-2">${member.firstName} ${member.lastName}</h5>
                 </div>
                 `;
             }else{
@@ -219,7 +219,7 @@
         });
         content += `
             <a class="border border-1 d-flex justify-content-center align-items-center p-4 mb-3" role="button" href="/interpersonal/new">
-                <h4 class="fw-bold"> + New Member</h4>
+                <h5 class="fw-bold"> + New Member</h5>
             </a>
             `;
         document.querySelector("#left-pane").innerHTML = content;

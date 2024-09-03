@@ -26,7 +26,7 @@ public class MemberService {
 
         for (Member member : members) {
             MemberListItem listItem = new MemberListItem(member);
-            List<Evaluation> allEvals = evaluationRepository.findAllByMemberOrderByTimestampDesc(member);
+            List<Evaluation> allEvals = evaluationRepository.findAllByMemberOrderByTimestampDesc(member); // TODO: optimize this by maybe just storing the latest eval in the member itself
             if(!allEvals.isEmpty()){
                 listItem.setLastEvaluation(allEvals.get(0));
             }

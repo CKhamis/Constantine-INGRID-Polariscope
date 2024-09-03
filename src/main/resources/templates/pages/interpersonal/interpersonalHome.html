@@ -80,6 +80,11 @@
                         <div class="calendar-cell"></div>
                     </div>
                 </div>
+
+                <div class="bg-body-tertiary p-3 mt-3">
+                    <h3 class="fw-bold">Upcoming Birthdays</h3>
+                    <div id="birthday-content"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -125,6 +130,7 @@
                 renderHighestEval();
                 renderLowestEval();
                 renderCalendarWidget();
+                renderBirthdays();
 
                 if(userInfo.tutorialNeeded){
                     window.location.href = "/tutorial";
@@ -133,6 +139,48 @@
             .then(() => {
 
             });
+    }
+
+    function renderBirthdays(){
+        const now = new Date();
+        const fourWeeksLater = new Date(now.getTime() + 4 * 7 * 24 * 60 * 60 * 1000); // Current time + 4 weeks
+
+        // Filter for birthdays within the next 4 weeks
+        const upcomingBirthdays = memberList.filter(obj => {
+            const birthdayThisYear = new Date(now.getFullYear(), new Date(obj.birthday).getMonth(), new Date(obj.birthday).getDate());
+            const birthdayNextYear = new Date(now.getFullYear() + 1, new Date(obj.birthday).getMonth(), new Date(obj.birthday).getDate());
+
+            // Check if birthday is within the next 4 weeks
+            return (birthdayThisYear >= now && birthdayThisYear <= fourWeeksLater) ||
+                (birthdayNextYear >= now && birthdayNextYear <= fourWeeksLater && birthdayThisYear < now);
+        });
+
+        // Sort by closest upcoming birthday
+        upcomingBirthdays.sort((a, b) => {
+            const nextBirthdayA = new Date(now.getFullYear(), new Date(a.birthday).getMonth(), new Date(a.birthday).getDate());
+            const nextBirthdayB = new Date(now.getFullYear(), new Date(b.birthday).getMonth(), new Date(b.birthday).getDate());
+
+            // Handle case where the birthday is earlier in the year than the current date
+            if (nextBirthdayA < now) nextBirthdayA.setFullYear(now.getFullYear() + 1);
+            if (nextBirthdayB < now) nextBirthdayB.setFullYear(now.getFullYear() + 1);
+
+            return nextBirthdayA - nextBirthdayB;
+        });
+
+        const birthdayContainer = document.querySelector("#birthday-content");
+        let content = '';
+        upcomingBirthdays.forEach((member => {
+            content += `
+            <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" href="/interpersonal/member/view/${member.id}">
+                <div class="d-flex justify-content-start gap-2 align-items-center mt-2">
+                    <img class="square-image img-fluid" style="width: 25px; height: 25px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
+                    <p class="mb-0 fw-bold ms-2 fs-5">${member.firstName} ${member.lastName}</p>
+                </div>
+                <p class="mb-0">${formatDate(member.birthday)}</p>
+            </a>
+            `;
+        }));
+        birthdayContainer.innerHTML = content;
     }
 
     function getMonthName(date) {
