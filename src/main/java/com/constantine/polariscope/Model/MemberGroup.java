@@ -13,7 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class Group {
+public class MemberGroup {
 
     @Id
     @GeneratedValue
@@ -27,16 +27,17 @@ public class Group {
     @ManyToOne
     private User author;
 
-    public Group(){
+    public MemberGroup(){
         created = LocalDateTime.now();
         lastModified = LocalDateTime.now();
     }
 
-    public Group(GroupForm form){
+    public MemberGroup(GroupForm form, User author){
         this.name = form.getName();
         this.description = form.getDescription();
         this.created = LocalDateTime.now();
         this.lastModified = LocalDateTime.now();
+        this.author = author;
     }
 
     @PrePersist

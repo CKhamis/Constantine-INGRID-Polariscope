@@ -2,7 +2,7 @@ package com.constantine.polariscope.Controller;
 
 import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
-import com.constantine.polariscope.Service.GroupService;
+import com.constantine.polariscope.Service.MemberGroupService;
 import com.constantine.polariscope.Service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,7 +17,7 @@ import java.security.Principal;
 @AllArgsConstructor
 public class FrontEndController {
     private final UserService userService;
-    private final GroupService groupService;
+    private final MemberGroupService groupService;
     private static final String VERSION = "1.2.0";
 
     private User getCurrentUser(Principal principal){

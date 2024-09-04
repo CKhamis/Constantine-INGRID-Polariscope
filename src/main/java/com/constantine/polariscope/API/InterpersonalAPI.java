@@ -30,7 +30,7 @@ public class InterpersonalAPI {
     private final MemberService memberService;
     private final UserService userService;
     private final EvaluationService evaluationService;
-    private final GroupService groupService;
+    private final MemberGroupService groupService;
     private final ActivityLogService activityLogService;
 
     private User getCurrentUser(Principal principal) throws Exception{
@@ -95,10 +95,10 @@ public class InterpersonalAPI {
 
                         if(formElements.getGroup() != null){
                             // UUID provided
-                            Optional<Group> optionalGroup = groupService.findGroupById(formElements.getGroup());
+                            Optional<MemberGroup> optionalGroup = groupService.findGroupById(formElements.getGroup());
                             if(optionalGroup.isPresent()){
                                 //UUID matches with an existing UUID
-                                Group group = optionalGroup.get();
+                                MemberGroup group = optionalGroup.get();
                                 if(group.getAuthor().getId().equals(retrievedUser.getId())){
                                     // UUID is owned by logged in user
                                     retrievedMember.setGroup(group);
@@ -233,7 +233,7 @@ public class InterpersonalAPI {
             User retrievedUser = getCurrentUser(principal);
 
             // Get all places from repository
-            List<Group> groups = groupService.findAll(retrievedUser);
+            List<MemberGroup> groups = groupService.findAll(retrievedUser);
             return ResponseEntity.ok(new InterpersonalEnums(groups));
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Enums", ResponseMessage.Severity.LOW, e.getMessage()));
@@ -378,7 +378,7 @@ public class InterpersonalAPI {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Evaluation", ResponseMessage.Severity.LOW, "Evaluation could not be deleted"));
             }
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error deleting evaluation"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Evaluation", ResponseMessage.Severity.LOW, "Error deleting evaluation"));
         }
     }
 
@@ -388,10 +388,10 @@ public class InterpersonalAPI {
             User user = getCurrentUser(principal);
 
             // Get id of evaluation
-            Optional<Group> optionalGroup = groupService.findGroupById(id);
+            Optional<MemberGroup> optionalGroup = groupService.findGroupById(id);
 
             if(optionalGroup.isPresent()){
-                Group group = optionalGroup.get();
+                MemberGroup group = optionalGroup.get();
 
                 // Check if group is owned by logged in user
                 User author = group.getAuthor();
@@ -417,11 +417,18 @@ public class InterpersonalAPI {
         try{
             User user = getCurrentUser(principal);
 
+            if(form.getId() == null){
+                // Save brand new group
+                MemberGroup newGroup = new MemberGroup(form, user);
+                groupService.saveGroup(newGroup);
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Saved", ResponseMessage.Severity.INFORMATIONAL, "Group was created and saved to memory"));
+            }
+
             // Get id of evaluation
-            Optional<Group> optionalGroup = groupService.findGroupById(form.getId());
+            Optional<MemberGroup> optionalGroup = groupService.findGroupById(form.getId());
 
             if(optionalGroup.isPresent()){
-                Group group = optionalGroup.get();
+                MemberGroup group = optionalGroup.get();
 
                 // Check if group is owned by logged in user
                 User author = group.getAuthor();
@@ -438,10 +445,7 @@ public class InterpersonalAPI {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Group", ResponseMessage.Severity.LOW, "Authentication issue"));
                 }
             }else{
-                // Save brand new group
-                Group newGroup = new Group(form);
-                groupService.saveGroup(newGroup);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Group Saved", ResponseMessage.Severity.LOW, "A new group has been added to your list"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Group", ResponseMessage.Severity.LOW, "ID is invalid"));
             }
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Group", ResponseMessage.Severity.LOW, "OOPS! There was an error :("));

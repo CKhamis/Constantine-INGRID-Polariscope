@@ -52,7 +52,7 @@ public class Member {
     private User author;
 
     @ManyToOne
-    private Group group;
+    private MemberGroup group;
 
     @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
@@ -82,7 +82,7 @@ public class Member {
         lastModified = LocalDateTime.now();
     }
 
-    public Member(@NonNull UUID id, @NonNull String firstName, @NonNull String lastName, String middleName, RelationshipType relationship, Sexuality sexuality, String personality, String favoriteColor, String description, Sex sex, Integer ageMet, LocalDate birthday, @NonNull LocalDateTime created, @NonNull LocalDateTime lastModified, @NonNull User author, Group group, List<Evaluation> timeline) {
+    public Member(@NonNull UUID id, @NonNull String firstName, @NonNull String lastName, String middleName, RelationshipType relationship, Sexuality sexuality, String personality, String favoriteColor, String description, Sex sex, Integer ageMet, LocalDate birthday, @NonNull LocalDateTime created, @NonNull LocalDateTime lastModified, @NonNull User author, MemberGroup group, List<Evaluation> timeline) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
