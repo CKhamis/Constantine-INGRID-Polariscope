@@ -93,6 +93,19 @@ public class InterpersonalAPI {
                             retrievedMember.setSexuality(Member.Sexuality.valueOf(formElements.getSexuality()));
                         }
 
+                        if(formElements.getGroup() != null){
+                            // UUID provided
+                            Optional<Group> optionalGroup = groupService.findGroupById(formElements.getGroup());
+                            if(optionalGroup.isPresent()){
+                                //UUID matches with an existing UUID
+                                Group group = optionalGroup.get();
+                                if(group.getAuthor().getId().equals(retrievedUser.getId())){
+                                    // UUID is owned by logged in user
+                                    retrievedMember.setGroup(group);
+                                }
+                            }
+                        }
+
                         // Profile image
                         if (file != null && !file.isEmpty()) {
                             String fileType = FileValidator.getImageFileType(file);
@@ -387,7 +400,7 @@ public class InterpersonalAPI {
                     groupService.deleteGroup(group);
                     return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Deleted", ResponseMessage.Severity.INFORMATIONAL, "Group and associations have been permanently deleted"));
                 }else{
-                    // Member author does not match with logged in user
+                    // Group author does not match with logged in user
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "Authentication issue"));
                 }
             }else{
@@ -399,7 +412,7 @@ public class InterpersonalAPI {
         }
     }
 
-    @PostMapping("/group/delete")
+    @PostMapping("/group/save")
     public ResponseEntity<ResponseMessage> saveGroup(@RequestBody GroupForm form, Principal principal){
         try{
             User user = getCurrentUser(principal);
@@ -414,18 +427,24 @@ public class InterpersonalAPI {
                 User author = group.getAuthor();
 
                 if(user.getId().equals(author.getId())){
-                    groupService.deleteGroup(group);
-                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Deleted", ResponseMessage.Severity.INFORMATIONAL, "Group and associations have been permanently deleted"));
+                    // Edit existing group
+                    group.setName(form.getName());
+                    group.setDescription(form.getDescription());
+                    groupService.saveGroup(group);
+
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Saved", ResponseMessage.Severity.INFORMATIONAL, "Group info has been modified"));
                 }else{
-                    // Member author does not match with logged in user
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "Authentication issue"));
+                    // Group author does not match with logged in user
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Group", ResponseMessage.Severity.LOW, "Authentication issue"));
                 }
             }else{
-                // Evaluation not found
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "Group could not be found"));
+                // Save brand new group
+                Group newGroup = new Group(form);
+                groupService.saveGroup(newGroup);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Group Saved", ResponseMessage.Severity.LOW, "A new group has been added to your list"));
             }
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "OOPS! There was an error :("));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Group", ResponseMessage.Severity.LOW, "OOPS! There was an error :("));
         }
     }
 }

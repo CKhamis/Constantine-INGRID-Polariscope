@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Model;
 
+import com.constantine.polariscope.DTO.GroupForm;
 import com.constantine.polariscope.Util.EncryptUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -29,6 +30,13 @@ public class Group {
     public Group(){
         created = LocalDateTime.now();
         lastModified = LocalDateTime.now();
+    }
+
+    public Group(GroupForm form){
+        this.name = form.getName();
+        this.description = form.getDescription();
+        this.created = LocalDateTime.now();
+        this.lastModified = LocalDateTime.now();
     }
 
     @PrePersist

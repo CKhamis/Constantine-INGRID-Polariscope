@@ -28,4 +28,6 @@ public class MemberForm {
 
     private boolean archive;
     private boolean scoreHold;
+
+    private UUID group;
 }
