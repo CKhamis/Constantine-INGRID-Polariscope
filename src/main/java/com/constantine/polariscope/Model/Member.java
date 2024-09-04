@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,7 +52,7 @@ public class Member {
     private User author;
 
     @ManyToOne
-    private Place placeMet;
+    private Group group;
 
     @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
@@ -83,7 +82,7 @@ public class Member {
         lastModified = LocalDateTime.now();
     }
 
-    public Member(@NonNull UUID id, @NonNull String firstName, @NonNull String lastName, String middleName, RelationshipType relationship, Sexuality sexuality, String personality, String favoriteColor, String description, Sex sex, Integer ageMet, LocalDate birthday, @NonNull LocalDateTime created, @NonNull LocalDateTime lastModified, @NonNull User author, Place placeMet, List<Evaluation> timeline) {
+    public Member(@NonNull UUID id, @NonNull String firstName, @NonNull String lastName, String middleName, RelationshipType relationship, Sexuality sexuality, String personality, String favoriteColor, String description, Sex sex, Integer ageMet, LocalDate birthday, @NonNull LocalDateTime created, @NonNull LocalDateTime lastModified, @NonNull User author, Group group, List<Evaluation> timeline) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -101,7 +100,7 @@ public class Member {
         this.lastModified = lastModified;
 
         this.author = author;
-        this.placeMet = placeMet;
+        this.group = group;
         this.timeline = timeline;
 
         this.archive = false;

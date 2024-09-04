@@ -2,7 +2,7 @@ package com.constantine.polariscope.Controller;
 
 import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
-import com.constantine.polariscope.Service.PlaceService;
+import com.constantine.polariscope.Service.GroupService;
 import com.constantine.polariscope.Service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,8 +17,8 @@ import java.security.Principal;
 @AllArgsConstructor
 public class FrontEndController {
     private final UserService userService;
-    private final PlaceService placeService;
-    private static final String VERSION = "1.1.0";
+    private final GroupService groupService;
+    private static final String VERSION = "1.2.0";
 
     private User getCurrentUser(Principal principal){
         if(principal == null){
@@ -68,7 +68,7 @@ public class FrontEndController {
         model.addAttribute("relationshipTypes", Member.RelationshipType.values());
         model.addAttribute("sexualityTypes", Member.Sexuality.values());
         model.addAttribute("sexTypes", Member.Sex.values());
-        model.addAttribute("places", placeService.findAll(getCurrentUser(principal)));
+        model.addAttribute("places", groupService.findAll(getCurrentUser(principal)));
         return "pages/interpersonal/newMember";
     }
 
@@ -78,7 +78,7 @@ public class FrontEndController {
         model.addAttribute("relationshipTypes", Member.RelationshipType.values());
         model.addAttribute("sexualityTypes", Member.Sexuality.values());
         model.addAttribute("sexTypes", Member.Sex.values());
-        model.addAttribute("places", placeService.findAll(getCurrentUser(principal)));
+        model.addAttribute("places", groupService.findAll(getCurrentUser(principal)));
         return "pages/interpersonal/interpersonalView";
     }
 
@@ -87,7 +87,7 @@ public class FrontEndController {
         model.addAttribute("relationshipTypes", Member.RelationshipType.values());
         model.addAttribute("sexualityTypes", Member.Sexuality.values());
         model.addAttribute("sexTypes", Member.Sex.values());
-        model.addAttribute("places", placeService.findAll(getCurrentUser(principal)));
+        model.addAttribute("places", groupService.findAll(getCurrentUser(principal)));
         return "pages/interpersonal/interpersonalCompare";
     }
 

@@ -13,15 +13,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -34,7 +30,7 @@ public class InterpersonalAPI {
     private final MemberService memberService;
     private final UserService userService;
     private final EvaluationService evaluationService;
-    private final PlaceService placeService;
+    private final GroupService groupService;
     private final ActivityLogService activityLogService;
 
     private User getCurrentUser(Principal principal) throws Exception{
@@ -224,8 +220,8 @@ public class InterpersonalAPI {
             User retrievedUser = getCurrentUser(principal);
 
             // Get all places from repository
-            List<Place> places = placeService.findAll(retrievedUser);
-            return ResponseEntity.ok(new InterpersonalEnums(places));
+            List<Group> groups = groupService.findAll(retrievedUser);
+            return ResponseEntity.ok(new InterpersonalEnums(groups));
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Enums", ResponseMessage.Severity.LOW, e.getMessage()));
         }
@@ -370,6 +366,66 @@ public class InterpersonalAPI {
             }
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Member", ResponseMessage.Severity.LOW, "Error deleting evaluation"));
+        }
+    }
+
+    @PostMapping("/group/delete")
+    public ResponseEntity<ResponseMessage> deleteGroup(@RequestBody UUID id, Principal principal){
+        try{
+            User user = getCurrentUser(principal);
+
+            // Get id of evaluation
+            Optional<Group> optionalGroup = groupService.findGroupById(id);
+
+            if(optionalGroup.isPresent()){
+                Group group = optionalGroup.get();
+
+                // Check if group is owned by logged in user
+                User author = group.getAuthor();
+
+                if(user.getId().equals(author.getId())){
+                    groupService.deleteGroup(group);
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Deleted", ResponseMessage.Severity.INFORMATIONAL, "Group and associations have been permanently deleted"));
+                }else{
+                    // Member author does not match with logged in user
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "Authentication issue"));
+                }
+            }else{
+                // Evaluation not found
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "Group could not be found"));
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "OOPS! There was an error :("));
+        }
+    }
+
+    @PostMapping("/group/delete")
+    public ResponseEntity<ResponseMessage> saveGroup(@RequestBody GroupForm form, Principal principal){
+        try{
+            User user = getCurrentUser(principal);
+
+            // Get id of evaluation
+            Optional<Group> optionalGroup = groupService.findGroupById(form.getId());
+
+            if(optionalGroup.isPresent()){
+                Group group = optionalGroup.get();
+
+                // Check if group is owned by logged in user
+                User author = group.getAuthor();
+
+                if(user.getId().equals(author.getId())){
+                    groupService.deleteGroup(group);
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Deleted", ResponseMessage.Severity.INFORMATIONAL, "Group and associations have been permanently deleted"));
+                }else{
+                    // Member author does not match with logged in user
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "Authentication issue"));
+                }
+            }else{
+                // Evaluation not found
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "Group could not be found"));
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "OOPS! There was an error :("));
         }
     }
 }

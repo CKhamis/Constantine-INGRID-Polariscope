@@ -67,7 +67,7 @@
             <div class="col-md-4 mb-3">
                 <label for="psf">Places</label>
                 <select class="form-select" id="psf">
-                    <th:block th:each="place : ${places}">
+                    <th:block th:each="place : ${groups}">
                         <option th:value="${place}" th:text="${place.toString().toLowerCase()}"></option>
                     </th:block>
                 </select>

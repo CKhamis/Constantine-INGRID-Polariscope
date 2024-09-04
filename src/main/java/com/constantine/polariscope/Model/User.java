@@ -44,7 +44,7 @@ public class User implements UserDetails {
 
     @JsonIgnore
     @OneToMany(mappedBy = "author")
-    private List<Place> places;
+    private List<Group> groups;
 
     @PrePersist
     protected void onCreate(){

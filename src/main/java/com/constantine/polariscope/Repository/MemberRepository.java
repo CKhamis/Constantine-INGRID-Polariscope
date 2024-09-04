@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Repository;
 
+import com.constantine.polariscope.Model.Group;
 import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +12,5 @@ import java.util.UUID;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, UUID> {
     List<Member> findAllByAuthorOrderByLastModifiedDesc(User author);
+    List<Member> deleteAllByGroup(Group group);
 }
