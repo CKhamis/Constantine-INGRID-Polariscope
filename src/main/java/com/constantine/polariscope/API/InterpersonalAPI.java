@@ -139,6 +139,19 @@ public class InterpersonalAPI {
                 // Save to new user
                 Member member = new Member(formElements, retrievedUser);
 
+                if(formElements.getGroup() != null){
+                    // UUID provided
+                    Optional<MemberGroup> optionalGroup = groupService.findGroupById(formElements.getGroup());
+                    if(optionalGroup.isPresent()){
+                        //UUID matches with an existing UUID
+                        MemberGroup group = optionalGroup.get();
+                        if(group.getAuthor().getId().equals(retrievedUser.getId())){
+                            // UUID is owned by logged in user
+                            member.setGroup(group);
+                        }
+                    }
+                }
+
                 // Profile image
                 if (file != null && !file.isEmpty()) {
                     String fileType = FileValidator.getImageFileType(file);

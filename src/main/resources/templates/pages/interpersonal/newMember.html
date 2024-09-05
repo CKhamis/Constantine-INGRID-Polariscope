@@ -65,12 +65,8 @@
             </div>
 
             <div class="col-md-4 mb-3">
-                <label for="psf">Places</label>
-                <select class="form-select" id="psf">
-                    <th:block th:each="place : ${groups}">
-                        <option th:value="${place}" th:text="${place.toString().toLowerCase()}"></option>
-                    </th:block>
-                </select>
+                <label for="group-form">Primary Group</label>
+                <select class="form-select" id="group-form"></select>
             </div>
 
             <div class="col-12 mb-3">
@@ -87,6 +83,37 @@
 <div th:replace="~{components/Network :: data-upload}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
 <script>
+    refresh();
+    function refresh(){
+        const enumFetch = fetch("/api/interpersonal/enums", {});
+        Promise.all([enumFetch])
+            .then(responses => {
+                return Promise.all(responses);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                let content = `<option value="">None</option>`;
+
+                data[0].groups.forEach((group) => {
+                    content += `<option value="${group.id}">${group.name}</option>`;
+                });
+
+                document.querySelector("#group-form").innerHTML = content;
+            })
+            .catch((response) => {
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                    });
+            });
+    }
+
+
     function submit(){
         const formData = new FormData();
 
@@ -101,6 +128,7 @@
         formData.append('ageMet',        document.querySelector("#amf").value);
         formData.append('birthday',      document.querySelector("#bdf").value);
         formData.append('description',   document.querySelector("#df").value);
+        formData.append('group', document.querySelector("#group-form").value);
 
         formData.append('archive', false);
         formData.append('scoreHold', false);
