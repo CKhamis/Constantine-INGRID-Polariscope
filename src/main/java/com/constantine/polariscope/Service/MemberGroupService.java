@@ -4,6 +4,7 @@ import com.constantine.polariscope.Model.MemberGroup;
 import com.constantine.polariscope.Model.User;
 import com.constantine.polariscope.Repository.MemberGroupRepository;
 import com.constantine.polariscope.Repository.MemberRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,8 @@ public class MemberGroupService {
     public MemberGroup saveGroup(MemberGroup group){
         return groupRepository.save(group);
     }
+
+    @Transactional
     public void deleteGroup(MemberGroup group){
         // First, remove all associations to the group
         memberRepository.deleteAllByGroup(group);

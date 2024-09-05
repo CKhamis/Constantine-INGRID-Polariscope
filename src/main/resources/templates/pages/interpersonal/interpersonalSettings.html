@@ -292,9 +292,9 @@
                     <tr>
                         <th style="vertical-align: middle">${group.name}</th>
                         <th style="vertical-align: middle">${group.description}</th>
-                        <th>${formatTimestamp(new Date(group.lastModified))}</th>
-                        <th><button class="btn btn-secondary" onclick="updateModal('${group.id}')" data-bs-toggle="modal" data-bs-target="#saveGroupModal">Edit</button></th>
-                        <th><button class="btn btn-danger bevel-sm" onclick="deleteGroup('${group.id}')">Delete</button></th>
+                        <th style="vertical-align: middle">${formatTimestamp(new Date(group.lastModified))}</th>
+                        <th style="vertical-align: middle"><button class="btn btn-secondary" onclick="updateModal('${group.id}')" data-bs-toggle="modal" data-bs-target="#saveGroupModal">Edit</button></th>
+                        <th style="vertical-align: middle"><button class="btn btn-danger bevel-sm" onclick="deleteGroup('${group.id}')">Delete</button></th>
                     </tr>
                     `;
                 });
