@@ -12,5 +12,5 @@ import java.util.UUID;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, UUID> {
     List<Member> findAllByAuthorOrderByLastModifiedDesc(User author);
-    List<Member> deleteAllByGroup(MemberGroup group);
+    List<Member> findAllByGroupOrderByLastModifiedDesc(MemberGroup group);
 }

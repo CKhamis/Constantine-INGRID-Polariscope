@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Service;
 
+import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.MemberGroup;
 import com.constantine.polariscope.Model.User;
 import com.constantine.polariscope.Repository.MemberGroupRepository;
@@ -28,7 +29,11 @@ public class MemberGroupService {
     @Transactional
     public void deleteGroup(MemberGroup group){
         // First, remove all associations to the group
-        memberRepository.deleteAllByGroup(group);
+        List<Member> members = memberRepository.findAllByGroupOrderByLastModifiedDesc(group);
+        for(Member member : members){
+            member.setGroup(null);
+            memberRepository.save(member);
+        }
         // Now delete the group itself
         groupRepository.delete(group);
     }
