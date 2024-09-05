@@ -118,12 +118,9 @@
                         </div>
 
                         <div class="col-md-4 mb-3">
-                            <label for="psf">Places</label>
-                            <select class="form-select" id="psf">
-                                <option value="">None</option>
-                                <th:block th:each="place : ${groups}">
-                                    <option th:value="${place}" th:text="${place.toString().toLowerCase()}"></option>
-                                </th:block>
+                            <label for="group-form">Primary Group</label>
+                            <select class="form-select" id="group-form">
+                                <option value="" selected>None</option>
                             </select>
                         </div>
 
@@ -289,7 +286,7 @@
 <script>
     let memberList;
     let memberDetails;
-
+    let enums;
     let evalChartEval, evalChartEvalHome;
 
     refresh();
@@ -303,18 +300,20 @@
         let errorIcon = document.querySelector("#error-icon");
 
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
+        const enumFetch = fetch("/api/interpersonal/enums", {});
         const memberDetailFetch = fetch("/api/interpersonal/member/view/" + memberId, {});
-        Promise.all([memberListFetch, memberDetailFetch])
+        Promise.all([memberListFetch, memberDetailFetch, enumFetch])
             .then(responses => {
-                return Promise.all([responses[0], responses[1]]);
+                return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json(), data[1].json()]);
+                return Promise.all([data[0].json(), data[1].json(), data[2].json()]);
             })
             .then(data => {
                 tableAddons = "";
                 memberList = data[0];
                 memberDetails = data[1];
+                enums = data[2];
                 renderMemberSelect(data[0]);
                 renderBadges();
                 document.querySelector("#member-name").textContent = memberDetails.firstName + " " + memberDetails.lastName;
@@ -325,6 +324,13 @@
                 renderInfoTab();
                 updateEvalChart();
                 renderEvaluationTable();
+                updateGroups();
+            })
+            .then((response) => {
+                if(memberDetails.group !== null){
+                    document.querySelector("#group-form").value = memberDetails.group.id;
+                }
+                return response;
             })
             .catch((response) => {
                 console.log(response);
@@ -344,6 +350,16 @@
                 spinner.classList.remove("d-block");
                 spinner.classList.add("d-none");
             });
+    }
+
+    function updateGroups(){
+        let content = `<option value="">None</option>`;
+
+        enums.groups.forEach((group) => {
+            content += `<option value="${group.id}">${group.name}</option>`;
+        });
+
+        document.querySelector("#group-form").innerHTML = content;
     }
 
     function modalSaveEval(){
@@ -583,6 +599,7 @@
         formData.append('ageMet', document.querySelector("#amf").value);
         formData.append('birthday', document.querySelector("#bdf").value);
         formData.append('description', document.querySelector("#df").value);
+        formData.append('group', document.querySelector("#group-form").value);
 
         formData.append('archive', memberDetails.archive);
         formData.append('scoreHold', memberDetails.scoreHold);

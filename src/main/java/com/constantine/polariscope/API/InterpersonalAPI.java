@@ -104,6 +104,8 @@ public class InterpersonalAPI {
                                     retrievedMember.setGroup(group);
                                 }
                             }
+                        }else{
+                            retrievedMember.setGroup(null);
                         }
 
                         // Profile image
