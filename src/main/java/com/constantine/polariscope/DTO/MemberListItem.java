@@ -2,6 +2,7 @@ package com.constantine.polariscope.DTO;
 
 import com.constantine.polariscope.Model.Evaluation;
 import com.constantine.polariscope.Model.Member;
+import com.constantine.polariscope.Model.MemberGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class MemberListItem {
     private boolean scoreHold;
     private boolean archive;
     private LocalDate birthday;
+    private MemberGroup group;
 
     public MemberListItem(Member member){
         id = member.getId();
@@ -38,5 +40,6 @@ public class MemberListItem {
         scoreHold = member.isScoreHold();
         archive = member.isArchive();
         birthday = member.getBirthday();
+        group = member.getGroup();
     }
 }

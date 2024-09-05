@@ -37,6 +37,7 @@
                         <tr>
                             <th scope="col">Photo</th>
                             <th scope="col">Name</th>
+                            <th scope="col">Group</th>
                             <th scope="col" class="text-center">Archive</th>
                             <th scope="col" class="text-center">Hold</th>
                             <th scope="col">Relationship</th>
@@ -93,6 +94,15 @@
                         </div>
                     </div>
                     <div class="col-12">
+                        <label for="group-form" class="form-label">Filter by Group</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-text">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="group-checkbox-filter-modal" aria-label="Enable filtering by Grpoup">
+                            </div>
+                            <select class="form-select" name="relationship" id="group-form"></select>
+                        </div>
+                    </div>
+                    <div class="col-12">
                         <label for="sex-form-group" class="form-label">Filter by Sex</label>
                         <div class="input-group mb-3" id="sex-form-group">
                             <div class="input-group-text">
@@ -132,7 +142,7 @@
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: external}"></div>
 <script>
-    let allMembers, memberCompositionChart, sexCompositionChart;
+    let allMembers, memberCompositionChart, sexCompositionChart, enums;
     refresh();
     setupGraph();
     function refresh(){
@@ -142,18 +152,20 @@
         spinner.classList.remove("d-none");
 
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
-        Promise.all([memberListFetch])
+        const enumFetch = fetch("/api/interpersonal/enums", {});
+        Promise.all([memberListFetch, enumFetch])
             .then(responses => {
-                return Promise.all([responses[0]]);
+                return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json()]);
+                return Promise.all([data[0].json(), data[1].json()]);
             })
             .then(data => {
                 allMembers = data[0];
+                enums = data[1];
                 renderTable();
-                renderStats();
                 updateGraph();
+                renderEnums();
             })
             .catch((response) => {
                 errorIcon.classList.add("d-block");
@@ -172,6 +184,17 @@
                 spinner.classList.add("d-none");
             });
     }
+
+    function renderEnums(){
+        let content = ``;
+
+        enums.groups.forEach((group) => {
+            content += `<option value="${group.id}">${group.name}</option>`;
+        });
+
+        document.querySelector("#group-form").innerHTML = content;
+    }
+
     function renderTable(){
         let tableContents = '';
         const fnCheck = document.querySelector("#fn-checkbox-filter-modal").checked;
@@ -179,19 +202,22 @@
         const relationshipCheck = document.querySelector("#relationship-checkbox-filter-modal").checked;
         const sexualityCheck = document.querySelector("#sexuality-checkbox-filter-modal").checked;
         const sexCheck = document.querySelector("#sex-checkbox-filter-modal").checked;
+        const groupCheck = document.querySelector("#group-checkbox-filter-modal").checked;
 
         const fn = document.querySelector("#fn-form").value;
         const ln = document.querySelector("#ln-form").value;
         const relationship = document.querySelector("#relationship-form").value;
+        const group = document.querySelector("#group-form").value;
         const sex = document.querySelector("#sex-form").value;
         const sexuality = document.querySelector("#sexuality-form").value;
 
         allMembers.forEach((member) => {
-            if((!fnCheck || member.firstName.toLowerCase().includes(fn.toLowerCase())) && (!lnCheck || member.lastName.toLowerCase().includes(ln.toLowerCase())) && (!relationshipCheck || relationship === member.relationship) && (!sexualityCheck || sexuality === member.sexuality) && (!sexCheck || sex === member.sex)){
+            if((!fnCheck || member.firstName.toLowerCase().includes(fn.toLowerCase())) && (!lnCheck || member.lastName.toLowerCase().includes(ln.toLowerCase())) && (!relationshipCheck || relationship === member.relationship) && (!groupCheck || (groupCheck && member.group !== null && group === member.group.id)) && (!sexualityCheck || sexuality === member.sexuality) && (!sexCheck || sex === member.sex)){
                 tableContents += `
                     <tr>
                         <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}"></th>
                         <td>${member.firstName} ${member.lastName}</td>
+                        <td>${member.group == null? "" : member.group.name}</td>
                         <td class="text-center">${member.archive? "A" : ""}</td>
                         <td class="text-center">${member.scoreHold? "H" : ""}</td>
                         <td>${member.relationship}</td>
@@ -203,10 +229,6 @@
             }
         });
         document.querySelector("#table-body").innerHTML = tableContents;
-    }
-
-    function renderStats(){
-
     }
 
     function updateGraph(){
