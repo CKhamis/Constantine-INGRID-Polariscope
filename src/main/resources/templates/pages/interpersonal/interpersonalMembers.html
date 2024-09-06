@@ -38,6 +38,7 @@
                             <th scope="col">Photo</th>
                             <th scope="col">Name</th>
                             <th scope="col">Group</th>
+                            <th scope="col"></th>
                             <th scope="col" class="text-center">Archive</th>
                             <th scope="col" class="text-center">Hold</th>
                             <th scope="col">Relationship</th>
@@ -214,17 +215,18 @@
         allMembers.forEach((member) => {
             if((!fnCheck || member.firstName.toLowerCase().includes(fn.toLowerCase())) && (!lnCheck || member.lastName.toLowerCase().includes(ln.toLowerCase())) && (!relationshipCheck || relationship === member.relationship) && (!groupCheck || (groupCheck && member.group !== null && group === member.group.id)) && (!sexualityCheck || sexuality === member.sexuality) && (!sexCheck || sex === member.sex)){
                 tableContents += `
-                    <tr>
-                        <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}"></th>
-                        <td>${member.firstName} ${member.lastName}</td>
-                        <td>${member.group == null? "" : member.group.name}</td>
-                        <td class="text-center">${member.archive? "A" : ""}</td>
-                        <td class="text-center">${member.scoreHold? "H" : ""}</td>
-                        <td>${member.relationship}</td>
-                        <td>${member.sex}</td>
-                        <td>${member.sexuality}</td>
-                        <td><a href="/interpersonal/member/view/${member.id}">View Member ></a></td>
-                    </tr>
+                <tr>
+                    <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}"></th>
+                    <td>${member.firstName} ${member.lastName}</td>
+                    <td style="vertical-align: middle">${member.group == null ? "" : '<img class="square-image float-start me-2" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/group/image/' + member.group.id + '">'}</td>
+                    <td style="vertical-align: middle">${member.group == null ? "" : '<p class="mb-0">' + member.group.name + '</p>'}</td>
+                    <td class="text-center">${member.archive? "A" : ""}</td>
+                    <td class="text-center">${member.scoreHold? "H" : ""}</td>
+                    <td>${member.relationship}</td>
+                    <td>${member.sex}</td>
+                    <td>${member.sexuality}</td>
+                    <td><a href="/interpersonal/member/view/${member.id}">View Member ></a></td>
+                </tr>
                     `;
             }
         });
