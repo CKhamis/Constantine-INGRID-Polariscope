@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,6 +21,7 @@ public class MemberGroup {
     private UUID id;
     private String name;
     private String description;
+    private Color color;
     private LocalDateTime created;
     private LocalDateTime lastModified;
 
