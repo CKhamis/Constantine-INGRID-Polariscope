@@ -42,6 +42,28 @@
                         <label for="group-description-form" class="form-label">Description</label>
                         <textarea class="form-control" id="group-description-form" rows="3"></textarea>
                     </div>
+                    <div class="col-12 mt-3">
+                        <label for="color-preview" class="form-label">Color</label>
+                        <div class="container" style="height:40px" id="color-preview"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="group-red-form">Red</label>
+                            <input type="number" class="form-control" id="group-red-form">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="group-green-form">Green</label>
+                            <input type="number" class="form-control" id="group-green-form">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="group-blue-form">Blue</label>
+                            <input type="number" class="form-control" id="group-blue-form">
+                        </div>
+                    </div>
                     <input type="hidden" id="group-id-form" />
                 </div>
             </div>
@@ -291,6 +313,7 @@
                     tableContent += `
                     <tr>
                         <th style="vertical-align: middle">${group.name}</th>
+                        <th style="vertical-align: middle"><div class="square-image" style="height: 30px; background-color: rgb(${group.color.red}, ${group.color.green}, ${group.color.blue})"></div></th>
                         <th style="vertical-align: middle">${group.description}</th>
                         <th style="vertical-align: middle">${formatTimestamp(new Date(group.lastModified))}</th>
                         <th style="vertical-align: middle"><button class="btn btn-secondary" onclick="updateModal('${group.id}')" data-bs-toggle="modal" data-bs-target="#saveGroupModal">Edit</button></th>
@@ -312,6 +335,7 @@
                           <thead>
                             <tr>
                               <th scope="col">Name</th>
+                              <th scope="col">Color</th>
                               <th scope="col">Description</th>
                               <th scope="col">Modified</th>
                               <th scope="col">Edit</th>
@@ -341,6 +365,10 @@
         document.querySelector("#group-id-form").value = "";
         document.querySelector("#group-title-form").value = "";
         document.querySelector("#saveGroupModalTitle").innerText = "New Group";
+        document.querySelector("#group-red-form").value = Math.floor(Math.random() * 256);
+        document.querySelector("#group-green-form").value = Math.floor(Math.random() * 256);
+        document.querySelector("#group-blue-form").value = Math.floor(Math.random() * 256);
+        updateColorPreview();
     }
 
     function updateModal(id){
@@ -348,14 +376,27 @@
         document.querySelector("#group-description-form").value = group.description;
         document.querySelector("#group-id-form").value = id;
         document.querySelector("#group-title-form").value = group.name;
+        document.querySelector("#group-red-form").value = group.color.red;
+        document.querySelector("#group-green-form").value = group.color.green;
+        document.querySelector("#group-blue-form").value = group.color.blue;
         document.querySelector("#saveGroupModalTitle").innerText = "Edit Group";
+        updateColorPreview();
+    }
+
+    function updateColorPreview(){
+        const color = "rgb(" + document.querySelector("#group-red-form").value + "," + document.querySelector("#group-green-form").value + "," + document.querySelector("#group-blue-form").value + ")";
+        console.log(color);
+        document.querySelector("#color-preview").style.backgroundColor = color;
     }
 
     function modalSaveGroup(){
         const group = {
             description: document.querySelector("#group-description-form").value,
             id: document.querySelector("#group-id-form").value,
-            name: document.querySelector("#group-title-form").value
+            name: document.querySelector("#group-title-form").value,
+            red: document.querySelector("#group-red-form").value,
+            green: document.querySelector("#group-green-form").value,
+            blue: document.querySelector("#group-blue-form").value
         };
 
         let toastId = createToast("Saving Group");
@@ -408,6 +449,17 @@
             })
             .finally(() => {displayGroups()});
     }
+
+
+    document.querySelector("#group-red-form").addEventListener('input', function() {
+        updateColorPreview();
+    });
+    document.querySelector("#group-green-form").addEventListener('input', function() {
+        updateColorPreview();
+    });
+    document.querySelector("#group-blue-form").addEventListener('input', function() {
+        updateColorPreview();
+    });
 </script>
 </body>
 </html>

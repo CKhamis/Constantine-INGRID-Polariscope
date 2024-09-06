@@ -18,10 +18,12 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.List;
 
 @Controller
 @AllArgsConstructor
@@ -428,13 +430,14 @@ public class InterpersonalAPI {
     }
 
     @PostMapping("/group/save")
-    public ResponseEntity<ResponseMessage> saveGroup(@RequestBody GroupForm form, Principal principal){
+    public ResponseEntity<ResponseMessage> saveGroup(@RequestBody @Valid GroupForm form, Principal principal){
         try{
             User user = getCurrentUser(principal);
 
             if(form.getId() == null){
                 // Save brand new group
                 MemberGroup newGroup = new MemberGroup(form, user);
+                newGroup.setColor(new Color(form.getRed(), form.getGreen(), form.getBlue()));
                 groupService.saveGroup(newGroup);
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Saved", ResponseMessage.Severity.INFORMATIONAL, "Group was created and saved to memory"));
             }
@@ -451,6 +454,7 @@ public class InterpersonalAPI {
                 if(user.getId().equals(author.getId())){
                     // Edit existing group
                     group.setName(form.getName());
+                    group.setColor(new Color(form.getRed(), form.getGreen(), form.getBlue()));
                     group.setDescription(form.getDescription());
                     groupService.saveGroup(group);
 
