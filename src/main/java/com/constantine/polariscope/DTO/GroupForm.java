@@ -9,10 +9,10 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class GroupForm {
     private UUID id;
     private String name;

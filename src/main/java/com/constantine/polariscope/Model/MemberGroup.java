@@ -29,6 +29,13 @@ public class MemberGroup {
     @ManyToOne
     private User author;
 
+    @Lob
+    @JsonIgnore
+    @Column(columnDefinition = "longblob")
+    private byte[] profileImageData;
+    private String profileImageType;
+    private LocalDateTime profileImageTimestamp;
+
     public MemberGroup(){
         created = LocalDateTime.now();
         lastModified = LocalDateTime.now();
@@ -49,6 +56,10 @@ public class MemberGroup {
         this.name = EncryptUtil.encryptString(this.name, this.id);
         this.description = EncryptUtil.encryptString(this.description, this.id);
         this.created = EncryptUtil.encryptDateTime(this.created, this.id);
+
+        this.profileImageData = EncryptUtil.encryptBytes(this.profileImageData, this.id);
+        this.profileImageType = EncryptUtil.encryptString(this.profileImageType, this.id);
+        this.profileImageTimestamp = EncryptUtil.encryptDateTime(this.profileImageTimestamp, this.id);
     }
 
     @PostLoad
@@ -56,5 +67,9 @@ public class MemberGroup {
         this.name = EncryptUtil.decryptString(this.name, this.id);
         this.description = EncryptUtil.decryptString(this.description, this.id);
         this.created = EncryptUtil.decryptDateTime(this.created, this.id);
+
+        this.profileImageData = EncryptUtil.decryptBytes(this.profileImageData, this.id);
+        this.profileImageType = EncryptUtil.decryptString(this.profileImageType, this.id);
+        this.profileImageTimestamp = EncryptUtil.decryptDateTime(this.profileImageTimestamp, this.id);
     }
 }

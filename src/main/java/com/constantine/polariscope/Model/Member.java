@@ -176,6 +176,7 @@ public class Member {
         GAY,
         LESBIAN,
         ASEXUAL,
+        NONE
     }
 
     public enum RelationshipType{

@@ -197,12 +197,12 @@ public class InterpersonalAPI {
     }
 
     @GetMapping("/member/profile-image/" + "{memberId}")
-    public ResponseEntity<?> downloadFile(@PathVariable UUID memberId, Principal principal) {
+    public ResponseEntity<?> downloadMemberFile(@PathVariable UUID memberId, Principal principal) {
         try{
             Member retrievedMember = memberService.findMember(memberId);
             if(retrievedMember.getAuthor().equals(getCurrentUser(principal))){
                 if(retrievedMember.getProfileImageData() == null){
-                    return getDefaultImageResponse();
+                    return getDefaultImageResponse("static/icons/Default User.svg");
                 }else{
                     return ResponseEntity.ok()
                             .contentType(MediaType.parseMediaType("image/" + retrievedMember.getProfileImageType()))
@@ -210,16 +210,47 @@ public class InterpersonalAPI {
                             .body(new ByteArrayResource(retrievedMember.getProfileImageData()));
                 }
             }else{
-                return getDefaultImageResponse();
+                return getDefaultImageResponse("static/icons/Default User.svg");
             }
         }catch (Exception e){
-            return getDefaultImageResponse();
+            return getDefaultImageResponse("static/icons/Default User.svg");
         }
     }
 
-    private ResponseEntity<?> getDefaultImageResponse() {
+    @GetMapping("/group/image/" + "{id}")
+    public ResponseEntity<?> downloadGroupFile(@PathVariable UUID id, Principal principal) {
+        try{
+            Optional<MemberGroup> retrievedGroup = groupService.findGroupById(id);
+            if(retrievedGroup.isPresent()){
+                MemberGroup group = retrievedGroup.get();
+                if(group.getAuthor().equals(getCurrentUser(principal))){
+                    if(group.getProfileImageData() != null){
+                        return ResponseEntity.ok()
+                                .contentType(MediaType.parseMediaType("image/" + group.getProfileImageType()))
+                                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename= \"" + group.getName() + "\"")
+                                .body(new ByteArrayResource(group.getProfileImageData()));
+
+                    }else{
+                        // Group does not have an image
+                        return getDefaultImageResponse("static/icons/Default Group.svg");
+                    }
+                }else{
+                    // Group is not owned by currently logged in user
+                    return getDefaultImageResponse("static/icons/Default Group.svg");
+                }
+            }else{
+                // Group not found
+                return getDefaultImageResponse("static/icons/Default Group.svg");
+            }
+        }catch (Exception e){
+            // Misc. issue
+            return getDefaultImageResponse("static/icons/Default Group.svg");
+        }
+    }
+
+    private ResponseEntity<?> getDefaultImageResponse(String filePath) {
         try {
-            Resource resource = new ClassPathResource("static/icons/Default User.svg");
+            Resource resource = new ClassPathResource(filePath);
             byte[] defaultImageData = StreamUtils.copyToByteArray(resource.getInputStream());
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType("image/svg+xml"))
@@ -430,7 +461,7 @@ public class InterpersonalAPI {
     }
 
     @PostMapping("/group/save")
-    public ResponseEntity<ResponseMessage> saveGroup(@RequestBody @Valid GroupForm form, Principal principal){
+    public ResponseEntity<ResponseMessage> saveGroup(@Valid @ModelAttribute GroupForm form, Principal principal, @RequestParam(value = "image", required = false) MultipartFile file){
         try{
             User user = getCurrentUser(principal);
 
@@ -438,6 +469,18 @@ public class InterpersonalAPI {
                 // Save brand new group
                 MemberGroup newGroup = new MemberGroup(form, user);
                 newGroup.setColor(new Color(form.getRed(), form.getGreen(), form.getBlue()));
+
+                if (file != null && !file.isEmpty()) {
+                    String fileType = FileValidator.getImageFileType(file);
+                    if(!fileType.isEmpty()){
+                        newGroup.setProfileImageType(fileType);
+                        newGroup.setProfileImageData(file.getBytes());
+                        newGroup.setProfileImageTimestamp(LocalDateTime.now());
+                    }else{
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Group", ResponseMessage.Severity.MEDIUM, "Image filetype was invalid. No changes were saved to the member. Please make sure to provide a valid image file."));
+                    }
+                }
+
                 groupService.saveGroup(newGroup);
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Saved", ResponseMessage.Severity.INFORMATIONAL, "Group was created and saved to memory"));
             }
@@ -456,6 +499,18 @@ public class InterpersonalAPI {
                     group.setName(form.getName());
                     group.setColor(new Color(form.getRed(), form.getGreen(), form.getBlue()));
                     group.setDescription(form.getDescription());
+
+                    if (file != null && !file.isEmpty()) {
+                        String fileType = FileValidator.getImageFileType(file);
+                        if(!fileType.isEmpty()){
+                            group.setProfileImageType(fileType);
+                            group.setProfileImageData(file.getBytes());
+                            group.setProfileImageTimestamp(LocalDateTime.now());
+                        }else{
+                            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Group", ResponseMessage.Severity.MEDIUM, "Image filetype was invalid. No changes were saved to the member. Please make sure to provide a valid image file."));
+                        }
+                    }
+
                     groupService.saveGroup(group);
 
                     return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Saved", ResponseMessage.Severity.INFORMATIONAL, "Group info has been modified"));
