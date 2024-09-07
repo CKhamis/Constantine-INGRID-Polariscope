@@ -3,86 +3,43 @@
 <head th:replace="~{components/Header :: head('Home')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
-<main class="px-4 py-5" style="margin-left: 60px;">
-<div class="row">
-    <div class="d-none d-lg-block col-3">
-        <h2 class="fw-bold">Instructions</h2>
-        <p>Enter the information regarding a person of interest in your life. This information will be used for identification and analytical purposes within Polariscope.</p>
-    </div>
-    <div class="col-12 col-md-9 px-3">
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label for="fnf">First name</label>
-                <input type="text" class="form-control" id="fnf" name="firstName" placeholder="First name" required>
+<main class="bg-body px-0 d-flex flex-column" style="height:100vh;margin-left:60px;">
+    <nav class="p-4" id="header-container">
+        <div class="row mb-2">
+            <div class="col-md-10 d-flex flex-row align-items-center justify-content-start">
+                <img class="square-image me-2" style="height: 80px; width: 80px" alt="group image" th:src="@{/icons/Default Group.svg}" id="group-image">
+                <h1 class="fw-bold" id="group-name">Name</h1>
             </div>
-            <div class="col-md-4 mb-3">
-                <label for="lnf">Last name</label>
-                <input type="text" class="form-control" id="lnf" name="lastName" placeholder="Last name">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="mnf">Middle name</label>
-                <input type="text" class="form-control" id="mnf" name="middleName" placeholder="Middle name">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="relationf">Relationship Type</label>
-                <select class="form-select" id="relationf" name="relationship" required>
-                    <th:block th:each="relationshipType : ${relationshipTypes}">
-                        <option th:value="${relationshipType}" th:text="${relationshipType.toString().toLowerCase()}"></option>
-                    </th:block>
-                </select>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="sexf">Sex</label>
-                <select class="form-select" id="sexf" name="relationship">
-                    <th:block th:each="SexType : ${sexTypes}">
-                        <option th:value="${SexType}" th:text="${SexType.toString().toLowerCase()}"></option>
-                    </th:block>
-                </select>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="sexualityf">Sexuality</label>
-                <select class="form-select" id="sexualityf" name="sexuality">
-                    <th:block th:each="sexualityType : ${sexualityTypes}">
-                        <option th:value="${sexualityType}" th:text="${sexualityType.toString().toLowerCase()}"></option>
-                    </th:block>
-                </select>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="mbp">MB Personality</label>
-                <input type="text" class="form-control" id="mbp" name="personality" placeholder="ENFJ">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="fcf">Favorite Color</label>
-                <input type="text" class="form-control" id="fcf" name="favoriteColor" placeholder="Red">
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="amf">Year Met</label>
-                <input type="number" class="form-control" id="amf" name="ageMet" placeholder="2001" required>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="bdf">Birthday</label>
-                <input type="date" class="form-control" id="bdf" name="birthday" required>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label for="group-form">Primary Group</label>
-                <select class="form-select" id="group-form"></select>
-            </div>
-
-            <div class="col-12 mb-3">
-                <label for="df">Description</label>
-                <input type="text" class="form-control" id="df" name="description" placeholder="Description of member">
+            <div class="col-md-2 mb-2 d-flex flex-column align-items-center justify-content-center">
+                <label for="group-form">Select Group</label>
+                <div class="input-group">
+                    <select class="form-select" id="group-form">
+                        <option value="" selected>None</option>
+                    </select>
+                    <button class="btn btn-primary bevel-sm" type="button" onclick="changeUser()">Change</button>
+                </div>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary" onclick="submit()" id="submit-button">Submit</button>
+        <p class="fs-5 mb-2" id="group-description">Description</p>
+        <p id="last-modified" class="mb-0"></p>
+    </nav>
+    <div class="p-4 flex-grow-1 overflow-auto" id="main-content">
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <h3 class="text-center fw-bold">Please Wait</h3>
     </div>
-</div>
 </main>
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/Network :: data-upload}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
+<div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
 <script>
+    let enums;
+
     refresh();
     function refresh(){
         const enumFetch = fetch("/api/interpersonal/enums", {});
@@ -94,13 +51,14 @@
                 return Promise.all([data[0].json()]);
             })
             .then(data => {
-                let content = `<option value="">None</option>`;
+                enums = data[0];
 
-                data[0].groups.forEach((group) => {
-                    content += `<option value="${group.id}">${group.name}</option>`;
-                });
-
-                document.querySelector("#group-form").innerHTML = content;
+                renderDropdown();
+                if(enums.groups.length > 0){
+                    renderHeader(0);
+                }else{
+                    document.querySelector("#main-content").innerHTML = "<h2 class='text-center fw-bold mt-2'>No groups to display</h2><p class='text-center'>Create one in settings</p>"
+                }
             })
             .catch((response) => {
                 response.json()
@@ -113,69 +71,22 @@
             });
     }
 
+    function renderHeader(index){
+        document.querySelector("#header-container").style.background = `linear-gradient(to top right, rgb(${enums.groups[index].color.red}, ${enums.groups[index].color.green}, ${enums.groups[index].color.blue},.6), rgb(${enums.groups[index].color.red}, ${enums.groups[index].color.green}, ${enums.groups[index].color.blue},.1))`;
+        document.querySelector("#group-description").textContent = enums.groups[index].description;
+        document.querySelector("#group-name").textContent = enums.groups[index].name;
+        document.querySelector("#group-image").src = `/api/interpersonal/group/image/${enums.groups[index].id}`;
+        document.querySelector("#last-modified").innerText = "Last modified: " + formatTimestamp(enums.groups[index].lastModified);
+    }
 
-    function submit(){
-        const formData = new FormData();
+    function renderDropdown(){
+        let content = `<option value="">None</option>`;
 
-        formData.append('firstName',     document.querySelector("#fnf").value);
-        formData.append('lastName',      document.querySelector("#lnf").value);
-        formData.append('middleName',    document.querySelector("#mnf").value);
-        formData.append('relationship',  document.querySelector("#relationf").value);
-        formData.append('sex',           document.querySelector("#sexf").value);
-        formData.append('sexuality',     document.querySelector("#sexualityf").value);
-        formData.append('personality',   document.querySelector("#mbp").value);
-        formData.append('favoriteColor', document.querySelector("#fcf").value);
-        formData.append('ageMet',        document.querySelector("#amf").value);
-        formData.append('birthday',      document.querySelector("#bdf").value);
-        formData.append('description',   document.querySelector("#df").value);
-        formData.append('group', document.querySelector("#group-form").value);
+        enums.groups.forEach((group) => {
+            content += `<option value="${group.id}">${group.name}</option>`;
+        });
 
-        formData.append('archive', false);
-        formData.append('scoreHold', false);
-
-        let button = document.querySelector("#submit-button");
-        button.disabled = true;
-        button.classList.remove("btn-primary");
-        button.classList.add("btn-disabled");
-        button.textContent = "Saving...";
-
-        let toastId = createToast("Saving Member Details");
-        postDataWithFile("/api/interpersonal/member/save", formData)
-            .then((message) => {
-                message.json()
-                    .then(messageData => {
-                        document.getElementById(`${toastId}-body`).innerText = getIcon(messageData.severity) + messageData.message;
-                        document.getElementById(`${toastId}-title`).innerText =  messageData.title;
-                        document.getElementById(`${toastId}-loading`).style.color = "green";
-                    })
-                    .catch(error => {
-                        console.error("Error parsing error response:", error);
-                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
-                        document.getElementById(`${toastId}-title`).innerText = "Error";
-                        document.getElementById(`${toastId}-loading`).style.color = "red";
-                    });
-            })
-            .catch((response) => {
-                console.log(response);
-                response.json()
-                    .then(errorData => {
-                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
-                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
-                        document.getElementById(`${toastId}-loading`).style.color = "red";
-                    })
-                    .catch(error => {
-                        console.error("Error parsing error response:", error);
-                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
-                        document.getElementById(`${toastId}-title`).innerText = "Error";
-                        document.getElementById(`${toastId}-loading`).style.color = "red";
-                    });
-            })
-            .finally(() => {
-                button.disabled = false;
-                button.classList.remove("btn-disabled");
-                button.classList.add("btn-primary");
-                button.textContent = "Submit";
-            });
+        document.querySelector("#group-form").innerHTML = content;
     }
 
 </script>
