@@ -10,13 +10,11 @@
                 <img class="square-image me-2" style="height: 80px; width: 80px" alt="group image" th:src="@{/icons/Default Group.svg}" id="group-image">
                 <h1 class="fw-bold" id="group-name">Name</h1>
             </div>
-            <div class="col-md-2 mb-2 d-flex flex-column align-items-center justify-content-center">
+            <div class="col-md-2 mb-2 d-flex flex-column align-items-start justify-content-center">
                 <label for="group-form">Select Group</label>
                 <div class="input-group">
-                    <select class="form-select" id="group-form">
-                        <option value="" selected>None</option>
-                    </select>
-                    <button class="btn btn-primary bevel-sm" type="button" onclick="changeUser()">Change</button>
+                    <select class="form-select" id="group-form"></select>
+                    <button class="btn btn-primary bevel-sm" type="button" onclick="changeGroup()">Change</button>
                 </div>
             </div>
         </div>
@@ -72,7 +70,7 @@
     }
 
     function renderHeader(index){
-        document.querySelector("#header-container").style.background = `linear-gradient(to top right, rgb(${enums.groups[index].color.red}, ${enums.groups[index].color.green}, ${enums.groups[index].color.blue},.6), rgb(${enums.groups[index].color.red}, ${enums.groups[index].color.green}, ${enums.groups[index].color.blue},.1))`;
+        document.querySelector("#header-container").style.background = `linear-gradient(to top right, rgb(${enums.groups[index].color.red}, ${enums.groups[index].color.green}, ${enums.groups[index].color.blue},.5), rgb(${enums.groups[index].color.red}, ${enums.groups[index].color.green}, ${enums.groups[index].color.blue},.05))`;
         document.querySelector("#group-description").textContent = enums.groups[index].description;
         document.querySelector("#group-name").textContent = enums.groups[index].name;
         document.querySelector("#group-image").src = `/api/interpersonal/group/image/${enums.groups[index].id}`;
@@ -80,13 +78,18 @@
     }
 
     function renderDropdown(){
-        let content = `<option value="">None</option>`;
+        let content = ``;
 
-        enums.groups.forEach((group) => {
-            content += `<option value="${group.id}">${group.name}</option>`;
+        enums.groups.forEach((group, index) => {
+            content += `<option value="${index}">${group.name}</option>`;
         });
 
         document.querySelector("#group-form").innerHTML = content;
+    }
+
+    function changeGroup(){
+        const index = document.querySelector("#group-form").value;
+        renderHeader(index);
     }
 
 </script>
