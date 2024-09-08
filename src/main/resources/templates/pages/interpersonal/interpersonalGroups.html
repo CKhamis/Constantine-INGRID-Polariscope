@@ -74,7 +74,7 @@
         document.querySelector("#group-description").textContent = enums.groups[index].description;
         document.querySelector("#group-name").textContent = enums.groups[index].name;
         document.querySelector("#group-image").src = `/api/interpersonal/group/image/${enums.groups[index].id}`;
-        document.querySelector("#last-modified").innerText = "Last modified: " + formatTimestamp(enums.groups[index].lastModified);
+        document.querySelector("#last-modified").innerText = "Members: " + enums.groups[index].numMembers + " - Last modified: " + formatTimestamp(enums.groups[index].lastModified);
     }
 
     function renderDropdown(){

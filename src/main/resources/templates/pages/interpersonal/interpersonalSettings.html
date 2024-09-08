@@ -322,6 +322,7 @@
                         <td style="vertical-align: middle"><div class="square-image" style="height: 30px; background-color: rgb(${group.color.red}, ${group.color.green}, ${group.color.blue})"></div></td>
                         <td style="vertical-align: middle">${group.description}</td>
                         <td style="vertical-align: middle">${formatTimestamp(new Date(group.lastModified))}</td>
+                        <td style="vertical-align: middle">${group.numMembers}</td>
                         <td style="vertical-align: middle"><button class="btn btn-secondary" onclick="updateModal('${group.id}')" data-bs-toggle="modal" data-bs-target="#saveGroupModal">Edit</button></td>
                         <td style="vertical-align: middle"><button class="btn btn-danger bevel-sm" onclick="deleteGroup('${group.id}')">Delete</button></td>
                     </tr>
@@ -345,6 +346,7 @@
                               <th scope="col">Color</th>
                               <th scope="col">Description</th>
                               <th scope="col">Modified</th>
+                              <th scope="col">Members</th>
                               <th scope="col">Edit</th>
                               <th scope="col">Delete</th>
                             </tr>

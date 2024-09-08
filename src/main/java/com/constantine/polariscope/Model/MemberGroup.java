@@ -20,6 +20,7 @@ public class MemberGroup {
     @GeneratedValue
     private UUID id;
     private String name;
+    @Column(columnDefinition="text")
     private String description;
     private Color color;
     private LocalDateTime created;
@@ -35,6 +36,9 @@ public class MemberGroup {
     private byte[] profileImageData;
     private String profileImageType;
     private LocalDateTime profileImageTimestamp;
+
+    @Transient
+    private Integer numMembers;
 
     public MemberGroup(){
         created = LocalDateTime.now();

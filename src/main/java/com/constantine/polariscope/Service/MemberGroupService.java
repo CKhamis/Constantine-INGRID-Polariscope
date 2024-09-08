@@ -20,7 +20,11 @@ public class MemberGroupService {
     private final MemberRepository memberRepository;
 
     public List<MemberGroup> findAll(User author){
-        return groupRepository.findAllByAuthorOrderByLastModifiedDesc(author);
+        List<MemberGroup> groups = groupRepository.findAllByAuthorOrderByLastModifiedDesc(author);
+        for(MemberGroup group : groups){
+            group.setNumMembers(memberRepository.countAllByGroup(group));
+        }
+        return groups;
     }
     public MemberGroup saveGroup(MemberGroup group){
         return groupRepository.save(group);
