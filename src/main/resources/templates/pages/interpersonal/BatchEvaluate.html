@@ -144,6 +144,7 @@
     }
 
     function selectMember(id) {
+        currentId = id;
         let spinner = document.querySelector("#loading-spinner");
         let errorIcon = document.querySelector("#error-icon");
         spinner.classList.add("d-block");
