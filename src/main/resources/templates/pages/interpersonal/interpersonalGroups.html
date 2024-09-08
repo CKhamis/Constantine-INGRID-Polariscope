@@ -50,10 +50,10 @@
             })
             .then(data => {
                 enums = data[0];
-
                 renderDropdown();
                 if(enums.groups.length > 0){
                     renderHeader(0);
+                    renderBody(enums.groups[0].id);
                 }else{
                     document.querySelector("#main-content").innerHTML = "<h2 class='text-center fw-bold mt-2'>No groups to display</h2><p class='text-center'>Create one in settings</p>"
                 }
@@ -90,8 +90,54 @@
     function changeGroup(){
         const index = document.querySelector("#group-form").value;
         renderHeader(index);
+        renderBody(enums.groups[index].id);
     }
 
+    function renderBody(id){
+        const enumFetch = fetch("/api/interpersonal/member/group/" + id, {});
+        Promise.all([enumFetch])
+            .then(responses => {
+                return Promise.all(responses);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                let content = `
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <h3 class="fw-bold">Members</h3>
+                    </div>
+                    <div class="col-md-6 d-flex flex-row align-content-center justify-content-end">
+                        <button type="button" class="btn btn-primary">Primary</button>
+                        <button type="button" class="btn btn-primary">Primary</button>
+                    </div>
+                </div>
+                <div class="row">
+                `;
+
+                data[0].forEach((member) => {
+                    content += `
+                        <a class="col-6 col-md-3 col-lg-2 p-2 d-flex flex-column" href="/interpersonal/member/view/${member.id}">
+                            <img class="square-image w-100 p-3" alt="Member image" src="/api/interpersonal/member/profile-image/${member.id}">
+                            <p class="text-center text-white fs-4 fw-bold text-nowrap text-truncate">${member.firstName + ' ' + member.lastName}</p>
+                        </a>
+                    `;
+                })
+
+                content += `</div>`;
+                document.querySelector("#main-content").innerHTML = content;
+            })
+            .catch((response) => {
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                    });
+            });
+    }
 </script>
 </body>
 </html>

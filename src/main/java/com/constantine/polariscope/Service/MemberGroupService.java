@@ -44,4 +44,8 @@ public class MemberGroupService {
     public Optional<MemberGroup> findGroupById(UUID id){
         return groupRepository.findById(id);
     }
+
+    public List<Member> findMembersByGroup(MemberGroup group){
+        return memberRepository.findAllByGroupOrderByLastModifiedDesc(group);
+    }
 }

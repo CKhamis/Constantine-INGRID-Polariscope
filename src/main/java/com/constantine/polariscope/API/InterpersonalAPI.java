@@ -34,6 +34,7 @@ public class InterpersonalAPI {
     private final EvaluationService evaluationService;
     private final MemberGroupService groupService;
     private final ActivityLogService activityLogService;
+    private final MemberGroupService memberGroupService;
 
     private User getCurrentUser(Principal principal) throws Exception{
         if(principal == null){
@@ -270,6 +271,29 @@ public class InterpersonalAPI {
             List<MemberListItem> members = memberService.allMembers(retrievedUser);
 
             return ResponseEntity.ok(members);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, e.getMessage()));
+        }
+    }
+
+    @GetMapping("/member/group/{id}")
+    public ResponseEntity<?> allMembers(Principal principal, @PathVariable UUID id){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            Optional<MemberGroup> optionalGroup = groupService.findGroupById(id);
+            if(optionalGroup.isPresent()){
+                if(optionalGroup.get().getAuthor().equals(retrievedUser)){
+                    MemberGroup group = optionalGroup.get();
+
+                    // Get all users from repository
+                    List<Member> members = memberGroupService.findMembersByGroup(group);
+                    return ResponseEntity.ok(members);
+                }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, "Authentication error"));
+            }
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, "Group not found"));
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Members", ResponseMessage.Severity.LOW, e.getMessage()));
         }
