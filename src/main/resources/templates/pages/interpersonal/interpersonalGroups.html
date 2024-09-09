@@ -30,29 +30,139 @@
         <h3 class="text-center fw-bold">Please Wait</h3>
     </div>
 </main>
+
+<div class="modal fade" id="saveGroupModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="saveGroupModalTitle">Save Group</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <h4 class="fw-bold text-center" id="recent-score-modal"></h4>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="pfp-file" class="form-label">Upload group icon</label>
+                        <input class="form-control" type="file" name="file" accept="image/*" id="pfp-file">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="group-title-form" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="group-title-form" required>
+                    </div>
+                    <div class="col-12">
+                        <label for="group-description-form" class="form-label">Description</label>
+                        <textarea class="form-control" id="group-description-form" rows="3"></textarea>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <label for="color-preview" class="form-label">Color</label>
+                        <div class="container" style="height:40px" id="color-preview"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="group-red-form">Red</label>
+                            <input type="number" class="form-control" id="group-red-form">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="group-green-form">Green</label>
+                            <input type="number" class="form-control" id="group-green-form">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="group-blue-form">Blue</label>
+                            <input type="number" class="form-control" id="group-blue-form">
+                        </div>
+                    </div>
+                    <input type="hidden" id="group-id-form" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="modalSaveGroup()" data-bs-dismiss="modal">Save Group</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" aria-labelledby="be" id="member-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="be">Add/Remove Members</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <p>Please choose the members you would like to add or remove to the currently selected group.</p>
+                    </div>
+                    <div class="col-12">
+                        <div class="accordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+                                        Included Members
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
+                                    <div class="list-group" id="member-list-included">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                                        Members Not Included
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
+                                    <div class="list-group" id="member-list-not-included">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/Network :: data-upload}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
 <script>
-    let enums;
+    let enums, memberList;
 
     refresh();
     function refresh(){
         const enumFetch = fetch("/api/interpersonal/enums", {});
-        Promise.all([enumFetch])
+        const memberListFetch = fetch("/api/interpersonal/member/all", {});
+        Promise.all([enumFetch, memberListFetch])
             .then(responses => {
                 return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json()]);
+                return Promise.all([data[0].json(), data[1].json()]);
             })
             .then(data => {
                 enums = data[0];
+                memberList = data[1];
                 renderDropdown();
                 if(enums.groups.length > 0){
                     renderHeader(0);
+                    renderMemberModal(enums.groups[0].id);
                     renderBody(enums.groups[0].id);
                 }else{
                     document.querySelector("#main-content").innerHTML = "<h2 class='text-center fw-bold mt-2'>No groups to display</h2><p class='text-center'>Create one in settings</p>"
@@ -106,10 +216,12 @@
                 let content = `
                 <div class="row">
                     <div class="col-md-6 mb-2">
-                        <h3 class="fw-bold">Members</h3>
+                        <h3 class="fw-bold mb-0">Members</h3>
                     </div>
                     <div class="col-md-6 d-flex flex-row align-content-center justify-content-end">
-                        <!-- controls to be added here -->
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="updateModal('${id}')">Edit Group</button>
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#member-modal" onclick="updateModal('${id}')">Manage Members</button>
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="resetGroupModal('${id}')">+ New Group</button>
                     </div>
                 </div>
                 <div class="row">
@@ -135,6 +247,172 @@
                     .catch(error => {
                         console.error("Error parsing error response:", error);
                     });
+            });
+    }
+
+    function updateModal(id){
+        const group = enums.groups.find(g => g.id === id);
+        document.querySelector("#group-description-form").value = group.description;
+        document.querySelector("#group-id-form").value = id;
+        document.querySelector("#group-title-form").value = group.name;
+        document.querySelector("#group-red-form").value = group.color.red;
+        document.querySelector("#group-green-form").value = group.color.green;
+        document.querySelector("#group-blue-form").value = group.color.blue;
+        document.querySelector("#saveGroupModalTitle").innerText = "Edit Group";
+        updateColorPreview();
+    }
+
+    function updateColorPreview(){
+        const color = "rgb(" + document.querySelector("#group-red-form").value + "," + document.querySelector("#group-green-form").value + "," + document.querySelector("#group-blue-form").value + ")";
+        console.log(color);
+        document.querySelector("#color-preview").style.backgroundColor = color;
+    }
+
+    function resetGroupModal(){
+        document.querySelector("#group-description-form").value = "";
+        document.querySelector("#group-id-form").value = "";
+        document.querySelector("#group-title-form").value = "";
+        document.querySelector("#saveGroupModalTitle").innerText = "New Group";
+        document.querySelector("#group-red-form").value = Math.floor(Math.random() * 256);
+        document.querySelector("#group-green-form").value = Math.floor(Math.random() * 256);
+        document.querySelector("#group-blue-form").value = Math.floor(Math.random() * 256);
+        updateColorPreview();
+    }
+
+    function modalSaveGroup(){
+        const formData = new FormData();
+
+        const imageFile = document.getElementById('pfp-file').files[0];
+        formData.append('image', imageFile);
+
+        formData.append('id',           document.querySelector("#group-id-form").value);
+        formData.append('description',  document.querySelector("#group-description-form").value);
+        formData.append('name',         document.querySelector("#group-title-form").value);
+        formData.append('red',          document.querySelector("#group-red-form").value);
+        formData.append('green',        document.querySelector("#group-green-form").value);
+        formData.append('blue',         document.querySelector("#group-blue-form").value);
+
+        let toastId = createToast("Saving Group");
+        postDataWithFile("/api/interpersonal/group/save", formData)
+            .then((message) => {
+                message.json()
+                    .then(messageData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(messageData.severity) + messageData.message;
+                        document.getElementById(`${toastId}-title`).innerText =  messageData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "green";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => {refresh()});
+    }
+
+    function renderMemberModal(id){
+        const notIncludedContainer = document.querySelector("#member-list-not-included");
+        const includedContainer = document.querySelector("#member-list-included");
+        let notIncluded = "", included = "";
+
+        memberList.forEach((member) => {
+            if(member.lastEvaluation != null){
+                let element = `<button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="toggleGroup('${member.id}', '${id}')">
+                                <div class="d-flex justify-content-start gap-2 align-items-center">
+                                    <img class="square-image img-fluid" style="width: 20px; height: 20px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
+                                    <p class="mb-0 fw-bold ms-2">${member.firstName} ${member.lastName}</p>
+                                </div>
+                                <p class="mb-0 fw-bold" style="color: ${getColorGradient(member.lastEvaluation.cscore, -100, 100)}">${member.lastEvaluation.cscore}</p>
+                            </button>`;
+
+                if(member.group !== null && member.group.id === id){
+                    included += element;
+                }else{
+                    notIncluded += element;
+                }
+            }
+        });
+        notIncludedContainer.innerHTML = notIncluded;
+        includedContainer.innerHTML = included;
+    }
+
+
+    function toggleGroup(memberId, groupId){
+        const member = memberList.find(g => g.id === memberId);
+
+        const formData = new FormData();
+
+        formData.append('id',     memberId);
+        formData.append('firstName',     null);
+        formData.append('lastName',      null);
+        formData.append('middleName',    null);
+        formData.append('relationship',  null);
+        formData.append('sex',           null);
+        formData.append('sexuality',     null);
+        formData.append('personality',   null);
+        formData.append('favoriteColor', null);
+        formData.append('ageMet',        null);
+        formData.append('birthday',      null);
+        formData.append('description',   null);
+
+        if(member.group === null || member.group.id !== memberId){
+            formData.append('group', groupId);
+        }else{
+            formData.append('group', null);
+        }
+
+        formData.append('archive', member.archive);
+        formData.append('scoreHold', member.scoreHold);
+
+        let toastId = createToast("Saving Member Details");
+        postDataWithFile("/api/interpersonal/member/save", formData)
+            .then((message) => {
+                message.json()
+                    .then(messageData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(messageData.severity) + messageData.message;
+                        document.getElementById(`${toastId}-title`).innerText =  messageData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "green";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => {
+                renderMemberModal(groupId);
             });
     }
 </script>
