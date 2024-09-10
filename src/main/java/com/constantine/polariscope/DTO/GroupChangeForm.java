@@ -12,6 +12,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class GroupChangeForm {
-    private UUID memberId;
-    private UUID groupId;
+    private String memberId;
+    private String groupId;
 }

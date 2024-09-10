@@ -146,7 +146,7 @@
     let enums, memberList;
 
     refresh();
-    function refresh(){
+    function refresh(id = 0){
         const enumFetch = fetch("/api/interpersonal/enums", {});
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         Promise.all([enumFetch, memberListFetch])
@@ -160,11 +160,16 @@
                 enums = data[0];
                 memberList = data[1];
                 renderDropdown();
-                if(enums.groups.length > 0){
-                    renderHeader(0);
-                    renderMemberModal(enums.groups[0].id);
-                    renderBody(enums.groups[0].id);
+                if(enums.groups.length > id){
+                    renderHeader(id);
+                    renderMemberModal(enums.groups[id].id);
+                    renderBody(enums.groups[id].id);
                 }else{
+                    if(enums.groups.length > 0){
+                        renderHeader(0);
+                        renderMemberModal(enums.groups[0].id);
+                        renderBody(enums.groups[0].id);
+                    }
                     document.querySelector("#main-content").innerHTML = "<h2 class='text-center fw-bold mt-2'>No groups to display</h2><p class='text-center'>Create one in settings</p>"
                 }
             })
@@ -183,7 +188,7 @@
         document.querySelector("#header-container").style.background = `linear-gradient(to top right, rgb(${enums.groups[index].color.red}, ${enums.groups[index].color.green}, ${enums.groups[index].color.blue},.5), rgb(${enums.groups[index].color.red}, ${enums.groups[index].color.green}, ${enums.groups[index].color.blue},.05))`;
         document.querySelector("#group-description").textContent = enums.groups[index].description;
         document.querySelector("#group-name").textContent = enums.groups[index].name;
-        document.querySelector("#group-image").src = `/api/interpersonal/group/image/${enums.groups[index].id}`;
+        document.querySelector("#group-image").src = `/api/interpersonal/group/image/${enums.groups[index].id}?=${new Date().getTime()}`;
         document.querySelector("#last-modified").innerText = "Members: " + enums.groups[index].numMembers + " - Last modified: " + formatTimestamp(enums.groups[index].lastModified);
     }
 
@@ -356,7 +361,8 @@
     function toggleGroup(memberId, groupId){
         const member = memberList.find(g => g.id === memberId);
 
-        const toggle = member.group == null || member.group !== groupId ? groupId : "";
+        const toggle = member.group == null || member.group.id.trim() !== groupId.trim() ? groupId : "";
+
         const form = {
             memberId: memberId,
             groupId: toggle
@@ -367,18 +373,9 @@
         let toastId = createToast("Saving Member Details");
         postData("/api/interpersonal/member/change-group", form)
             .then((message) => {
-                message.json()
-                    .then(messageData => {
-                        document.getElementById(`${toastId}-body`).innerText = getIcon(messageData.severity) + messageData.message;
-                        document.getElementById(`${toastId}-title`).innerText =  messageData.title;
-                        document.getElementById(`${toastId}-loading`).style.color = "green";
-                    })
-                    .catch(error => {
-                        console.error("Error parsing error response:", error);
-                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
-                        document.getElementById(`${toastId}-title`).innerText = "Error";
-                        document.getElementById(`${toastId}-loading`).style.color = "red";
-                    });
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-title`).innerText =  message.title;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
             })
             .catch((response) => {
                 console.log(response);
@@ -396,9 +393,19 @@
                     });
             })
             .finally(() => {
-                renderMemberModal(groupId);
+                refresh(enums.groups.findIndex(g => g.id === groupId));
             });
     }
+
+    document.querySelector("#group-red-form").addEventListener('input', function() {
+        updateColorPreview();
+    });
+    document.querySelector("#group-green-form").addEventListener('input', function() {
+        updateColorPreview();
+    });
+    document.querySelector("#group-blue-form").addEventListener('input', function() {
+        updateColorPreview();
+    });
 </script>
 </body>
 </html>

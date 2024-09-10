@@ -181,24 +181,37 @@ public class InterpersonalAPI {
         try{
             User user = getCurrentUser(principal);
 
-            Member member = memberService.findMember(form.getMemberId());
+            UUID memberId = UUID.fromString(form.getMemberId());
+
+            Member member = memberService.findMember(memberId);
             if(member.getAuthor().getId().equals(user.getId())){
-                Optional<MemberGroup> optionalMemberGroup = groupService.findGroupById(form.getGroupId());
 
-                if(optionalMemberGroup.isPresent()){
-                    MemberGroup group = optionalMemberGroup.get();
+                if(!form.getGroupId().isEmpty()){
+                    // Add to group
+                    UUID groupId = UUID.fromString(form.getGroupId());
 
-                    if(group.getAuthor().getId().equals(user.getId())){
-                        member.setGroup(group);
-                        memberService.save(member);
-                        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Member Group Changed", ResponseMessage.Severity.INFORMATIONAL, "Member group changed and saved."));
-                    }else {
-                        // user does not own group
+                    Optional<MemberGroup> optionalMemberGroup = groupService.findGroupById(groupId);
+
+                    if(optionalMemberGroup.isPresent()){
+                        MemberGroup group = optionalMemberGroup.get();
+
+                        if(group.getAuthor().getId().equals(user.getId())){
+                            member.setGroup(group);
+                            memberService.save(member);
+                            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Member Group Changed", ResponseMessage.Severity.INFORMATIONAL, "Member group changed and saved."));
+                        }else{
+                            // user does not own group
+                            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Changing Group", ResponseMessage.Severity.LOW, "Authentication error"));
+                        }
+                    }else{
+                        // group not found
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Changing Group", ResponseMessage.Severity.LOW, "Authentication error"));
                     }
                 }else{
-                    // group not found
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Changing Group", ResponseMessage.Severity.LOW, "Authentication error"));
+                    // Remove current group
+                    member.setGroup(null);
+                    memberService.save(member);
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Member Group Changed", ResponseMessage.Severity.INFORMATIONAL, "Member group removed from member."));
                 }
             }else{
                 // user does not own member
