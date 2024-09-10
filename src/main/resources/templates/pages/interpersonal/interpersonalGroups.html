@@ -21,13 +21,37 @@
         <p class="fs-5 mb-2" id="group-description">Description</p>
         <p id="last-modified" class="mb-0"></p>
     </nav>
-    <div class="p-4 flex-grow-1 overflow-auto" id="main-content">
-        <div class="d-flex justify-content-center">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
+    <div class="p-4 flex-grow-1 overflow-auto">
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="nav nav-underline" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fs-3 p-0" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Members</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fs-3 p-0" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysi-tab-pane" type="button" role="tab" aria-controls="analysi-tab-pane" aria-selected="false">Statistics</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6 d-flex flex-row align-content-center justify-content-end">
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="updateModal()">Edit Group</button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#member-modal" onclick="updateModal()">Manage Members</button>
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="resetGroupModal()">+ New Group</button>
             </div>
         </div>
-        <h3 class="text-center fw-bold">Please Wait</h3>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                <div class="row" id="main-content">
+                    <div class="d-flex justify-content-center col-12">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <h3 class="text-center fw-bold">Please Wait</h3>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="analysis-tab-pane" role="tabpanel" aria-labelledby="analysis-tab" tabindex="0">...</div>
+        </div>
     </div>
 </main>
 
@@ -143,7 +167,7 @@
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
 <script>
-    let enums, memberList;
+    let enums, memberList, selectedGroupId;
 
     refresh();
     function refresh(id = 0){
@@ -209,6 +233,7 @@
     }
 
     function renderBody(id){
+        selectedGroupId = id;
         const enumFetch = fetch("/api/interpersonal/member/group/" + id, {});
         Promise.all([enumFetch])
             .then(responses => {
@@ -218,22 +243,9 @@
                 return Promise.all([data[0].json()]);
             })
             .then(data => {
-                let content = `
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <h3 class="fw-bold mb-0">Members</h3>
-                    </div>
-                    <div class="col-md-6 d-flex flex-row align-content-center justify-content-end">
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="updateModal('${id}')">Edit Group</button>
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#member-modal" onclick="updateModal('${id}')">Manage Members</button>
-                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="resetGroupModal('${id}')">+ New Group</button>
-                    </div>
-                </div>
-                <div class="row">
-                `;
-
+                let memberListContent = ``;
                 data[0].forEach((member) => {
-                    content += `
+                    memberListContent += `
                         <a class="col-6 col-md-3 col-lg-2 p-2 d-flex flex-column" href="/interpersonal/member/view/${member.id}">
                             <img class="square-image w-100 p-3" alt="Member image" src="/api/interpersonal/member/profile-image/${member.id}">
                             <p class="text-center text-white fs-4 fw-bold text-nowrap text-truncate">${member.firstName + ' ' + member.lastName}</p>
@@ -241,8 +253,7 @@
                     `;
                 })
 
-                content += `</div>`;
-                document.querySelector("#main-content").innerHTML = content;
+                document.querySelector("#main-content").innerHTML = memberListContent;
             })
             .catch((response) => {
                 response.json()
@@ -255,10 +266,10 @@
             });
     }
 
-    function updateModal(id){
-        const group = enums.groups.find(g => g.id === id);
+    function updateModal(){
+        const group = enums.groups.find(g => g.id === selectedGroupId);
         document.querySelector("#group-description-form").value = group.description;
-        document.querySelector("#group-id-form").value = id;
+        document.querySelector("#group-id-form").value = selectedGroupId;
         document.querySelector("#group-title-form").value = group.name;
         document.querySelector("#group-red-form").value = group.color.red;
         document.querySelector("#group-green-form").value = group.color.green;
