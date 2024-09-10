@@ -26,6 +26,7 @@ public class MemberListItem {
     private boolean archive;
     private LocalDate birthday;
     private MemberGroup group;
+    private int editCount;
 
     public MemberListItem(Member member){
         id = member.getId();
@@ -41,5 +42,6 @@ public class MemberListItem {
         archive = member.isArchive();
         birthday = member.getBirthday();
         group = member.getGroup();
+        editCount = member.getEditCount();
     }
 }

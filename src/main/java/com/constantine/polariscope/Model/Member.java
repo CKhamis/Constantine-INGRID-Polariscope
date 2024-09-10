@@ -41,6 +41,8 @@ public class Member {
     private boolean scoreHold;
     private boolean archive;
 
+    private int editCount;
+
     @NonNull
     private LocalDateTime created;
     @NonNull
@@ -105,6 +107,8 @@ public class Member {
 
         this.archive = false;
         this.scoreHold = false;
+
+        editCount = 0;
     }
 
     public Member(MemberForm form, @NonNull User user){
@@ -131,11 +135,16 @@ public class Member {
 
         author = user;
         profileImageType = "";
+
+        editCount = 0;
     }
 
     @PrePersist
     @PreUpdate
     private void encrypt() {
+        editCount++;
+        this.editCount = EncryptUtil.encryptInteger(this.editCount, this.id);
+
         this.lastModified = LocalDateTime.now();
         this.firstName = EncryptUtil.encryptString(this.firstName, this.id);
         this.lastName = EncryptUtil.encryptString(this.lastName, this.id);
@@ -152,6 +161,7 @@ public class Member {
 
     @PostLoad
     private void decrypt() {
+        this.editCount = EncryptUtil.decryptInteger(this.editCount, this.id);
         this.firstName = EncryptUtil.decryptString(this.firstName, this.id);
         this.lastName = EncryptUtil.decryptString(this.lastName, this.id);
         this.middleName = EncryptUtil.decryptString(this.middleName, this.id);
