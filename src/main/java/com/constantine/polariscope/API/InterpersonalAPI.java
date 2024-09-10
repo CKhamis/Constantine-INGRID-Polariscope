@@ -176,6 +176,40 @@ public class InterpersonalAPI {
         }
     }
 
+    @PostMapping("/member/change-group")
+    public ResponseEntity<ResponseMessage> deleteMember(@RequestBody GroupChangeForm form, Principal principal){
+        try{
+            User user = getCurrentUser(principal);
+
+            Member member = memberService.findMember(form.getMemberId());
+            if(member.getAuthor().getId().equals(user.getId())){
+                Optional<MemberGroup> optionalMemberGroup = groupService.findGroupById(form.getGroupId());
+
+                if(optionalMemberGroup.isPresent()){
+                    MemberGroup group = optionalMemberGroup.get();
+
+                    if(group.getAuthor().getId().equals(user.getId())){
+                        member.setGroup(group);
+                        memberService.save(member);
+                        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Member Group Changed", ResponseMessage.Severity.INFORMATIONAL, "Member group changed and saved."));
+                    }else {
+                        // user does not own group
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Changing Group", ResponseMessage.Severity.LOW, "Authentication error"));
+                    }
+                }else{
+                    // group not found
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Changing Group", ResponseMessage.Severity.LOW, "Authentication error"));
+                }
+            }else{
+                // user does not own member
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Changing Group", ResponseMessage.Severity.LOW, "Authentication error"));
+            }
+        }catch (Exception e){
+            // No user/ not found
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Changing Group", ResponseMessage.Severity.LOW, "Authentication error"));
+        }
+    }
+
     @PostMapping("/member/delete")
     public ResponseEntity<ResponseMessage> deleteMember(@RequestBody UUID id, Principal principal){
         try{

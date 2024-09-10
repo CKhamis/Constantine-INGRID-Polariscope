@@ -356,32 +356,16 @@
     function toggleGroup(memberId, groupId){
         const member = memberList.find(g => g.id === memberId);
 
-        const formData = new FormData();
+        const toggle = member.group == null || member.group !== groupId ? groupId : "";
+        const form = {
+            memberId: memberId,
+            groupId: toggle
+        };
 
-        formData.append('id',     memberId);
-        formData.append('firstName',     null);
-        formData.append('lastName',      null);
-        formData.append('middleName',    null);
-        formData.append('relationship',  null);
-        formData.append('sex',           null);
-        formData.append('sexuality',     null);
-        formData.append('personality',   null);
-        formData.append('favoriteColor', null);
-        formData.append('ageMet',        null);
-        formData.append('birthday',      null);
-        formData.append('description',   null);
-
-        if(member.group === null || member.group.id !== memberId){
-            formData.append('group', groupId);
-        }else{
-            formData.append('group', null);
-        }
-
-        formData.append('archive', member.archive);
-        formData.append('scoreHold', member.scoreHold);
+        console.log(form);
 
         let toastId = createToast("Saving Member Details");
-        postDataWithFile("/api/interpersonal/member/save", formData)
+        postData("/api/interpersonal/member/change-group", form)
             .then((message) => {
                 message.json()
                     .then(messageData => {
