@@ -65,20 +65,14 @@
                         </div>
                     </div>
                     <div class="col-lg-6 mb-3">
-                        <div class="px-3 py-3 rounded-3 bg-dark dual-info-box h-100">
+                        <div class="px-3 py-3 rounded-3 bg-dark d-flex justify-content-around h-100">
                             <div>
-                                <h5 class="fw-bold text-center">First Seen</h5>
-                                <p class="fs-4 text-center mb-0">09/09/2024</p>
-
-                                <h5 class="fw-bold text-center mt-4">Browser</h5>
-                                <p class="fs-4 text-center mb-0 mt-3">e</p>
+                                <h5 class="fw-bold text-center">Average Edits</h5>
+                                <p class="fs-4 text-center mb-0 mt-3" id="av-edits">E</p>
                             </div>
                             <div>
-                                <h5 class="fw-bold text-center">Last Seen</h5>
-                                <p class="fs-4 text-center mb-0">09/09/2024</p>
-
-                                <h5 class="fw-bold text-center mt-4">OS</h5>
-                                <p class="fs-4 text-center mb-0 mt-3">e</p>
+                                <h5 class="fw-bold text-center">Total Edits</h5>
+                                <p class="fs-4 text-center mb-0 mt-3" id="tot-edits">E</p>
                             </div>
                         </div>
                     </div>
@@ -278,14 +272,9 @@
             })
             .then(data => {
                 let memberListContent = ``;
-                let editCountTotal = 0, evaluationTotal = 0, eTotal = 0;
+                let editCountTotal = 0;
                 data[0].forEach((member) => {
                     editCountTotal += member.editCount;
-
-                    if (member.lastEvaluation !== undefined) {
-                        ecTotal += 1;
-                        evaluationTotal += member.lastEvaluation.cscore;
-                    }
 
                     memberListContent += `
                         <a class="col-6 col-md-3 col-lg-2 p-2 d-flex flex-column" href="/interpersonal/member/view/${member.id}">
@@ -294,6 +283,9 @@
                         </a>
                     `;
                 })
+
+                document.querySelector("#av-edits").textContent = editCountTotal / data[0].length;
+                document.querySelector("#tot-edits").textContent = editCountTotal;
 
                 updateGraph(data[0]);
 
