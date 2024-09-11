@@ -61,4 +61,13 @@ public class MemberService {
         evaluationRepository.deleteAllByMember(member);
         memberRepository.delete(member);
     }
+
+    @Transactional
+    public void resetEditCounters(User user){
+        List<Member> members = memberRepository.findAllByAuthorOrderByLastModifiedDesc(user);
+        for(Member member : members){
+            member.setEditCount(0);
+            memberRepository.save(member);
+        }
+    }
 }

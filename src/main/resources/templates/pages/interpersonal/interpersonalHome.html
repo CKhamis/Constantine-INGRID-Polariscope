@@ -129,13 +129,13 @@
                 memberList = data[0];
                 userInfo = data[1];
                 activityList = data[2];
+                renderMostEdited();
                 renderQuickStats();
                 renderLeastRecentEval();
                 renderHighestEval();
                 renderLowestEval();
                 renderCalendarWidget();
                 renderBirthdays();
-                renderMostEdited();
 
                 if(userInfo.tutorialNeeded){
                     window.location.href = "/tutorial";

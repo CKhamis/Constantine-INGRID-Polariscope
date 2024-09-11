@@ -79,6 +79,28 @@
     </div>
 </div>
 
+<div class="modal fade" id="resetEditCounterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Reset All Edit Counters?</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <p>All members entered into Polariscope contain a special counter that tracks how many times it was edited. This function will reset all member counts to 0 to start over. Nothing else will be modified or deleted.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" onclick="modalResetCount()" data-bs-dismiss="modal">Reset All Edit Counts</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
@@ -117,6 +139,11 @@
         <div class="col-lg-2 d-none d-lg-block"></div>
         <div class="col-lg-8 col-12">
             <div class="row">
+                <a class="col-md-6 col-lg-4 mb-4 px-3" data-bs-toggle="modal" data-bs-target="#resetEditCounterModal">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                        <p class="fs-4 fs-bold text-center m-0">Reset Edit Count</p>
+                    </div>
+                </a>
                 <a class="col-md-6 col-lg-4 mb-4 px-3" href="/interpersonal/import">
                     <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
                         <p class="fs-4 fs-bold text-center m-0">Import Members</p>
@@ -471,6 +498,30 @@
             .finally(() => {displayGroups()});
     }
 
+    function modalResetCount(){
+        let toastId = createToast("Resetting Edit Counters");
+        postData("/api/interpersonal/member/edit-counter/reset", {})
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            });
+    }
 
     document.querySelector("#group-red-form").addEventListener('input', function() {
         updateColorPreview();

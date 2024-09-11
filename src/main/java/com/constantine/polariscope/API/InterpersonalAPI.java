@@ -244,6 +244,20 @@ public class InterpersonalAPI {
         }
     }
 
+    @PostMapping("/member/edit-counter/reset")
+    public ResponseEntity<ResponseMessage> deleteMemberEditCounts(Principal principal){
+        try{
+            User user = getCurrentUser(principal);
+
+            // run function
+            memberService.resetEditCounters(user);
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Member Edit Counts Reset", ResponseMessage.Severity.INFORMATIONAL, "All member edit counts have been set to 0 and saved."));
+
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Resetting Edit Counts", ResponseMessage.Severity.LOW, "Error with modifying edit counts"));
+        }
+    }
+
     @GetMapping("/member/profile-image/" + "{memberId}")
     public ResponseEntity<?> downloadMemberFile(@PathVariable UUID memberId, Principal principal) {
         try{
