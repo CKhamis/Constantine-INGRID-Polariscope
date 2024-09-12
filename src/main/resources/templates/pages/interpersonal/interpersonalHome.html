@@ -241,11 +241,17 @@
                 cell.classList.add('fw-bold');
             }
 
+            cell.setAttribute('data-bs-toggle', 'tooltip');
+            cell.setAttribute('data-bs-placement', 'bottom');
+            cell.setAttribute('data-bs-title', 'Contributions: ' + heatmapData[i]);
+
             cell.textContent = i + 1 + '';
             cell.style.backgroundColor = greyToGreenGradient(0, 10, heatmapData[i]);
             cell.classList.add('calendar-cell');
             container.appendChild(cell);
         }
+        tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     }
 
     function renderQuickStats(){
