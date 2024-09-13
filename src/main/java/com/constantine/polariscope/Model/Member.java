@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,6 +79,9 @@ public class Member {
 
     @Transient
     private int timelineSize;
+
+    @ManyToMany
+    private ArrayList<Event> events;
 
     public Member(){
         created = LocalDateTime.now();
