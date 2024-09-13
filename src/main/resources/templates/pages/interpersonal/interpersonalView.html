@@ -787,7 +787,7 @@
 
 // Dates for the vertical lines (replace with your actual event dates)
         const eventDates = [
-            { date: '2021-09-01', label: 'Event 1' },
+            { date: '2020-09-01', label: 'Event 1' },
             { date: '2022-09-05', label: 'Event 2' },
             { date: '2024-09-10', label: 'Event 3' }
         ];
@@ -812,13 +812,11 @@
                             borderWidth: 2,
                             label: {
                                 content: event.label, // The label text to display
-                                enabled: true, // Make sure the label is displayed
-                                position: 'center', // Position the label in the middle of the line
+                                display: true, // Make sure the label is displayed
+                                position: 'start', // You can use 'center', 'end', etc. depending on placement
                                 backgroundColor: 'rgba(255, 99, 132, 0.8)', // Label background color
                                 color: 'white', // Label text color
-                                yAdjust: 0, // Adjust label position along the y-axis (fine-tune this if necessary)
-                                padding: 6, // Add padding for readability
-                                textAlign: 'center', // Center the text
+                                yAdjust: -10 // Adjust label position along the y-axis
                             }
                         }))
                     }
@@ -836,6 +834,8 @@
                 }
             }
         });
+
+
 
 
         let canvas2 = document.querySelector("#evaluation-history-chart-home");
