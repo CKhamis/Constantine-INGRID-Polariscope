@@ -47,9 +47,14 @@ public class ActivityLog{
         MEMBER_CREATED,
         MEMBER_MODIFIED,
         MEMBER_DELETED,
+        GROUP_CREATED,
+        GROUP_MODIFIED,
+        GROUP_DELETED,
         EVALUATION_CREATED,
         EVALUATION_MODIFIED,
         EVALUATION_DELETED,
-
+        EVENT_CREATED,
+        EVENT_MODIFIED,
+        EVENT_DELETED,
     }
 }

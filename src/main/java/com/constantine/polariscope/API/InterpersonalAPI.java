@@ -2,6 +2,7 @@ package com.constantine.polariscope.API;
 
 import com.constantine.polariscope.DTO.*;
 import com.constantine.polariscope.Model.*;
+import com.constantine.polariscope.Model.Event;
 import com.constantine.polariscope.Service.*;
 import com.constantine.polariscope.Util.FileValidator;
 import jakarta.validation.Valid;
@@ -35,6 +36,7 @@ public class InterpersonalAPI {
     private final MemberGroupService groupService;
     private final ActivityLogService activityLogService;
     private final MemberGroupService memberGroupService;
+    private final EventService eventService;
 
     private User getCurrentUser(Principal principal) throws Exception{
         if(principal == null){
@@ -527,10 +529,9 @@ public class InterpersonalAPI {
                 MemberGroup group = optionalGroup.get();
 
                 // Check if group is owned by logged in user
-                User author = group.getAuthor();
-
-                if(user.getId().equals(author.getId())){
+                if(group.getAuthor().getId().equals(id)){
                     groupService.deleteGroup(group);
+                    activityLogService.save(new ActivityLog(ActivityLog.ActivityType.GROUP_DELETED, user));
                     return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Deleted", ResponseMessage.Severity.INFORMATIONAL, "Group and associations have been permanently deleted"));
                 }else{
                     // Group author does not match with logged in user
@@ -567,6 +568,7 @@ public class InterpersonalAPI {
                 }
 
                 groupService.saveGroup(newGroup);
+                activityLogService.save(new ActivityLog(ActivityLog.ActivityType.GROUP_CREATED, user));
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Saved", ResponseMessage.Severity.INFORMATIONAL, "Group was created and saved to memory"));
             }
 
@@ -577,9 +579,7 @@ public class InterpersonalAPI {
                 MemberGroup group = optionalGroup.get();
 
                 // Check if group is owned by logged in user
-                User author = group.getAuthor();
-
-                if(user.getId().equals(author.getId())){
+                if(group.getAuthor().getId().equals(user.getId())){
                     // Edit existing group
                     group.setName(form.getName());
                     group.setColor(new Color(form.getRed(), form.getGreen(), form.getBlue()));
@@ -597,7 +597,7 @@ public class InterpersonalAPI {
                     }
 
                     groupService.saveGroup(group);
-
+                    activityLogService.save(new ActivityLog(ActivityLog.ActivityType.GROUP_MODIFIED, user));
                     return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Group Saved", ResponseMessage.Severity.INFORMATIONAL, "Group info has been modified"));
                 }else{
                     // Group author does not match with logged in user
@@ -608,6 +608,98 @@ public class InterpersonalAPI {
             }
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Group", ResponseMessage.Severity.LOW, "OOPS! There was an error :("));
+        }
+    }
+
+    @PostMapping("/event/save")
+    public ResponseEntity<ResponseMessage> saveEvent(@Valid @ModelAttribute EventForm formElements, Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            if(formElements.getId() != null){
+                // Save to existing event
+
+                Optional<Event> optionalEvent = eventService.findById(formElements.getId());
+                if(optionalEvent.isPresent()){
+                    // Check if event author matches logged in user
+                    Event retrievedEvent = optionalEvent.get();
+
+                    if(retrievedEvent.getAuthor().getId().equals(retrievedUser.getId())){
+
+                        try{
+                            if(!formElements.getLabel().isEmpty()){
+                                retrievedEvent.setLabel(formElements.getLabel());
+                            }
+
+                            retrievedEvent.setDate(formElements.getDate());
+
+                            retrievedEvent.setColor(new Color(formElements.getRed(), formElements.getGreen(), formElements.getBlue()));
+
+                            eventService.save(retrievedEvent);
+                            activityLogService.save(new ActivityLog(ActivityLog.ActivityType.EVENT_MODIFIED, retrievedUser));
+
+                            return ResponseEntity.ok(new ResponseMessage("Member Saved", ResponseMessage.Severity.INFORMATIONAL, "Member details saved"));
+
+                        }catch (Exception e){
+                            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Error Saving Event", ResponseMessage.Severity.MEDIUM, e.getMessage()));
+                        }
+                    }else{
+                        // Author did not write the event
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Error Saving Event", ResponseMessage.Severity.LOW, "ID not found"));
+                    }
+                }else{
+                    // Event not found. Throw an error
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("Error Saving Event", ResponseMessage.Severity.LOW, "ID not found"));
+                }
+            }else{
+                try{
+                    // Save to new user
+                    Event event = new Event();
+                    event.setAuthor(retrievedUser);
+                    event.setLabel(formElements.getLabel());
+                    event.setDate(formElements.getDate());
+                    event.setColor(new Color(formElements.getRed(), formElements.getGreen(), formElements.getBlue()));
+
+                    eventService.save(event);
+                    activityLogService.save(new ActivityLog(ActivityLog.ActivityType.EVENT_CREATED, retrievedUser));
+                    return ResponseEntity.ok(new ResponseMessage("Event Saved", ResponseMessage.Severity.INFORMATIONAL, "Event saved to Polariscope"));
+
+                }catch (Exception e){
+                    // Error with saving event
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Error Saving Event", ResponseMessage.Severity.MEDIUM, e.getMessage()));
+                }
+            }
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Event", ResponseMessage.Severity.LOW, "OOOPS :)"));
+        }
+    }
+
+    @PostMapping("/event/delete")
+    public ResponseEntity<ResponseMessage> deleteEvent(@RequestBody UUID id, Principal principal){
+        try{
+            User user = getCurrentUser(principal);
+
+            // Get id of evaluation
+            Optional<Event> optionalEvent = eventService.findById(id);
+
+            if(optionalEvent.isPresent()){
+                Event event = optionalEvent.get();
+
+                // Check if event is owned by logged in user
+                if(event.getAuthor().getId().equals(user.getId())){
+                    eventService.delete(event);
+                    activityLogService.save(new ActivityLog(ActivityLog.ActivityType.GROUP_DELETED, user));
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Event Deleted", ResponseMessage.Severity.INFORMATIONAL, "Event was deleted."));
+                }else{
+                    // event author does not match with logged in user
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "Authentication issue"));
+                }
+            }else{
+                // Event not found
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "Group could not be found"));
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "OOPS! There was an error :("));
         }
     }
 }

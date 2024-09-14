@@ -1,10 +1,7 @@
 package com.constantine.polariscope.Service;
 
-import com.constantine.polariscope.Model.Evaluation;
 import com.constantine.polariscope.Model.Event;
-import com.constantine.polariscope.Model.Member;
 import com.constantine.polariscope.Model.User;
-import com.constantine.polariscope.Repository.EvaluationRepository;
 import com.constantine.polariscope.Repository.EventRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +21,10 @@ public class EventService {
 
     public List<Event> findAllByAuthor(User user) {
         return eventRepository.findAllByAuthor(user);
+    }
+
+    public Optional<Event> findById(UUID id) {
+        return eventRepository.findById(id);
     }
 
     public void delete(Event event) {
