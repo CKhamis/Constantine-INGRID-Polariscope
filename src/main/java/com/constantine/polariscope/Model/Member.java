@@ -11,9 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -61,8 +59,8 @@ public class Member {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Evaluation> timeline;
 
-    @ManyToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private ArrayList<Event> events;
+    @ManyToMany
+    private Set<Event> events = new HashSet<>();
 
     @Lob
     @JsonIgnore

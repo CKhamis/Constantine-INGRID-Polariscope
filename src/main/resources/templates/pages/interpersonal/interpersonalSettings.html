@@ -33,7 +33,11 @@
                 <div class="row">
                     <div class="col-12 mb-3">
                         <label for="group-title-form" class="form-label">Label</label>
-                        <input type="text" class="form-control" id="event-title-form" required>
+                        <input type="text" class="form-control" id="event-label-form" required>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="event-date-form" class="form-label">Date</label>
+                        <input type="datetime-local" class="form-control" id="event-date-form">
                     </div>
                     <div class="col-12">
                         <label for="group-description-form" class="form-label">Description</label>
@@ -612,7 +616,7 @@
                     </div>
                     <div class="col-md-9 col-lg-10">
                         <div class="d-flex flex-row-reverse mb-2">
-                            <button class="btn btn-secondary" onclick="resetEventModal()" data-bs-toggle="modal" data-bs-target="#saveGroupModal">+ New Event</button>
+                            <button class="btn btn-secondary" onclick="resetEventModal()" data-bs-toggle="modal" data-bs-target="#saveEventModal">+ New Event</button>
                         </div>
                         <table class="table table-responsive">
                           <thead>
@@ -644,14 +648,14 @@
     }
 
     function resetEventModal(){
-        document.querySelector("#group-description-form").value = "";
-        document.querySelector("#group-id-form").value = "";
-        document.querySelector("#group-title-form").value = "";
-        document.querySelector("#saveGroupModalTitle").innerText = "New Group";
-        document.querySelector("#group-red-form").value = Math.floor(Math.random() * 256);
-        document.querySelector("#group-green-form").value = Math.floor(Math.random() * 256);
-        document.querySelector("#group-blue-form").value = Math.floor(Math.random() * 256);
-        updateColorPreview();
+        document.querySelector("#event-id-form").value,
+        document.querySelector("#event-label-form").value,
+        document.querySelector("#event-description-form").value,
+        document.querySelector("#event-date-form").value,
+        document.querySelector("#event-red-form").value = Math.floor(Math.random() * 256);
+        document.querySelector("#event-green-form").value = Math.floor(Math.random() * 256);
+        document.querySelector("#event-blue-form").value = Math.floor(Math.random() * 256);
+        updateEventColorPreview();
     }
 
     function updateEventModal(id){
@@ -667,22 +671,37 @@
     }
 
     function updateEventColorPreview(){
-        const color = "rgb(" + document.querySelector("#group-red-form").value + "," + document.querySelector("#group-green-form").value + "," + document.querySelector("#group-blue-form").value + ")";
+        const color = "rgb(" + document.querySelector("#event-red-form").value + "," + document.querySelector("#event-green-form").value + "," + document.querySelector("#event-blue-form").value + ")";
         console.log(color);
-        document.querySelector("#color-preview").style.backgroundColor = color;
+        document.querySelector("#event-color-preview").style.backgroundColor = color;
     }
 
     function modalSaveEvent(){
         const formData = {
-
+            id: document.querySelector("#event-id-form").value,
+            label: document.querySelector("#event-label-form").value,
+            description: document.querySelector("#event-description-form").value,
+            date: document.querySelector("#event-date-form").value,
+            red: document.querySelector("#event-red-form").value,
+            green: document.querySelector("#event-green-form").value,
+            blue: document.querySelector("#event-blue-form").value
         };
 
-        let toastId = createToast("Saving Group");
+        let toastId = createToast("Saving Event");
         postDataWithFile("/api/interpersonal/event/save", formData)
             .then((message) => {
-                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
-                document.getElementById(`${toastId}-title`).innerText =  message.title;
-                document.getElementById(`${toastId}-loading`).style.color = "green";
+                message.json()
+                    .then(messageData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(messageData.severity) + messageData.message;
+                        document.getElementById(`${toastId}-title`).innerText =  messageData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "green";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
             })
             .catch((response) => {
                 console.log(response);

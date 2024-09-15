@@ -12,6 +12,8 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -36,7 +38,7 @@ public class Event {
     private User author;
 
     @ManyToMany
-    private ArrayList<Member> members;
+    private Set<Event> members = new HashSet<>();
 
     @PrePersist
     @PreUpdate
