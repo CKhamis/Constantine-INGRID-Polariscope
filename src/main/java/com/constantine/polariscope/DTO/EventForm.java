@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -17,7 +18,8 @@ import java.util.UUID;
 public class EventForm {
     private UUID id;
     private String label;
-    private LocalDate date;
+    private String description;
+    private LocalDateTime date;
     @Min(value = 0, message = "Value must be at least 0")
     @Max(value = 255, message = "Value must be at most 255")
     private int red;

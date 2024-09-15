@@ -408,7 +408,7 @@ public class InterpersonalAPI {
         try{
             User retrievedUser = getCurrentUser(principal);
 
-            //Find evaluations. Give same error if member is not found or wrong user account
+            // Find evaluations. Give same error if member is not found or wrong user account
             try{
                 Member subject = memberService.findMember(id);
                 if(subject.getAuthor().getId().equals(retrievedUser.getId())){
@@ -631,6 +631,10 @@ public class InterpersonalAPI {
                                 retrievedEvent.setLabel(formElements.getLabel());
                             }
 
+                            if(!formElements.getDescription().isEmpty()){
+                                retrievedEvent.setDescription(formElements.getDescription());
+                            }
+
                             retrievedEvent.setDate(formElements.getDate());
 
                             retrievedEvent.setColor(new Color(formElements.getRed(), formElements.getGreen(), formElements.getBlue()));
@@ -671,6 +675,20 @@ public class InterpersonalAPI {
             }
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Event", ResponseMessage.Severity.LOW, "OOOPS :)"));
+        }
+    }
+
+    @GetMapping("/event/all")
+    public ResponseEntity<?> allEvents(Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            // Get all users from repository
+            List<Event> events = eventService.findAllByAuthor(retrievedUser);
+
+            return ResponseEntity.ok(events);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Events", ResponseMessage.Severity.LOW, e.getMessage()));
         }
     }
 

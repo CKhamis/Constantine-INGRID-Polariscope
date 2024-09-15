@@ -61,6 +61,9 @@ public class Member {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Evaluation> timeline;
 
+    @ManyToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private ArrayList<Event> events;
+
     @Lob
     @JsonIgnore
     @Column(columnDefinition = "longblob")
@@ -79,9 +82,6 @@ public class Member {
 
     @Transient
     private int timelineSize;
-
-    @ManyToMany
-    private ArrayList<Event> events;
 
     public Member(){
         created = LocalDateTime.now();

@@ -24,7 +24,8 @@ public class Event {
     @GeneratedValue
     private UUID id;
     private String label;
-    private LocalDate date;
+    private LocalDateTime date;
+    private String description;
 
     private Color color;
     private LocalDateTime created;
@@ -42,14 +43,16 @@ public class Event {
     private void encrypt() {
         this.modified = LocalDateTime.now();
         this.label = EncryptUtil.encryptString(this.label, this.id);
-        this.date = EncryptUtil.encryptDate(this.date, this.id);
+        this.date = EncryptUtil.encryptDateTime(this.date, this.id);
         this.created = EncryptUtil.encryptDateTime(this.created, this.id);
+        this.description = EncryptUtil.encryptString(this.description, this.id);
     }
 
     @PostLoad
     private void decrypt() {
         this.label = EncryptUtil.decryptString(this.label, this.id);
-        this.date = EncryptUtil.decryptDate(this.date, this.id);
+        this.date = EncryptUtil.decryptDateTime(this.date, this.id);
         this.created = EncryptUtil.decryptDateTime(this.created, this.id);
+        this.description = EncryptUtil.decryptString(this.description, this.id);
     }
 }

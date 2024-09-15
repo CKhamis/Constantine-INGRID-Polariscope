@@ -22,6 +22,56 @@
     </nav>
 </main>
 
+<div class="modal fade" id="saveEventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="saveEventModalTitle">Save Event</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="group-title-form" class="form-label">Label</label>
+                        <input type="text" class="form-control" id="event-title-form" required>
+                    </div>
+                    <div class="col-12">
+                        <label for="group-description-form" class="form-label">Description</label>
+                        <textarea class="form-control" id="event-description-form" rows="3"></textarea>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <label for="color-preview" class="form-label">Color</label>
+                        <div class="container" style="height:40px" id="event-color-preview"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="group-red-form">Red</label>
+                            <input type="number" class="form-control" id="event-red-form">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="group-green-form">Green</label>
+                            <input type="number" class="form-control" id="event-green-form">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="group-blue-form">Blue</label>
+                            <input type="number" class="form-control" id="event-blue-form">
+                        </div>
+                    </div>
+                    <input type="hidden" id="event-id-form" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="modalSaveEvent()" data-bs-dismiss="modal">Save Event</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="saveGroupModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -139,6 +189,11 @@
         <div class="col-lg-2 d-none d-lg-block"></div>
         <div class="col-lg-8 col-12">
             <div class="row">
+                <a class="col-md-6 col-lg-4 mb-4 px-3" onclick="displayEvents()">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                        <p class="fs-4 fs-bold text-center m-0">Events</p>
+                    </div>
+                </a>
                 <a class="col-md-6 col-lg-4 mb-4 px-3" data-bs-toggle="modal" data-bs-target="#resetEditCounterModal">
                     <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
                         <p class="fs-4 fs-bold text-center m-0">Reset Edit Count</p>
@@ -523,6 +578,149 @@
             });
     }
 
+    function displayEvents(){
+        document.querySelector("#title").textContent = `Polariscope Settings > Member Settings > Events`;
+        const eventFetch = fetch('/api/interpersonal/event/all')
+
+        let content = "";
+        Promise.all([eventFetch])
+            .then(responses => {
+                return Promise.all(responses);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                let tableContent = "";
+                data[0].forEach((event) => {
+                    tableContent += `
+                    <tr>
+                        <td style="vertical-align: middle" class="fw-bold">${event.label}</td>
+                        <td style="vertical-align: middle"><div class="square-image" style="height: 30px; background-color: rgb(${group.color.red}, ${group.color.green}, ${group.color.blue})"></div></td>
+                        <td style="vertical-align: middle">${formatTimestamp(new Date(event.date))}</td>
+                        <td style="vertical-align: middle">${event.description}</td>
+                        <td style="vertical-align: middle"><button class="btn btn-secondary" onclick="updateEventModal('${event.id}')" data-bs-toggle="modal" data-bs-target="#saveGroupModal">Edit</button></td>
+                        <td style="vertical-align: middle"><button class="btn btn-danger bevel-sm" onclick="deleteEvent('${event.id}')">Delete</button></td>
+                    </tr>
+                    `;
+                });
+
+                content = `
+                <div class="row">
+                    <div class="col-md-3 col-lg-2 mb-2">
+                        <a onclick="displayMemberSettings()" class="text-decoration-underline">< Back to Member Settings</a>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <div class="d-flex flex-row-reverse mb-2">
+                            <button class="btn btn-secondary" onclick="resetEventModal()" data-bs-toggle="modal" data-bs-target="#saveGroupModal">+ New Event</button>
+                        </div>
+                        <table class="table table-responsive">
+                          <thead>
+                            <tr>
+                              <th scope="col">Label</th>
+                              <th scope="col">Color</th>
+                              <th scope="col">Date</th>
+                              <th scope="col">Description</th>
+                              <th scope="col">Edit</th>
+                              <th scope="col">Delete</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            ${tableContent}
+                          </tbody>
+                        </table>
+                    </div>
+                </div>
+                `;
+            })
+            .catch(() => {
+                content =  `
+                <h2 class="text-center">OOPS! There was an error :(</h2>
+                `;
+            })
+            .finally(() => {
+                document.querySelector("#main-content").innerHTML = content;
+            });
+    }
+
+    function resetEventModal(){
+        document.querySelector("#group-description-form").value = "";
+        document.querySelector("#group-id-form").value = "";
+        document.querySelector("#group-title-form").value = "";
+        document.querySelector("#saveGroupModalTitle").innerText = "New Group";
+        document.querySelector("#group-red-form").value = Math.floor(Math.random() * 256);
+        document.querySelector("#group-green-form").value = Math.floor(Math.random() * 256);
+        document.querySelector("#group-blue-form").value = Math.floor(Math.random() * 256);
+        updateColorPreview();
+    }
+
+    function updateEventModal(id){
+        const group = enums.groups.find(g => g.id === id);
+        document.querySelector("#group-description-form").value = group.description;
+        document.querySelector("#group-id-form").value = id;
+        document.querySelector("#group-title-form").value = group.name;
+        document.querySelector("#group-red-form").value = group.color.red;
+        document.querySelector("#group-green-form").value = group.color.green;
+        document.querySelector("#group-blue-form").value = group.color.blue;
+        document.querySelector("#saveGroupModalTitle").innerText = "Edit Group";
+        updateEventColorPreview();
+    }
+
+    function updateEventColorPreview(){
+        const color = "rgb(" + document.querySelector("#group-red-form").value + "," + document.querySelector("#group-green-form").value + "," + document.querySelector("#group-blue-form").value + ")";
+        console.log(color);
+        document.querySelector("#color-preview").style.backgroundColor = color;
+    }
+
+    function modalSaveEvent(){
+        const formData = {
+
+        };
+
+        let toastId = createToast("Saving Group");
+        postDataWithFile("/api/interpersonal/event/save", formData)
+            .then((message) => {
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-title`).innerText =  message.title;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => {displayGroups()});
+    }
+
+    function deleteEvent(id){
+        let toastId = createToast("Deleting Event");
+        postData("/api/interpersonal/event/delete", id)
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                response.json()
+                document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                document.getElementById(`${toastId}-loading`).style.color = "red";
+            })
+            .finally(() => {displayEvents()});
+    }
+
+
     document.querySelector("#group-red-form").addEventListener('input', function() {
         updateColorPreview();
     });
@@ -531,6 +729,16 @@
     });
     document.querySelector("#group-blue-form").addEventListener('input', function() {
         updateColorPreview();
+    });
+
+    document.querySelector("#event-red-form").addEventListener('input', function() {
+        updateEventColorPreview();
+    });
+    document.querySelector("#event-green-form").addEventListener('input', function() {
+        updateEventColorPreview();
+    });
+    document.querySelector("#event-blue-form").addEventListener('input', function() {
+        updateEventColorPreview();
     });
 </script>
 </body>
