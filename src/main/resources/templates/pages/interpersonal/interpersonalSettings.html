@@ -190,20 +190,24 @@
 
     function displayMemberSettings(){
         document.querySelector("#main-content").innerHTML = `
-        <div class="col-lg-2 d-none d-lg-block"></div>
-        <div class="col-lg-8 col-12">
+        <div class="col-12">
             <div class="row">
-                <a class="col-md-6 col-lg-4 mb-4 px-3" onclick="displayEvents()">
+                <a class="col-md-6 col-lg-3 mb-4 px-3" onclick="displayGroups()">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                        <p class="fs-4 fs-bold text-center m-0">Groups</p>
+                    </div>
+                </a>
+                <a class="col-md-6 col-lg-3 mb-4 px-3" onclick="displayEvents()">
                     <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
                         <p class="fs-4 fs-bold text-center m-0">Events</p>
                     </div>
                 </a>
-                <a class="col-md-6 col-lg-4 mb-4 px-3" data-bs-toggle="modal" data-bs-target="#resetEditCounterModal">
+                <a class="col-md-6 col-lg-3 mb-4 px-3" data-bs-toggle="modal" data-bs-target="#resetEditCounterModal">
                     <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
                         <p class="fs-4 fs-bold text-center m-0">Reset Edit Count</p>
                     </div>
                 </a>
-                <a class="col-md-6 col-lg-4 mb-4 px-3" href="/interpersonal/import">
+                <a class="col-md-6 col-lg-3 mb-4 px-3" href="/interpersonal/import">
                     <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
                         <p class="fs-4 fs-bold text-center m-0">Import Members</p>
                     </div>
@@ -247,11 +251,6 @@
                         <a class="col-md-4 col-lg-3 mb-4 px-3" href="/tutorial">
                             <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
                                 <p class="fs-4 fs-bold text-center m-0">Tutorial</p>
-                            </div>
-                        </a>
-                        <a class="col-md-4 col-lg-3 mb-4 px-3" onclick="displayGroups()">
-                            <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
-                                <p class="fs-4 fs-bold text-center m-0">Groups</p>
                             </div>
                         </a>
                         ${ownerSettings}
@@ -386,7 +385,7 @@
     }
 
     function displayGroups(){
-        document.querySelector("#title").textContent = `Polariscope Settings > User Settings > Groups`;
+        document.querySelector("#title").textContent = `Polariscope Settings > Member Settings > Groups`;
         const activityFetch = fetch('/api/interpersonal/enums')
 
         let content = "";
@@ -418,7 +417,7 @@
                 content = `
                 <div class="row">
                     <div class="col-md-3 col-lg-2 mb-2">
-                        <a onclick="displayUserSettings()" class="text-decoration-underline">< Back to User Settings</a>
+                        <a onclick="displayMemberSettings()" class="text-decoration-underline">< Back to Member Settings</a>
                     </div>
                     <div class="col-md-9 col-lg-10">
                         <div class="d-flex flex-row-reverse mb-2">
