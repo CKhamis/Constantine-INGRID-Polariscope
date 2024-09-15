@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Model;
 
+import com.constantine.polariscope.DTO.EventForm;
 import com.constantine.polariscope.Util.EncryptUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -39,6 +40,15 @@ public class Event {
 
     @ManyToMany
     private Set<Event> members = new HashSet<>();
+
+    public Event(User author, EventForm form){
+        this.author = author;
+        this.label = form.getLabel();
+        this.date = form.getDate();
+        this.description = form.getDescription();
+        this.color = new Color(form.getRed(), form.getGreen(), form.getBlue());
+        this.created = LocalDateTime.now();
+    }
 
     @PrePersist
     @PreUpdate

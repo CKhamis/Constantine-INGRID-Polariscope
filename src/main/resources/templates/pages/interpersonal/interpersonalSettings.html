@@ -164,7 +164,7 @@
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <script>
-    let enums;
+    let enums, events;
 
     displayMainMenu();
     function displayMainMenu(){
@@ -595,15 +595,17 @@
                 return Promise.all([data[0].json()]);
             })
             .then(data => {
+                events = data[0];
                 let tableContent = "";
                 data[0].forEach((event) => {
+                    console.log(event);
                     tableContent += `
                     <tr>
                         <td style="vertical-align: middle" class="fw-bold">${event.label}</td>
-                        <td style="vertical-align: middle"><div class="square-image" style="height: 30px; background-color: rgb(${group.color.red}, ${group.color.green}, ${group.color.blue})"></div></td>
+                        <td style="vertical-align: middle"><div class="square-image" style="height: 30px; background-color: rgb(${event.color.red}, ${event.color.green}, ${event.color.blue})"></div></td>
                         <td style="vertical-align: middle">${formatTimestamp(new Date(event.date))}</td>
                         <td style="vertical-align: middle">${event.description}</td>
-                        <td style="vertical-align: middle"><button class="btn btn-secondary" onclick="updateEventModal('${event.id}')" data-bs-toggle="modal" data-bs-target="#saveGroupModal">Edit</button></td>
+                        <td style="vertical-align: middle"><button class="btn btn-secondary" onclick="updateEventModal('${event.id}')" data-bs-toggle="modal" data-bs-target="#saveEventModal">Edit</button></td>
                         <td style="vertical-align: middle"><button class="btn btn-danger bevel-sm" onclick="deleteEvent('${event.id}')">Delete</button></td>
                     </tr>
                     `;
@@ -648,10 +650,11 @@
     }
 
     function resetEventModal(){
-        document.querySelector("#event-id-form").value,
-        document.querySelector("#event-label-form").value,
-        document.querySelector("#event-description-form").value,
-        document.querySelector("#event-date-form").value,
+        document.querySelector("#saveEventModalTitle").textContent = "New Event";
+        document.querySelector("#event-id-form").value = "";
+        document.querySelector("#event-label-form").value = "";
+        document.querySelector("#event-description-form").value = "";
+        document.querySelector("#event-date-form").value = "";
         document.querySelector("#event-red-form").value = Math.floor(Math.random() * 256);
         document.querySelector("#event-green-form").value = Math.floor(Math.random() * 256);
         document.querySelector("#event-blue-form").value = Math.floor(Math.random() * 256);
@@ -659,14 +662,16 @@
     }
 
     function updateEventModal(id){
-        const group = enums.groups.find(g => g.id === id);
-        document.querySelector("#group-description-form").value = group.description;
-        document.querySelector("#group-id-form").value = id;
-        document.querySelector("#group-title-form").value = group.name;
-        document.querySelector("#group-red-form").value = group.color.red;
-        document.querySelector("#group-green-form").value = group.color.green;
-        document.querySelector("#group-blue-form").value = group.color.blue;
-        document.querySelector("#saveGroupModalTitle").innerText = "Edit Group";
+        const event = events.find(g => g.id === id);
+        console.log(event);
+        document.querySelector("#saveEventModalTitle").textContent = "Edit Event Details";
+        document.querySelector("#event-id-form").value =  event.id;
+        document.querySelector("#event-label-form").value = event.label;
+        document.querySelector("#event-description-form").value = event.description;
+        document.querySelector("#event-date-form").value = event.date;
+        document.querySelector("#event-red-form").value = event.color.red;
+        document.querySelector("#event-green-form").value = event.color.green;
+        document.querySelector("#event-blue-form").value = event.color.blue;
         updateEventColorPreview();
     }
 
@@ -688,20 +693,11 @@
         };
 
         let toastId = createToast("Saving Event");
-        postDataWithFile("/api/interpersonal/event/save", formData)
+        postData("/api/interpersonal/event/save", formData)
             .then((message) => {
-                message.json()
-                    .then(messageData => {
-                        document.getElementById(`${toastId}-body`).innerText = getIcon(messageData.severity) + messageData.message;
-                        document.getElementById(`${toastId}-title`).innerText =  messageData.title;
-                        document.getElementById(`${toastId}-loading`).style.color = "green";
-                    })
-                    .catch(error => {
-                        console.error("Error parsing error response:", error);
-                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
-                        document.getElementById(`${toastId}-title`).innerText = "Error";
-                        document.getElementById(`${toastId}-loading`).style.color = "red";
-                    });
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-title`).innerText =  message.title;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
             })
             .catch((response) => {
                 console.log(response);
@@ -718,7 +714,7 @@
                         document.getElementById(`${toastId}-loading`).style.color = "red";
                     });
             })
-            .finally(() => {displayGroups()});
+            .finally(() => {displayEvents()});
     }
 
     function deleteEvent(id){

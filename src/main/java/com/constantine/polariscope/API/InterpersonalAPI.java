@@ -612,7 +612,7 @@ public class InterpersonalAPI {
     }
 
     @PostMapping("/event/save")
-    public ResponseEntity<ResponseMessage> saveEvent(@Valid @ModelAttribute EventForm formElements, Principal principal){
+    public ResponseEntity<ResponseMessage> saveEvent(@Valid @RequestBody EventForm formElements, Principal principal){
         try{
             User retrievedUser = getCurrentUser(principal);
 
@@ -658,11 +658,7 @@ public class InterpersonalAPI {
             }else{
                 try{
                     // Save to new user
-                    Event event = new Event();
-                    event.setAuthor(retrievedUser);
-                    event.setLabel(formElements.getLabel());
-                    event.setDate(formElements.getDate());
-                    event.setColor(new Color(formElements.getRed(), formElements.getGreen(), formElements.getBlue()));
+                    Event event = new Event(retrievedUser, formElements);
 
                     eventService.save(event);
                     activityLogService.save(new ActivityLog(ActivityLog.ActivityType.EVENT_CREATED, retrievedUser));
