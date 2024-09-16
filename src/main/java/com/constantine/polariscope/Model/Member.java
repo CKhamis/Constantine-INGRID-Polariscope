@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @AllArgsConstructor
-public class Member {
+public class Member implements Serializable {
     @Id
     @NonNull
     @GeneratedValue
@@ -68,16 +69,16 @@ public class Member {
     private LocalDateTime profileImageTimestamp;
 
     @Transient
-    private List<Evaluation> fullTimeline;
+    private transient List<Evaluation> fullTimeline;
 
     @Transient
-    private List<Evaluation> importedTimeline;
+    private transient List<Evaluation> importedTimeline;
 
     @Transient
-    private Evaluation mostRecentEval;
+    private transient Evaluation mostRecentEval;
 
     @Transient
-    private int timelineSize;
+    private transient int timelineSize;
 
     public Member(){
         created = LocalDateTime.now();
@@ -175,12 +176,12 @@ public class Member {
         this.profileImageTimestamp = EncryptUtil.decryptDateTime(this.profileImageTimestamp, this.id);
     }
 
-    public enum Sex{
+    public enum Sex implements Serializable{
         MALE,
         FEMALE,
         OTHER,
     }
-    public enum Sexuality{
+    public enum Sexuality implements Serializable{
         HETEROSEXUAL,
         BISEXUAL,
         GAY,
@@ -189,7 +190,7 @@ public class Member {
         NONE
     }
 
-    public enum RelationshipType{
+    public enum RelationshipType implements Serializable {
         FAMILY,
         COWORKER,
         FRIEND,

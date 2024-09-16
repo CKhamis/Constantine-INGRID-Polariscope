@@ -8,13 +8,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-public class MemberGroup {
+public class MemberGroup implements Serializable {
 
     @Id
     @GeneratedValue
@@ -38,7 +39,7 @@ public class MemberGroup {
     private LocalDateTime profileImageTimestamp;
 
     @Transient
-    private Integer numMembers;
+    private transient Integer numMembers;
 
     public MemberGroup(){
         created = LocalDateTime.now();

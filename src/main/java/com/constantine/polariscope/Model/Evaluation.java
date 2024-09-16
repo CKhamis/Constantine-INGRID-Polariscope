@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Evaluation implements Comparable<Evaluation>{
+public class Evaluation implements Comparable<Evaluation>, Serializable {
 
     @Id
     @GeneratedValue
