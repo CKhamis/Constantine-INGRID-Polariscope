@@ -47,10 +47,10 @@ public class DataManagementAPI {
     }
 
     @PostMapping("/import")
-    public ResponseEntity<?> setData(@RequestParam(value = "image") MultipartFile file, Principal principal){
+    public ResponseEntity<?> setData(@RequestBody String info, Principal principal){
         try{
             //User retrievedUser = getCurrentUser(principal);
-            saveDataService.importUserData(file.getBytes());
+            saveDataService.importUserData(info.getBytes());
 
             return ResponseEntity.ok().body(new ResponseMessage("User Data saved", ResponseMessage.Severity.INFORMATIONAL, "Tutorial is now dismissed"));
         }catch(Exception e){
