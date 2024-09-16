@@ -410,7 +410,7 @@
         let notIncluded = "", included = "";
 
         eventList.forEach((event) => {
-            let element = `<button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="">
+            let element = `<button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="toggleEvent('${event.id}')">
                             <div class="d-flex justify-content-start gap-2 align-items-center">
                                 <p class="mb-0 fw-bold ms-2">${event.label}</p>
                             </div>
@@ -429,6 +429,40 @@
         includedContainer.innerHTML = included;
     }
 
+    function toggleEvent(id){
+        const data = {
+            memberId: memberDetails.id,
+            eventId: id
+        }
+        let errorIcon = document.querySelector("#error-icon");
+        let toastId = createToast("Toggling Event");
+        postData("/api/interpersonal/event/change-member", data)
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to delete member";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => {
+                refresh();
+            });
+    }
 
 
     function updateGroups(){
@@ -840,36 +874,65 @@
         }
     }
 
-    function updateEvalChart(){
-        let newScores = {data:[]};
+    function updateEvalChart() {
+        let newScores = { data: [] };
 
-        if(memberDetails.fullTimeline == null){return;}
+        if (memberDetails.fullTimeline == null) {
+            return;
+        }
 
-        memberDetails.fullTimeline.forEach((eval) =>{
-            newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore});
+        // Update chart data
+        memberDetails.fullTimeline.forEach((eval) => {
+            newScores.data.push({ x: new Date(eval.timestamp), y: eval.cscore });
         });
 
+        // Update datasets
         evalChartEval.data.datasets.pop();
         evalChartEval.data.datasets.push(newScores);
-        evalChartEval.update();
 
         evalChartEvalHome.data.datasets.pop();
         evalChartEvalHome.data.datasets.push(newScores);
+
+        // Clear existing annotations
+        evalChartEval.options.plugins.annotation.annotations = [];
+        evalChartEvalHome.options.plugins.annotation.annotations = [];
+
+        // Add new annotations based on memberDetails.events
+        if (memberDetails.events) {
+            const newAnnotations = memberDetails.events.map((event, index) => ({
+                type: 'line',
+                xScaleID: 'x',
+                xMin: event.date,
+                xMax: event.date,
+                borderColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 1)`,
+                borderWidth: 2,
+                label: {
+                    content: event.label,
+                    display: true,
+                    position: 'start',
+                    backgroundColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 0.8)`,
+                    color: 'white',
+                    yAdjust: -10
+                }
+            }));
+
+            // Apply annotations to both charts
+            evalChartEval.options.plugins.annotation.annotations = newAnnotations;
+            evalChartEvalHome.options.plugins.annotation.annotations = newAnnotations;
+        }
+
+        // Update both charts
+        evalChartEval.update();
         evalChartEvalHome.update();
     }
+
+
 
     function createEvalChart(){
         let canvas = document.querySelector("#evaluation-history-chart");
         let scores = {
-            datasets: [{ data: [] }] // Assuming you will populate this with your data
+            datasets: [{ data: [] }]
         };
-
-        // Dates for the vertical lines (replace with your actual event dates)
-        const eventDates = [
-            { date: '2020-09-01', label: 'Event 1' },
-            { date: '2022-09-05', label: 'Event 2' },
-            { date: '2024-09-10', label: 'Event 3' }
-        ];
 
         evalChartEval = new Chart(canvas, {
             type: 'line',
@@ -881,24 +944,6 @@
                     legend: {
                         display: false
                     },
-                    annotation: {
-                        annotations: eventDates.map((event, index) => ({
-                            type: 'line',
-                            xScaleID: 'x', // This ties the annotation to the x-axis (which is time-based)
-                            xMin: event.date, // The date at which the line will be drawn
-                            xMax: event.date,
-                            borderColor: 'red',
-                            borderWidth: 2,
-                            label: {
-                                content: event.label, // The label text to display
-                                display: true, // Make sure the label is displayed
-                                position: 'start', // You can use 'center', 'end', etc. depending on placement
-                                backgroundColor: 'rgba(255, 99, 132, 0.8)', // Label background color
-                                color: 'white', // Label text color
-                                yAdjust: -10 // Adjust label position along the y-axis
-                            }
-                        }))
-                    }
                 },
                 scales: {
                     x: {
@@ -913,9 +958,6 @@
                 }
             }
         });
-
-
-
 
         let canvas2 = document.querySelector("#evaluation-history-chart-home");
         evalChartEvalHome = new Chart(canvas2, {

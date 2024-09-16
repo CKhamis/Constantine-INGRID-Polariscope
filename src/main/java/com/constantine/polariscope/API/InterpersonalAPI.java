@@ -717,7 +717,7 @@ public class InterpersonalAPI {
         }
     }
 
-    @PostMapping("/event/add-member")
+    @PostMapping("/event/change-member")
     public ResponseEntity<ResponseMessage> addMemberToEvent(@RequestBody EventConnectionForm form, Principal principal){
         try{
             User user = getCurrentUser(principal);
@@ -738,9 +738,17 @@ public class InterpersonalAPI {
                         // Check if member is owned by logged in user
                         if(member.getAuthor().getId().equals(user.getId())){
 
-                            // Actually add in the connection now
+                            // Actually add or remove the connection
+
                             Set<Event> events = member.getEvents();
-                            events.add(event);
+                            if(events.contains(event)){
+                                // disconnect
+                                events.remove(event);
+                            }else{
+                                // add in connection
+                                events.add(event);
+
+                            }
                             member.setEvents(events);
 
                             memberService.save(member);

@@ -68,4 +68,12 @@ public class Event {
         this.created = EncryptUtil.decryptDateTime(this.created, this.id);
         this.description = EncryptUtil.decryptString(this.description, this.id);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Event event){
+            return this.id.equals(event.id);
+        }
+        return false;
+    }
 }
