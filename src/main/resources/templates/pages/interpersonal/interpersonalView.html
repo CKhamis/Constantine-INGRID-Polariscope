@@ -137,6 +137,8 @@
                         <canvas id="evaluation-history-chart"></canvas>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#event-modal">Add/ Remove Events</button>
+
                         <h2 class="fw-bold mt-3">All Evaluations</h2>
 
                         <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button" data-bs-toggle="modal" data-bs-target="#filterModal">
@@ -293,18 +295,18 @@
                                     </button>
                                 </h2>
                                 <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
-                                    <div class="list-group" id="member-list-included">
+                                    <div class="list-group" id="event-list-included">
                                     </div>
                                 </div>
                             </div>
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
-                                        Members Not Included
+                                        Events Not Included
                                     </button>
                                 </h2>
                                 <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
-                                    <div class="list-group" id="member-list-not-included">
+                                    <div class="list-group" id="event-list-not-included">
                                     </div>
                                 </div>
                             </div>
@@ -332,6 +334,7 @@
 <script>
     let memberList;
     let memberDetails;
+    let eventList;
     let enums;
     let evalChartEval, evalChartEvalHome;
 
@@ -348,18 +351,20 @@
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         const enumFetch = fetch("/api/interpersonal/enums", {});
         const memberDetailFetch = fetch("/api/interpersonal/member/view/" + memberId, {});
-        Promise.all([memberListFetch, memberDetailFetch, enumFetch])
+        const allEventFetch = fetch("/api/interpersonal/event/all", {});
+        Promise.all([memberListFetch, memberDetailFetch, enumFetch, allEventFetch])
             .then(responses => {
                 return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json(), data[1].json(), data[2].json()]);
+                return Promise.all([data[0].json(), data[1].json(), data[2].json(), data[3].json()]);
             })
             .then(data => {
                 tableAddons = "";
                 memberList = data[0];
                 memberDetails = data[1];
                 enums = data[2];
+                eventList = data[3];
                 renderMemberSelect(data[0]);
                 renderBadges();
                 document.querySelector("#member-name").textContent = memberDetails.firstName + " " + memberDetails.lastName;
@@ -370,6 +375,7 @@
                 renderInfoTab();
                 updateEvalChart();
                 renderEvaluationTable();
+                updateEventModal();
                 updateGroups();
             })
             .then((response) => {
@@ -397,6 +403,33 @@
                 spinner.classList.add("d-none");
             });
     }
+
+    function updateEventModal(){
+        const notIncludedContainer = document.querySelector("#event-list-not-included");
+        const includedContainer = document.querySelector("#event-list-included");
+        let notIncluded = "", included = "";
+
+        eventList.forEach((event) => {
+            let element = `<button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="">
+                            <div class="d-flex justify-content-start gap-2 align-items-center">
+                                <p class="mb-0 fw-bold ms-2">${event.label}</p>
+                            </div>
+                            <td style="vertical-align: middle"><div style="height: 30px; width:30px; background-color: rgb(${event.color.red}, ${event.color.green}, ${event.color.blue})"></div>
+                        </button>`;
+
+            console.log(event);
+
+            if(memberDetails.events.some(mem => mem.id === event.id)){
+                included += element;
+            }else{
+                notIncluded += element;
+            }
+        });
+        notIncludedContainer.innerHTML = notIncluded;
+        includedContainer.innerHTML = included;
+    }
+
+
 
     function updateGroups(){
         let content = `<option value="">None</option>`;

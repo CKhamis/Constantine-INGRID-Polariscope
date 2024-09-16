@@ -38,6 +38,7 @@ public class Event {
     @ManyToOne
     private User author;
 
+    @JsonIgnore
     @ManyToMany
     private Set<Event> members = new HashSet<>();
 
