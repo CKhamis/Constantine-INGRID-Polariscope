@@ -716,4 +716,54 @@ public class InterpersonalAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Deleting Group", ResponseMessage.Severity.LOW, "OOPS! There was an error :("));
         }
     }
+
+    @PostMapping("/event/add-member")
+    public ResponseEntity<ResponseMessage> addMemberToEvent(@RequestBody EventConnectionForm form, Principal principal){
+        try{
+            User user = getCurrentUser(principal);
+
+            // Get id of evaluation
+            Optional<Event> optionalEvent = eventService.findById(form.getEventId());
+
+            if(optionalEvent.isPresent()){
+                Event event = optionalEvent.get();
+
+                // Check if event is owned by logged in user
+                if(event.getAuthor().getId().equals(user.getId())){
+
+                    // get member
+                    try{
+                        Member member = memberService.findMember(form.getMemberId());
+
+                        // Check if member is owned by logged in user
+                        if(member.getAuthor().getId().equals(user.getId())){
+
+                            // Actually add in the connection now
+                            Set<Event> events = member.getEvents();
+                            events.add(event);
+                            member.setEvents(events);
+
+                            memberService.save(member);
+                            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Event Added to Member", ResponseMessage.Severity.INFORMATIONAL, "Event was added to member."));
+                        }else{
+                            // Event is owned by logged in user, but member is not
+                            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Adding Event to Member", ResponseMessage.Severity.LOW, "Authentication issue"));
+                        }
+                    }catch (Exception e){
+                        // Member not found
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Adding Event to Member", ResponseMessage.Severity.LOW, "Member was not found"));
+                    }
+                }else{
+                    // event author does not match with logged in user
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Adding Event to Member", ResponseMessage.Severity.LOW, "Authentication issue"));
+                }
+            }else{
+                // Event not found
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Adding Event to Member", ResponseMessage.Severity.LOW, "Event was not found"));
+            }
+        }catch (Exception e){
+            // Auth issue or database issue
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Adding Event to Member", ResponseMessage.Severity.LOW, "OOPS! There was an error :("));
+        }
+    }
 }
