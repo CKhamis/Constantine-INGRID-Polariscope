@@ -532,6 +532,51 @@
     document.querySelector("#group-blue-form").addEventListener('input', function() {
         updateColorPreview();
     });
+
+    function importSaveData(){
+        const formData = new FormData();
+
+        const imageFile = document.getElementById('import-file-form').files[0];
+        formData.append('image', imageFile);
+
+        let toastId = createToast("saving");
+        postDataWithFile("/api/data/import", imageFile)
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => {displayGroups()});
+    }
+
+    function displayImportExport(){
+        document.querySelector("#title").textContent = `Polariscope Settings`;
+        document.querySelector("#main-content").innerHTML = `
+        <div class="row">
+            <div class="col-12 mb-3">
+                <label for="pfp-file" class="form-label">Upload group icon</label>
+                <input class="form-control" type="file" name="file" accept="text/plain" id="import-file-form">
+            </div>
+            <button type="submit" class="btn btn-primary" onclick="importSaveData()" id="submit-button">Save</button>
+        </div>
+        `;
+    }
+
 </script>
 </body>
 </html>

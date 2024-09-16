@@ -44,7 +44,7 @@ public class ActivityLog implements Serializable {
         this.user = user;
     }
 
-    public enum ActivityType{
+    public enum ActivityType implements Serializable{
         MEMBER_CREATED,
         MEMBER_MODIFIED,
         MEMBER_DELETED,

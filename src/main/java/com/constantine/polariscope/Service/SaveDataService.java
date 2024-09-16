@@ -5,9 +5,7 @@ import com.constantine.polariscope.Repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +19,8 @@ public class SaveDataService {
     MemberRepository memberRepository;
 
     public byte[] retrieveUserData(User user) throws IOException {
-        ArrayList<ActivityLog> allLogs = new ArrayList<>(activityLogRepository.findAllByUserOrderByCreatedAsc(user));
+        List<ActivityLog> rat = activityLogRepository.findAllByUserOrderByCreatedAsc(user);
+        ArrayList<ActivityLog> allLogs = new ArrayList<>(rat);
         ArrayList<Member> allMembers = new ArrayList<>(memberRepository.findAllByAuthorOrderByLastModifiedDesc(user));
         ArrayList<MemberGroup> allMemberGroups = new ArrayList<>(memberGroupRepository.findAllByAuthorOrderByLastModifiedDesc(user));
 
@@ -34,9 +33,19 @@ public class SaveDataService {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(this);
+        oos.writeObject(userSaveData);
         return baos.toByteArray();
     }
 
+    public void importUserData(byte[] saveDataBytes) throws ClassNotFoundException, IOException {
+        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(saveDataBytes));
+        UserSaveData data = (UserSaveData) ois.readObject();
 
+        if(data.VERSION.equals(UserSaveData.VERSION)) {
+            activityLogRepository.saveAll(data.getActivity());
+            memberRepository.saveAll(data.getMembers());
+            evaluationRepository.saveAll(data.getEvaluations());
+            memberGroupRepository.saveAll(data.getGroups());
+        }
+    }
 }
