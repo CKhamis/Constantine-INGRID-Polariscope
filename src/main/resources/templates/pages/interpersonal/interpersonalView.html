@@ -288,7 +288,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="be">Add/Remove Events</h1>
+                <h1 class="modal-title fs-5" id="be">  Events</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -475,10 +475,11 @@
 
         eventList.forEach((event) => {
             let element = `<button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="toggleEvent('${event.id}')">
+                            <p class="mb-0 fw-bold ms-2">${event.label}</p>
                             <div class="d-flex justify-content-start gap-2 align-items-center">
-                                <p class="mb-0 fw-bold ms-2">${event.label}</p>
+                                <p class="mb-0">${formatTimestamp(event.date)}</p>
+                                <div style="height: 30px; width:30px; background-color: rgb(${event.color.red}, ${event.color.green}, ${event.color.blue})"></div>
                             </div>
-                            <td style="vertical-align: middle"><div style="height: 30px; width:30px; background-color: rgb(${event.color.red}, ${event.color.green}, ${event.color.blue})"></div>
                         </button>`;
 
             console.log(event);

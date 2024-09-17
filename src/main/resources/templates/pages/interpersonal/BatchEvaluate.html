@@ -101,7 +101,7 @@
 
     let evalChartEval;
 
-    let currentId;
+    let currentId, currentMemberDetails;
 
     refresh();
     function refresh(){
@@ -151,15 +151,17 @@
         spinner.classList.remove("d-none");
 
         const evaluationFetch = fetch("/api/interpersonal/evaluation/all/" + id, {});
-        Promise.all([evaluationFetch])
+        const memberFetch = fetch("/api/interpersonal/member/view/" + id, {});
+        Promise.all([evaluationFetch, memberFetch])
             .then(responses => {
-                return Promise.all([responses[0]]);
+                return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json()]);
+                return Promise.all([data[0].json(), data[1].json()]);
             })
             .then(data => {
                 evalList = data[0];
+                currentMemberDetails = data[1];
                 renderEvaluations();
                 renderMemberInfo(id);
             })
@@ -198,8 +200,34 @@
 
             evalChartEval.data.datasets.pop();
             evalChartEval.data.datasets.push(newScores);
-            evalChartEval.update();
 
+            // Clear existing annotations
+            evalChartEval.options.plugins.annotation.annotations = [];
+
+            // Add new annotations based on memberDetails.events
+            if (currentMemberDetails.events) {
+                const newAnnotations = currentMemberDetails.events.map((event, index) => ({
+                    type: 'line',
+                    xScaleID: 'x',
+                    xMin: event.date,
+                    xMax: event.date,
+                    borderColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 1)`,
+                    borderWidth: 2,
+                    label: {
+                        content: event.label,
+                        display: true,
+                        position: 'start',
+                        backgroundColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 0.8)`,
+                        color: 'white',
+                        yAdjust: -10
+                    }
+                }));
+
+                // Apply annotations to both charts
+                evalChartEval.options.plugins.annotation.annotations = newAnnotations;
+            }
+
+            evalChartEval.update();
             document.querySelector("#score-container").innerHTML = scoreChartContent;
         }
     }
