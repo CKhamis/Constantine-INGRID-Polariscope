@@ -51,6 +51,7 @@
                     <h3 class="fw-bold mt-3">General Ovreview</h3>
                     <div class="row mt-2" id="member-chips"></div>
                     <canvas id="evaluation-history-chart-home"></canvas>
+                    <div id="event-info-1" class="alert alert-secondary mt-2">Hover over event to see additional info</div>
                     <h3 class="fw-bold mt-3">Note History</h3>
                     <div id="note-list-home"></div>
                 </div>
@@ -136,9 +137,11 @@
                     <div>
                         <canvas id="evaluation-history-chart"></canvas>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div id="event-info-2" class="alert alert-secondary mt-2">Hover over event to see additional info</div>
                         <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#event-modal">Add/ Remove Events</button>
-
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
                         <h2 class="fw-bold mt-3">All Evaluations</h2>
 
                         <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button" data-bs-toggle="modal" data-bs-target="#filterModal">
@@ -151,6 +154,13 @@
                 <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
                     <h3 class="fw-bold mt-3">Member Settings</h3>
                     <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Add or Remove Events</h5>
+                            <p class="card-text">This will add or remove markers on the member's evaluation graphs. Use this to highlight important events.</p>
+                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#event-modal">Add/ Remove Events</button>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
                         <div class="card-body">
                             <h5 class="card-title fw-bold">Score Hold</h5>
                             <p class="card-text">This will remove the member's appearance in the Batch Evaluate feature. Use this option if you do not anticipate not updating evaluations as frequently.</p>
@@ -316,6 +326,60 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="saveEventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="saveEventModalTitle">Save Event</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="event-label-form" class="form-label">Label</label>
+                        <input type="text" class="form-control" id="event-label-form" required>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="event-date-form" class="form-label">Date</label>
+                        <input type="datetime-local" class="form-control" id="event-date-form">
+                    </div>
+                    <div class="col-12">
+                        <label for="event-description-form" class="form-label">Description</label>
+                        <textarea class="form-control" id="event-description-form" rows="3"></textarea>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <label for="event-color-preview" class="form-label">Color</label>
+                        <div class="container" style="height:40px" id="event-color-preview"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="event-red-form">Red</label>
+                            <input type="number" class="form-control" id="event-red-form">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="event-green-form">Green</label>
+                            <input type="number" class="form-control" id="event-green-form">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="event-blue-form">Blue</label>
+                            <input type="number" class="form-control" id="event-blue-form">
+                        </div>
+                    </div>
+                    <input type="hidden" id="event-id-form" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="modalSaveEvent()" data-bs-dismiss="modal">Save Event</button>
             </div>
         </div>
     </div>
@@ -913,7 +977,28 @@
                     backgroundColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 0.8)`,
                     color: 'white',
                     yAdjust: -10
-                }
+                },
+                click: function(e) {
+                    updateEventSaveModal(event.id);
+                    let myModal = new bootstrap.Modal(document.getElementById('saveEventModal'));
+                    myModal.show();
+                },
+                enter: function(e) {
+                    let content = `
+                    <div class="d-flex flex-row justify-content-between align-items-center">
+                        <p class="fs-5 fw-bold">${event.label}</p>
+                        <p class="fw-bold">${formatTimestamp(event.date)}</p>
+                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveEventModal" onclick="updateEventSaveModal('${event.id}')">Edit Event</button>
+                    </div>
+                    <p class="fs-5">${event.description.length > 0? event.description : "No description given"}</p>
+                    `;
+
+                    document.querySelector("#event-info-1").innerHTML = content;
+                    document.querySelector("#event-info-2").innerHTML = content;
+
+                    document.querySelector("#event-info-1").style.background = `linear-gradient(to top right, rgb(${event.color.red}, ${event.color.green}, ${event.color.blue},.03), rgb(${event.color.red}, ${event.color.green}, ${event.color.blue},.15))`;
+                    document.querySelector("#event-info-2").style.background = `linear-gradient(to top right, rgb(${event.color.red}, ${event.color.green}, ${event.color.blue},.03), rgb(${event.color.red}, ${event.color.green}, ${event.color.blue},.15))`;
+                },
             }));
 
             // Apply annotations to both charts
@@ -926,7 +1011,70 @@
         evalChartEvalHome.update();
     }
 
+    function updateEventSaveModal(id){
+        const event = eventList.find(g => g.id === id);
+        document.querySelector("#saveEventModalTitle").textContent = "Edit Event Details";
+        document.querySelector("#event-id-form").value =  event.id;
+        document.querySelector("#event-label-form").value = event.label;
+        document.querySelector("#event-description-form").value = event.description;
+        document.querySelector("#event-date-form").value = event.date;
+        document.querySelector("#event-red-form").value = event.color.red;
+        document.querySelector("#event-green-form").value = event.color.green;
+        document.querySelector("#event-blue-form").value = event.color.blue;
+        updateEventColorPreview();
+    }
 
+    document.querySelector("#event-red-form").addEventListener('input', function() {
+        updateEventColorPreview();
+    });
+    document.querySelector("#event-green-form").addEventListener('input', function() {
+        updateEventColorPreview();
+    });
+    document.querySelector("#event-blue-form").addEventListener('input', function() {
+        updateEventColorPreview();
+    });
+
+    function updateEventColorPreview(){
+        const color = "rgb(" + document.querySelector("#event-red-form").value + "," + document.querySelector("#event-green-form").value + "," + document.querySelector("#event-blue-form").value + ")";
+        console.log(color);
+        document.querySelector("#event-color-preview").style.backgroundColor = color;
+    }
+
+    function modalSaveEvent(){
+        const formData = {
+            id: document.querySelector("#event-id-form").value,
+            label: document.querySelector("#event-label-form").value,
+            description: document.querySelector("#event-description-form").value,
+            date: document.querySelector("#event-date-form").value,
+            red: document.querySelector("#event-red-form").value,
+            green: document.querySelector("#event-green-form").value,
+            blue: document.querySelector("#event-blue-form").value
+        };
+
+        let toastId = createToast("Saving Event");
+        postData("/api/interpersonal/event/save", formData)
+            .then((message) => {
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-title`).innerText =  message.title;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => {refresh()});
+    }
 
     function createEvalChart(){
         let canvas = document.querySelector("#evaluation-history-chart");
