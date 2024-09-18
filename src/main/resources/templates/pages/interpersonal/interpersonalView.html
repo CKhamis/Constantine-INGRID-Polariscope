@@ -987,11 +987,11 @@
                 enter: function(e) {
                     let content = `
                     <div class="d-flex flex-row justify-content-between align-items-center">
-                        <p class="fs-5 fw-bold">${event.label}</p>
-                        <p class="fw-bold">${formatTimestamp(event.date)}</p>
-                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveEventModal" onclick="updateEventSaveModal('${event.id}')">Edit Event</button>
+                        <p class="fs-5 fw-bold text-center">${event.label}</p>
+                        <p class="fw-bold text-center">${formatTimestamp(event.date)}</p>
+                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveEventModal" style="background-color: rgba(200,200,200,.3)" onclick="updateEventSaveModal('${event.id}')">Edit Event</button>
                     </div>
-                    <p class="fs-5">${event.description.length > 0? event.description : "No description given"}</p>
+                    <p class="fs-5 text-center">${event.description.length > 0? event.description : "No description given"}</p>
                     `;
 
                     document.querySelector("#event-info-1").innerHTML = content;

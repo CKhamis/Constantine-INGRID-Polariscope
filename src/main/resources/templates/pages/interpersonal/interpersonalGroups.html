@@ -14,7 +14,7 @@
                 <label for="group-form">Select Group</label>
                 <div class="input-group">
                     <select class="form-select" id="group-form"></select>
-                    <button class="btn btn-primary bevel-sm" type="button" onclick="changeGroup()">Change</button>
+                    <button class="btn btn-primary bevel-sm" type="button" onclick="selectGroup()">Change</button>
                 </div>
             </div>
         </div>
@@ -37,9 +37,9 @@
                 </ul>
             </div>
             <div class="col-md-6 d-flex flex-row align-content-center justify-content-end">
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="updateModal()">Edit Group</button>
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#member-modal" onclick="updateModal()">Manage Members</button>
-                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="resetGroupModal()">+ New Group</button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="updateEditGroupModal()">Edit Group</button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#member-modal" onclick="renderGroupMemberSelectModal()">Manage Members</button>
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="resetEditGroupModal()">+ New Group</button>
             </div>
         </div>
         <div class="tab-content" id="myTabContent">
@@ -248,11 +248,12 @@
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
 <script>
-    let enums, memberList, groupMemberList, selectedGroupId, eventList;
+    let currentGroupId;
+    let enums, fullMemberList, groupMemberList, groupMemberEventList;
     let memberCompositionChart, sexCompositionChart;
 
     refresh();
-    function refresh(id = 0){
+    function refresh(){
         const enumFetch = fetch("/api/interpersonal/enums", {});
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         Promise.all([enumFetch, memberListFetch])
@@ -264,19 +265,13 @@
             })
             .then(data => {
                 enums = data[0];
-                memberList = data[1];
-                renderDropdown();
-                if(enums.groups.length > id){
-                    renderHeader(id);
-                    renderMemberModal(enums.groups[id].id);
-                    renderBody(enums.groups[id].id);
+                fullMemberList = data[1];
+
+                if(enums.groups.length === 0){
+                    document.querySelector("#main-content").innerHTML = "<h2 class='text-center fw-bold mt-2'>No groups to display</h2><p class='text-center'>Create one in settings or the new group button</p>";
                 }else{
-                    if(enums.groups.length > 0){
-                        renderHeader(0);
-                        renderMemberModal(enums.groups[0].id);
-                        renderBody(enums.groups[0].id);
-                    }
-                    document.querySelector("#main-content").innerHTML = "<h2 class='text-center fw-bold mt-2'>No groups to display</h2><p class='text-center'>Create one in settings</p>"
+                    renderDropdown();
+                    selectGroup();
                 }
             })
             .catch((response) => {
@@ -290,34 +285,20 @@
             });
     }
 
-    function renderHeader(index){
-        document.querySelector("#header-container").style.background = `linear-gradient(to top right, rgb(${enums.groups[index].color.red}, ${enums.groups[index].color.green}, ${enums.groups[index].color.blue},.5), rgb(${enums.groups[index].color.red}, ${enums.groups[index].color.green}, ${enums.groups[index].color.blue},.05))`;
-        document.querySelector("#group-description").textContent = enums.groups[index].description;
-        document.querySelector("#group-name").textContent = enums.groups[index].name;
-        document.querySelector("#group-image").src = `/api/interpersonal/group/image/${enums.groups[index].id}?=${new Date().getTime()}`;
-        document.querySelector("#last-modified").innerText = "Members: " + enums.groups[index].numMembers + " - Last modified: " + formatTimestamp(enums.groups[index].lastModified);
-    }
-
     function renderDropdown(){
         let content = ``;
 
         enums.groups.forEach((group, index) => {
-            content += `<option value="${index}">${group.name}</option>`;
+            content += `<option value="${group.id}">${group.name}</option>`;
         });
 
         document.querySelector("#group-form").innerHTML = content;
     }
 
-    function changeGroup(){
-        const index = document.querySelector("#group-form").value;
-        renderHeader(index);
-        renderBody(enums.groups[index].id);
-    }
-
-    function renderBody(id){
-        selectedGroupId = id;
-        const enumFetch = fetch("/api/interpersonal/member/group/" + id, {});
-        Promise.all([enumFetch])
+    function selectGroup(){
+        currentGroupId = document.querySelector("#group-form").value;
+        const memberDetailFetch = fetch("/api/interpersonal/member/group/" + currentGroupId, {});
+        Promise.all([memberDetailFetch])
             .then(responses => {
                 return Promise.all(responses);
             })
@@ -325,45 +306,8 @@
                 return Promise.all([data[0].json()]);
             })
             .then(data => {
-                let memberListContent = ``;
-                let editCountTotal = 0;
-                let allEventsCombined = [];
-
-                data[0].forEach((member) => {
-                    allEventsCombined.push(...member.events);
-                    editCountTotal += member.editCount;
-
-                    memberListContent += `
-                        <a class="col-6 col-md-3 col-lg-2 p-2 d-flex flex-column" href="/interpersonal/member/view/${member.id}">
-                            <img class="square-image w-100 p-3" alt="Member image" src="/api/interpersonal/member/profile-image/${member.id}">
-                            <p class="text-center text-white fs-4 fw-bold text-nowrap text-truncate">${member.firstName + ' ' + member.lastName}</p>
-                        </a>
-                    `;
-                });
-
-                document.querySelector("#av-edits").textContent = editCountTotal / data[0].length;
-                document.querySelector("#tot-edits").textContent = editCountTotal;
-
-                updateGraph(data[0]);
-
-                document.querySelector("#main-content").innerHTML = memberListContent;
-
-                // Event consolidation and ordering
-                const allEvents = allEventsCombined.reduce((acc, current) => {
-                    const exists = acc.find(item => item.id === current.id);
-                    if (!exists) {
-                        acc.push(current);
-                    }
-                    return acc;
-                }, []);
-
-                allEvents.sort((a, b) => {
-                    return new Date(b.date) - new Date(a.date)
-                });
-
-                eventList = allEvents;
                 groupMemberList = data[0];
-                renderEventsTab(data[0]);
+                renderBody();
             })
             .catch((response) => {
                 response.json()
@@ -373,16 +317,63 @@
                     .catch(error => {
                         console.error("Error parsing error response:", error);
                     });
+            })
+            .finally(() => {
+                tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
             });
     }
 
-    function renderEventsTab(members){
-        document.querySelector("#event-status").innerText = eventList.length + " total events with " + members.length + " members";
+    function renderBody(){
+        const currentGroup = getCurrentGroup(currentGroupId)
+        // render header
+        document.querySelector("#header-container").style.background = `linear-gradient(to top right, rgb(${currentGroup.color.red}, ${currentGroup.color.green}, ${currentGroup.color.blue},.5), rgb(${currentGroup.color.red}, ${currentGroup.color.green}, ${currentGroup.color.blue},.05))`;
+        document.querySelector("#group-description").textContent = currentGroup.description;
+        document.querySelector("#group-name").textContent = currentGroup.name;
+        document.querySelector("#group-image").src = `/api/interpersonal/group/image/${currentGroup.id}?=${new Date().getTime()}`;
+        document.querySelector("#last-modified").innerText = "Members: " + currentGroup.numMembers + " - Last modified: " + formatTimestamp(currentGroup.lastModified);
+
+        // Render body
+        let memberListContent = ``;
+        let editCountTotal = 0;
+        let allEventsCombined = [];
+
+        groupMemberList.forEach((member) => {
+            allEventsCombined.push(...member.events);
+            editCountTotal += member.editCount;
+
+            memberListContent += `
+                        <a class="col-6 col-md-3 col-lg-2 p-2 d-flex flex-column" href="/interpersonal/member/view/${member.id}">
+                            <img class="square-image w-100 p-3" alt="Member image" src="/api/interpersonal/member/profile-image/${member.id}">
+                            <p class="text-center text-white fs-4 fw-bold text-nowrap text-truncate">${member.firstName + ' ' + member.lastName}</p>
+                        </a>
+                    `;
+        });
+
+        document.querySelector("#av-edits").textContent = editCountTotal / groupMemberList.length;
+        document.querySelector("#tot-edits").textContent = editCountTotal;
+
+        document.querySelector("#main-content").innerHTML = memberListContent;
+
+        // Event content
+        const allEvents = allEventsCombined.reduce((acc, current) => {
+            const exists = acc.find(item => item.id === current.id);
+            if (!exists) {
+                acc.push(current);
+            }
+            return acc;
+        }, []);
+
+        allEvents.sort((a, b) => {
+            return new Date(b.date) - new Date(a.date)
+        });
+        
+        document.querySelector("#event-status").innerText = allEvents.length + " total events with " + groupMemberList.length + " members";
         let eventContent = ``;
-        eventList.forEach((event) => {
+        allEvents.forEach((event) => {
             //loop to gather members who have this event
             let memberContent = "";
-            members.forEach((m) => {
+            groupMemberList.forEach((m) => {
                 if(m.events.some(obj => obj.id === event.id)){
                     memberContent += `
                 <a href="/interpersonal/member/view/${m.id}">
@@ -397,7 +388,7 @@
                 <div class="d-flex flex-row justify-content-between align-items-center">
                     <p class="fs-4 fw-bold text-white">${event.label}</p>
                     <p class="fw-bold text-white">${formatTimestamp(event.date)}</p>
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#member-modal-2" onclick="renderEventMemberModal('${event.id}')">Manage Members</button>
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#member-modal-2" style="background-color: rgba(200,200,200,.3)" onclick="renderEventMemberModal('${event.id}')">Manage Members</button>
                 </div>
                 <p class="fs-5 text-white">${event.description.length > 0? event.description : "No description given"}</p>
                 <div class="d-flex flex-row justify-content-end align-items-center gap-2">
@@ -409,29 +400,129 @@
         });
         document.querySelector("#timeline-container").innerHTML = eventContent;
 
-        tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        // Update graphs
+        updateGraph();
+
+        // Update member select modal
+        renderGroupMemberSelectModal();
     }
 
-    function updateModal(){
-        const group = enums.groups.find(g => g.id === selectedGroupId);
+    setupGraph();
+    function setupGraph(){
+        let canvas = document.querySelector("#composition-canvas");
+        let data = {
+            datasets: [{
+                data:[]
+            }],
+            labels:[]
+        };
+        memberCompositionChart = new Chart(canvas, {
+            type: 'doughnut',
+            data:data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        let canvas2 = document.querySelector("#gender-canvas");
+        let data2 = {
+            datasets: [{
+                data:[]
+            }],
+            labels:[]
+        };
+        sexCompositionChart = new Chart(canvas2, {
+            type: 'doughnut',
+            data:data2,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function updateGraph(){
+        const relations = groupMemberList.reduce((acc, obj) => {
+            const type = obj.relationship;
+            if (acc[type]) {
+                acc[type]++;
+            } else {
+                acc[type] = 1;
+            }
+            return acc;
+        }, {});
+
+        const sexes = groupMemberList.reduce((acc, obj) => {
+            const type = obj.sex;
+            if (acc[type]) {
+                acc[type]++;
+            } else {
+                acc[type] = 1;
+            }
+            return acc;
+        }, {});
+
+
+        const labels = Object.keys(relations);
+        const values = Object.values(relations);
+
+        let data = {
+            datasets: [{
+                data:values
+            }],
+            labels:labels
+        };
+
+        memberCompositionChart.data = data;
+        memberCompositionChart.update();
+
+        const labels2 = Object.keys(sexes);
+        const values2 = Object.values(sexes);
+
+        let data2 = {
+            datasets: [{
+                data:values2
+            }],
+            labels:labels2
+        };
+
+        sexCompositionChart.data = data2;
+        sexCompositionChart.update();
+    }
+
+    function getCurrentGroup(id){
+        return enums.groups.find(g => g.id === id);
+    }
+
+    // Modals
+    function updateEditGroupModal(){
+        const group = getCurrentGroup(currentGroupId);
         document.querySelector("#group-description-form").value = group.description;
-        document.querySelector("#group-id-form").value = selectedGroupId;
+        document.querySelector("#group-id-form").value = currentGroupId;
         document.querySelector("#group-title-form").value = group.name;
         document.querySelector("#group-red-form").value = group.color.red;
         document.querySelector("#group-green-form").value = group.color.green;
         document.querySelector("#group-blue-form").value = group.color.blue;
         document.querySelector("#saveGroupModalTitle").innerText = "Edit Group";
-        updateColorPreview();
+        updateEditGroupModalColor();
     }
 
-    function updateColorPreview(){
+    function updateEditGroupModalColor(){
         const color = "rgb(" + document.querySelector("#group-red-form").value + "," + document.querySelector("#group-green-form").value + "," + document.querySelector("#group-blue-form").value + ")";
         console.log(color);
         document.querySelector("#color-preview").style.backgroundColor = color;
     }
 
-    function resetGroupModal(){
+    function resetEditGroupModal(){
         document.querySelector("#group-description-form").value = "";
         document.querySelector("#group-id-form").value = "";
         document.querySelector("#group-title-form").value = "";
@@ -439,9 +530,122 @@
         document.querySelector("#group-red-form").value = Math.floor(Math.random() * 256);
         document.querySelector("#group-green-form").value = Math.floor(Math.random() * 256);
         document.querySelector("#group-blue-form").value = Math.floor(Math.random() * 256);
-        updateColorPreview();
+        updateEditGroupModalColor();
     }
 
+    function renderGroupMemberSelectModal(){
+        const notIncludedContainer = document.querySelector("#member-list-not-included");
+        const includedContainer = document.querySelector("#member-list-included");
+        let notIncluded = "", included = "";
+
+        fullMemberList.forEach((member) => {
+            let element = `<button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="toggleGroup('${member.id}')">
+                                <div class="d-flex justify-content-start gap-2 align-items-center">
+                                    <img class="square-image img-fluid" style="width: 20px; height: 20px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
+                                    <p class="mb-0 fw-bold ms-2">${member.firstName} ${member.lastName}</p>
+                                </div>
+                            </button>`;
+
+            if(member.group !== null && member.group.id === currentGroupId){
+                included += element;
+            }else{
+                notIncluded += element;
+            }
+        });
+        notIncludedContainer.innerHTML = notIncluded;
+        includedContainer.innerHTML = included;
+    }
+
+    function toggleGroup(memberId){
+        const member = fullMemberList.find(g => g.id === memberId);
+
+        const toggle = member.group == null || member.group.id.trim() !== currentGroupId.trim() ? currentGroupId : "";
+
+        const form = {
+            memberId: memberId,
+            groupId: toggle
+        };
+
+        let toastId = createToast("Saving Member Details");
+        postData("/api/interpersonal/member/change-group", form)
+            .then((message) => {
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-title`).innerText =  message.title;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => {
+                refresh();
+            });
+    }
+
+    document.querySelector("#group-red-form").addEventListener('input', function() {
+        updateEditGroupModalColor();
+    });
+    document.querySelector("#group-green-form").addEventListener('input', function() {
+        updateEditGroupModalColor();
+    });
+    document.querySelector("#group-blue-form").addEventListener('input', function() {
+        updateEditGroupModalColor();
+    });
+
+    function renderEventMemberModal(id){
+        const groupFetch = fetch("/api/interpersonal/member/group/" + currentGroupId, {});
+        Promise.all([groupFetch])
+            .then(responses => {
+                return Promise.all(responses);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                const notIncludedContainer = document.querySelector("#member-list-not-included-2");
+                const includedContainer = document.querySelector("#member-list-included-2");
+                let notIncluded = "", included = "";
+
+                data[0].forEach((member) => {
+                    let element = `<button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="toggleEvent('${member.id}', '${id}')">
+                                <div class="d-flex justify-content-start gap-2 align-items-center">
+                                    <img class="square-image img-fluid" style="width: 20px; height: 20px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
+                                    <p class="mb-0 fw-bold ms-2">${member.firstName} ${member.lastName}</p>
+                                </div>
+                            </button>`;
+
+                    if(member.events.some(obj => obj.id === id)){
+                        included += element;
+                    }else{
+                        notIncluded += element;
+                    }
+                });
+                notIncludedContainer.innerHTML = notIncluded;
+                includedContainer.innerHTML = included;
+            })
+            .catch((response) => {
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                    });
+            });
+    }
+
+    // Database functionality
     function modalSaveGroup(){
         const formData = new FormData();
 
@@ -489,32 +693,6 @@
             .finally(() => {refresh()});
     }
 
-    function renderMemberModal(id){
-        const notIncludedContainer = document.querySelector("#member-list-not-included");
-        const includedContainer = document.querySelector("#member-list-included");
-        let notIncluded = "", included = "";
-
-        memberList.forEach((member) => {
-            if(member.lastEvaluation != null){
-                let element = `<button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="toggleGroup('${member.id}', '${id}')">
-                                <div class="d-flex justify-content-start gap-2 align-items-center">
-                                    <img class="square-image img-fluid" style="width: 20px; height: 20px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
-                                    <p class="mb-0 fw-bold ms-2">${member.firstName} ${member.lastName}</p>
-                                </div>
-                                <p class="mb-0 fw-bold" style="color: ${getColorGradient(member.lastEvaluation.cscore, -100, 100)}">${member.lastEvaluation.cscore}</p>
-                            </button>`;
-
-                if(member.group !== null && member.group.id === id){
-                    included += element;
-                }else{
-                    notIncluded += element;
-                }
-            }
-        });
-        notIncludedContainer.innerHTML = notIncluded;
-        includedContainer.innerHTML = included;
-    }
-
     function toggleEvent(memberId, eventId){
         const form = {
             memberId: memberId,
@@ -545,172 +723,8 @@
             })
             .finally(() => {
                 renderEventMemberModal(eventId);
-                refresh(selectedGroupId);
+                refresh();
             });
-    }
-
-    function toggleGroup(memberId, groupId){
-        const member = memberList.find(g => g.id === memberId);
-
-        const toggle = member.group == null || member.group.id.trim() !== groupId.trim() ? groupId : "";
-
-        const form = {
-            memberId: memberId,
-            groupId: toggle
-        };
-
-        console.log(form);
-
-        let toastId = createToast("Saving Member Details");
-        postData("/api/interpersonal/member/change-group", form)
-            .then((message) => {
-                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
-                document.getElementById(`${toastId}-title`).innerText =  message.title;
-                document.getElementById(`${toastId}-loading`).style.color = "green";
-            })
-            .catch((response) => {
-                console.log(response);
-                response.json()
-                    .then(errorData => {
-                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
-                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
-                        document.getElementById(`${toastId}-loading`).style.color = "red";
-                    })
-                    .catch(error => {
-                        console.error("Error parsing error response:", error);
-                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
-                        document.getElementById(`${toastId}-title`).innerText = "Error";
-                        document.getElementById(`${toastId}-loading`).style.color = "red";
-                    });
-            })
-            .finally(() => {
-                refresh(enums.groups.findIndex(g => g.id === groupId));
-            });
-    }
-
-    document.querySelector("#group-red-form").addEventListener('input', function() {
-        updateColorPreview();
-    });
-    document.querySelector("#group-green-form").addEventListener('input', function() {
-        updateColorPreview();
-    });
-    document.querySelector("#group-blue-form").addEventListener('input', function() {
-        updateColorPreview();
-    });
-
-    function updateGraph(members){
-        const relations = members.reduce((acc, obj) => {
-            const type = obj.relationship;
-            if (acc[type]) {
-                acc[type]++;
-            } else {
-                acc[type] = 1;
-            }
-            return acc;
-        }, {});
-
-        const sexes = members.reduce((acc, obj) => {
-            const type = obj.sex;
-            if (acc[type]) {
-                acc[type]++;
-            } else {
-                acc[type] = 1;
-            }
-            return acc;
-        }, {});
-
-
-        const labels = Object.keys(relations);
-        const values = Object.values(relations);
-
-        let data = {
-            datasets: [{
-                data:values
-            }],
-            labels:labels
-        };
-
-        memberCompositionChart.data = data;
-        memberCompositionChart.update();
-
-        const labels2 = Object.keys(sexes);
-        const values2 = Object.values(sexes);
-
-        let data2 = {
-            datasets: [{
-                data:values2
-            }],
-            labels:labels2
-        };
-
-        sexCompositionChart.data = data2;
-        sexCompositionChart.update();
-    }
-
-    setupGraph();
-    function setupGraph(){
-        let canvas = document.querySelector("#composition-canvas");
-        let data = {
-            datasets: [{
-                data:[]
-            }],
-            labels:[]
-        };
-        memberCompositionChart = new Chart(canvas, {
-            type: 'doughnut',
-            data:data,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-
-        let canvas2 = document.querySelector("#gender-canvas");
-        let data2 = {
-            datasets: [{
-                data:[]
-            }],
-            labels:[]
-        };
-        sexCompositionChart = new Chart(canvas2, {
-            type: 'doughnut',
-            data:data2,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-    }
-
-    function renderEventMemberModal(id){
-        const notIncludedContainer = document.querySelector("#member-list-not-included-2");
-        const includedContainer = document.querySelector("#member-list-included-2");
-        let notIncluded = "", included = "";
-
-        groupMemberList.forEach((member) => {
-            let element = `<button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="toggleEvent('${member.id}', '${id}')">
-                                <div class="d-flex justify-content-start gap-2 align-items-center">
-                                    <img class="square-image img-fluid" style="width: 20px; height: 20px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
-                                    <p class="mb-0 fw-bold ms-2">${member.firstName} ${member.lastName}</p>
-                                </div>
-                            </button>`;
-
-            if(member.events.some(obj => obj.id === id)){
-                included += element;
-            }else{
-                notIncluded += element;
-            }
-        });
-        notIncludedContainer.innerHTML = notIncluded;
-        includedContainer.innerHTML = included;
     }
 </script>
 </body>
