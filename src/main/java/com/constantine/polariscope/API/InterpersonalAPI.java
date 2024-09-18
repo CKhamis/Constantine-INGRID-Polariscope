@@ -747,7 +747,6 @@ public class InterpersonalAPI {
                             }else{
                                 // add in connection
                                 events.add(event);
-
                             }
                             member.setEvents(events);
 
