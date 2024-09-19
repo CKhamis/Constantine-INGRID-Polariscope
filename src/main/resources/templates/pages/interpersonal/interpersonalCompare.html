@@ -225,13 +225,13 @@
         let content = ``;
         memberDetailList.forEach((member) => {
             content += `
-                <button type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" onclick="toggleMark('${member.id}')">
+                <a type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" href="/interpersonal/member/view/${member.id}">
                     <div class="d-flex justify-content-start gap-2 align-items-center">
                         <img class="square-image img-fluid" style="width: 40px; height: 40px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
                         <p class="mb-0 fw-bold ms-2 fs-4">${member.firstName} ${member.lastName}</p>
                     </div>
                     <p class="mb-0 fw-bold" style="color: ${getColorGradient(member.mostRecentEval.cscore, -100, 100)}">${member.mostRecentEval.cscore}</p>
-                </button>
+                </a>
             `;
         });
 
@@ -284,6 +284,28 @@
             datasets.push(chartEntry);
         }
 
+        // Annotations
+        evalChart.options.plugins.annotation.annotations = [];
+
+        const newAnnotations = eventList.filter((event) => {return "included" in event && event.included === true}).map((event, index) => ({
+            type: 'line',
+            xScaleID: 'x',
+            xMin: new Date(event.date),
+            xMax: new Date(event.date),
+            borderColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 1)`,
+            borderWidth: 2,
+            label: {
+                content: event.label,
+                display: true,
+                position: 'start',
+                backgroundColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 0.8)`,
+                color: 'white',
+                yAdjust: -10
+            }
+        }));
+
+        evalChart.options.plugins.annotation.annotations = newAnnotations;
+
         evalChart.data.datasets = datasets;
         evalChart.update();
 
@@ -307,29 +329,6 @@
             }],
             labels:labels
         };
-
-        // Annotations
-        memberCompositionChart.options.plugins.annotation.annotations = [];
-
-        const newAnnotations = eventList.map((event, index) => ({
-            type: 'line',
-            xScaleID: 'x',
-            xMin: event.date,
-            xMax: event.date,
-            borderColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 1)`,
-            borderWidth: 2,
-            label: {
-                content: event.label,
-                display: true,
-                position: 'start',
-                backgroundColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 0.8)`,
-                color: 'white',
-                yAdjust: -10
-            }
-        }));
-
-        // Apply annotations to both charts
-        memberCompositionChart.options.plugins.annotation.annotations = newAnnotations;
 
         memberCompositionChart.data = data;
         memberCompositionChart.update();
