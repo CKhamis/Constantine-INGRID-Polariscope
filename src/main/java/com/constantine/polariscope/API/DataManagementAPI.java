@@ -47,7 +47,7 @@ public class DataManagementAPI {
     }
 
     @PostMapping("/import")
-    public ResponseEntity<?> setData(@RequestBody String info, Principal principal){
+    public ResponseEntity<?> setData(@RequestParam(value = "content") String info, Principal principal){ // todo: something is wrong with how file is handled or interpreted
         try{
             //User retrievedUser = getCurrentUser(principal);
             saveDataService.importUserData(info.getBytes());

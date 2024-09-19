@@ -536,11 +536,35 @@
     function importSaveData(){
         const formData = new FormData();
 
-        const imageFile = document.getElementById('import-file-form').files[0];
-        formData.append('image', imageFile);
+        const fileInput = document.getElementById('import-file-form');
+        const file = fileInput.files[0]; // Get the first file from the input
+        formData.append("content", file);
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const text = e.target.result; // The text content of the file
+                console.log(text);
+                formData.append("content", text);
+            };
+
+            reader.onerror = function(e) {
+                console.error("File reading error", e);
+            };
+
+            reader.readAsText(file); // Read the file as text
+
+            console.log(reader.result);
+        } else {
+            console.log("No file selected");
+        }
+
+
+
 
         let toastId = createToast("saving");
-        postDataWithFile("/api/data/import", imageFile)
+        postDataWithFile("/api/data/import", formData)
             .then((message) => {
                 console.log(message);
                 document.getElementById(`${toastId}-title`).innerText = message.title;
