@@ -991,7 +991,7 @@
                         <p class="fw-bold text-center">${formatTimestamp(event.date)}</p>
                         <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveEventModal" style="background-color: rgba(200,200,200,.3)" onclick="updateEventSaveModal('${event.id}')">Edit Event</button>
                     </div>
-                    <p class="fs-5 text-center">${event.description.length > 0? event.description : "No description given"}</p>
+                    ${event.description.length > 0? "<p class='fs-5'>" + event.description + "</p>" : "<p class='text-center fs-5'>No description given</p>"}</p>
                     `;
 
                     document.querySelector("#event-info-1").innerHTML = content;

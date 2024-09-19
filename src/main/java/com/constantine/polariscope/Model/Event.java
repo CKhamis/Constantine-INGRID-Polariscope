@@ -40,7 +40,7 @@ public class Event {
 
     @JsonIgnore
     @ManyToMany
-    private Set<Event> members = new HashSet<>();
+    private Set<Member> members = new HashSet<>();
 
     public Event(User author, EventForm form){
         this.author = author;

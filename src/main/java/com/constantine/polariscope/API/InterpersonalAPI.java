@@ -750,7 +750,10 @@ public class InterpersonalAPI {
                             }
                             member.setEvents(events);
 
+                            event.getMembers().add(member);
+
                             memberService.save(member);
+                            eventService.save(event);
                             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Event Added to Member", ResponseMessage.Severity.INFORMATIONAL, "Event was added to member."));
                         }else{
                             // Event is owned by logged in user, but member is not
