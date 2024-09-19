@@ -17,7 +17,7 @@ import java.security.Principal;
 @AllArgsConstructor
 public class FrontEndController {
     private final UserService userService;
-    private static final String VERSION = "1.3.3";
+    private static final String VERSION = "1.8.0";
 
     private User getCurrentUser(Principal principal){
         if(principal == null){
