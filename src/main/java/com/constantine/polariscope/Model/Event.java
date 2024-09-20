@@ -28,6 +28,7 @@ public class Event {
     private UUID id;
     private String label;
     private LocalDateTime date;
+    @Column(columnDefinition="text")
     private String description;
 
     private Color color;
