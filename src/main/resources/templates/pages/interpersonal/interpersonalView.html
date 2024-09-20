@@ -5,7 +5,6 @@
 <div th:replace="~{components/Navigation :: vertical}"></div>
 <main class="pt-3" style="margin-left: 60px">
 <div class="container-fluid px-4">
-
     <nav class="navbar d-flex justify-content-between align-items-center">
         <div>
             <h2 class="fw-bold">Member Records</h2>
@@ -42,6 +41,7 @@
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link active" id="nav-overview-tab" data-bs-toggle="tab" data-bs-target="#nav-overview" type="button" role="tab" aria-controls="nav-overview" aria-selected="true">Overview</button>
                     <button class="nav-link" id="nav-info-tab" data-bs-toggle="tab" data-bs-target="#nav-info" type="button" role="tab" aria-controls="nav-info" aria-selected="false">Information</button>
+                    <button class="nav-link" id="nav-events-tab" data-bs-toggle="tab" data-bs-target="#nav-events" type="button" role="tab" aria-controls="nav-events" aria-selected="false">Events</button>
                     <button class="nav-link" id="nav-evaluation-tab" data-bs-toggle="tab" data-bs-target="#nav-evaluation" type="button" role="tab" aria-controls="nav-evaluation" aria-selected="false">Evaluations</button>
                     <button class="nav-link" id="nav-settings-tab" data-bs-toggle="tab" data-bs-target="#nav-settings" type="button" role="tab" aria-controls="nav-settings" aria-selected="false">Settings</button>
                 </div>
@@ -139,7 +139,6 @@
                     </div>
                     <div>
                         <div id="event-info-2" class="alert alert-secondary mt-2">Hover over event to see additional info</div>
-                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#event-modal">Add/ Remove Events</button>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <h2 class="fw-bold mt-3">All Evaluations</h2>
@@ -150,6 +149,13 @@
                         </div>
                     </div>
                     <div id="eval-table-container"></div>
+                </div>
+                <div class="tab-pane fade" id="nav-events" role="tabpanel" aria-labelledby="nav-events-tab" tabindex="0">
+                    <div class="d-flex flex-row justify-content-between align-items-center">
+                        <h3 class="fw-bold mt-3">All Events</h3>
+                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#event-modal">Add/ Remove Events</button>
+                    </div>
+                    <div id="events-container"></div>
                 </div>
                 <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
                     <h3 class="fw-bold mt-3">Member Settings</h3>
@@ -288,7 +294,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="be">  Events</h1>
+                <h1 class="modal-title fs-5" id="be">Events</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -441,6 +447,7 @@
                 renderEvaluationTable();
                 updateEventModal();
                 updateGroups();
+                updateEventsTab();
             })
             .then((response) => {
                 if(memberDetails.group !== null){
@@ -466,6 +473,25 @@
                 spinner.classList.remove("d-block");
                 spinner.classList.add("d-none");
             });
+    }
+
+    function updateEventsTab(){
+        let content = "";
+
+        memberDetails.events.forEach((event) => {
+            content += `
+            <div class="alert alert-secondary mt-2" style="background: linear-gradient(to top right, rgb(${event.color.red}, ${event.color.green}, ${event.color.blue},.03), rgb(${event.color.red}, ${event.color.green}, ${event.color.blue},.15))">
+                <div class="d-flex flex-row justify-content-between align-items-center">
+                    <p class="fs-4 fw-bold text-white">${event.label}</p>
+                    <p class="fw-bold text-white">${formatTimestamp(event.date)}</p>
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveEventModal" style="background-color: rgba(200,200,200,.3)" onclick="updateEventSaveModal('${event.id}')">Edit Event</button>
+                </div>
+                <p class="fs-5 text-white">${event.description.length > 0? event.description : "No description given"}</p>
+            </div>
+            `;
+        })
+
+        document.querySelector("#events-container").innerHTML = content;
     }
 
     function updateEventModal(){
