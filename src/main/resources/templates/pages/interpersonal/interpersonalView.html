@@ -489,7 +489,11 @@
                 <p class="fs-5 text-white">${event.description.length > 0? event.description : "No description given"}</p>
             </div>
             `;
-        })
+        });
+
+        if(memberDetails.events.length === 0){
+            content = "<p class='text-center mt-3'>No events added.</p>";
+        }
 
         document.querySelector("#events-container").innerHTML = content;
     }
