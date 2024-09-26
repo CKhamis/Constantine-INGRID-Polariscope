@@ -16,6 +16,8 @@ This feature allows you to see an overview of all your members in sorted lists. 
 This feature allows you to see an organized list of all the members you have entered into Constantine Polariscope. On this screen, you will be able to filter through your members and go to their records.
 ### Member Records
 This feature allows you to view information about a specific member you add to Polariscope. You will be able to access a general overview about your relationship with the user, modify attributes related to the member, see all evaluations, add/ edit evaluations, and other settings.
+### Groups
+This feature allows you to combine like members into a grouping to see their collective events, statistics, and more. Members can only be placed into one group.
 ### Batch Evaluate
 This feature allows you to add evaluations to all members in a queue. This makes it simpler and faster if you want to add evaluations to everyone at once.
 ### Member Compare
