@@ -180,6 +180,9 @@
             .finally(() => {
                 spinner.classList.remove("d-block");
                 spinner.classList.add("d-none");
+
+                tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
             });
 
         function renderEvaluations(){
@@ -188,7 +191,7 @@
             evalList.forEach((eval) =>{
                 newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore});
                 scoreChartContent += `
-                <div class="mx-1">
+                <div class="mx-1" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="${eval.note}">
                     <div class="card d-flex justify-content-center" style="width: 5rem; height: 5rem;">
                         <p class="fs-2 fw-bold m-0 text-center">${eval.cscore}</p>
                     </div>
