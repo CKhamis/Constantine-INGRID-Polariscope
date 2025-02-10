@@ -3,7 +3,7 @@
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <img th:src="@{/icons/Logo.svg}" alt="Logo" width="30" class="d-inline-block align-text-top">
+                <img th:src="${spying} ? @{/icons/Logo.svg}: @{/icons/Logo Grey.svg}"  alt="Logo" width="30" class="d-inline-block align-text-top"/>
                 <strong>Polariscope</strong>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,9 +32,10 @@
         </div>
     </nav>
 </div>
+
 <div th:fragment="vertical" class="position-fixed d-flex flex-column flex-shrink-0 bg-body-tertiary" style="height:100vh; z-index: 99; box-sizing: border-box; top:0;">
     <a href="/interpersonal" class="d-block p-2 link-body-emphasis text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Polariscope">
-        <img src="/icons/Logo.svg" alt="Logo" width="45" class="d-inline-block align-text-top">
+        <img th:src="${spying} ? @{/icons/Logo.svg}: @{/icons/Logo Grey.svg}" alt="Logo" width="45" class="d-inline-block align-text-top">
     </a>
     <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
         <li class="nav-item">

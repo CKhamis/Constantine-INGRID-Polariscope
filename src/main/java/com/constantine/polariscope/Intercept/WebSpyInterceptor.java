@@ -23,19 +23,19 @@ public class WebSpyInterceptor implements HandlerInterceptor {
         // Generate the request report
         RequestReport report = new RequestReport(
                 "Polariscope",
-                request.getHeader("X-Forwarded-For"),
-                String.valueOf(request.getRemotePort()),
-                request.getRemoteUser(),
-                request.getLocale().toString(),
-                request.getSession().getId(),
-                request.getHeader("Cookie"),
-                request.getRequestURI(),
-                request.getRequestURL().toString(),
-                request.getMethod(),
-                request.getHeader("Accept"),
-                request.getProtocol(),
-                request.getScheme(),
-                request.getHeader("User-Agent")
+                ""+request.getHeader("X-Forwarded-For"),
+                ""+request.getRemotePort(),
+                ""+request.getRemoteUser(),
+                ""+request.getLocale().toString(),
+                ""+request.getSession().getId(),
+                ""+request.getHeader("Cookie"),
+                ""+request.getRequestURI(),
+                ""+request.getRequestURL().toString(),
+                ""+request.getMethod(),
+                ""+request.getHeader("Accept"),
+                ""+request.getProtocol(),
+                ""+request.getScheme(),
+                ""+request.getHeader("User-Agent")
         );
         RestTemplate restTemplate = new RestTemplate();
         String url = System.getenv("WEBSPY_URL");

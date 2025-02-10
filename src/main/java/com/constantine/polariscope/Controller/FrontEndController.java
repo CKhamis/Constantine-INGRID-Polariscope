@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.security.Principal;
 
+import static com.constantine.polariscope.Intercept.WebSpyInterceptor.spying;
+
 @Controller
 @AllArgsConstructor
 public class FrontEndController {
@@ -30,6 +32,7 @@ public class FrontEndController {
     @ModelAttribute
     public void addCommonAttributes(Model model, Principal principal) {
         model.addAttribute("version", VERSION);
+        model.addAttribute("spying", spying.get());
     }
 
     @GetMapping("/")
