@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Model;
 
+import com.constantine.polariscope.Util.EncryptUtil;
 import jakarta.persistence.*;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -13,14 +14,13 @@ import java.util.UUID;
 /**
  * Defines the relationships between two members
  */
-@NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
 public class Relationship {
     @Id
-    @NotNull
+    @NonNull
     @GeneratedValue
     private UUID id;
 
@@ -34,11 +34,31 @@ public class Relationship {
     @NotNull
     @ManyToOne
     private Member other;
+
     @NotNull
     private int health;
+
+    private Member.RelationshipType type;
 
     @NotNull
     private LocalDateTime created;
     @NotNull
     private LocalDateTime lastModified;
+
+    public Relationship() {
+        this.created = LocalDateTime.now();
+        this.lastModified = LocalDateTime.now();
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void encrypt() {
+        this.lastModified = LocalDateTime.now();
+        this.health = EncryptUtil.encryptInteger(this.health, this.id);
+    }
+
+    @PostLoad
+    private void decrypt() {
+        this.health = EncryptUtil.decryptInteger(this.health, this.id);
+    }
 }
