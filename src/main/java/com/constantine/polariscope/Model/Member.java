@@ -59,6 +59,10 @@ public class Member {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Evaluation> timeline;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "self", fetch = FetchType.LAZY)
+    private List<Relationship> relationships;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Event> events = new HashSet<>();
 
