@@ -21,9 +21,9 @@ public class RelationshipService {
     public List<Relationship> findAll(User author) {
         return relationshipRepository.findAllByAuthor_Id(author.getId());
     }
-    public Optional<Relationship> findById(UUID id) {return relationshipRepository.findById(id);}
+    public Optional<Relationship> findById(String id) {return relationshipRepository.findById(id);}
     public List<Relationship> findAllByMember(UUID memberId){return relationshipRepository.findAllBySelf_Id(memberId);}
-    public void delete(UUID id) {
+    public void delete(String id) {
         relationshipRepository.deleteById(id);
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.management.relation.RelationService;
 import java.awt.*;
 import java.io.IOException;
 import java.security.Principal;
@@ -37,6 +38,7 @@ public class InterpersonalAPI {
     private final ActivityLogService activityLogService;
     private final MemberGroupService memberGroupService;
     private final EventService eventService;
+    private final RelationshipService relationshipService;
 
     private User getCurrentUser(Principal principal) throws Exception{
         if(principal == null){
@@ -774,6 +776,74 @@ public class InterpersonalAPI {
         }catch (Exception e){
             // Auth issue or database issue
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Adding Event to Member", ResponseMessage.Severity.LOW, "OOPS! There was an error :("));
+        }
+    }
+
+    @PostMapping("/relationship/save")
+    public ResponseEntity<ResponseMessage> saveRelationship(@Valid @RequestBody MemberRelationshipForm formElements, Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            // Check if members are owned by existing user
+            Member self = memberService.findMember(formElements.getSelf());
+            Member other = memberService.findMember(formElements.getOther());
+
+            if(self.getAuthor().getId().equals(retrievedUser.getId()) && other.getAuthor().getId().equals(retrievedUser.getId())){
+                // Members are both created by logged in user. Check if there is a relationship that already exists
+                Optional<Relationship> optionalRelationship = relationshipService.findById(formElements.getSelf().toString() + formElements.getOther().toString());
+
+                if(optionalRelationship.isPresent()){
+                    // Relationship exists
+                    Relationship relationship = optionalRelationship.get();
+                    relationship.setHealth(formElements.getHealth());
+                    relationship.setType(formElements.getType());
+                    relationship.setLastModified(LocalDateTime.now());
+                    relationshipService.save(relationship);
+                }else{
+                    // Relationship does not exist. Create one
+                    relationshipService.save(new Relationship(retrievedUser, self, other, formElements.getHealth(), formElements.getType()));
+                }
+            }
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseMessage("Error Saving Relationship", ResponseMessage.Severity.LOW, "Authentication error"));
+
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Relationship", ResponseMessage.Severity.LOW, "OOOPS :)"));
+        }
+    }
+
+    @PostMapping("/relationship/delete")
+    public ResponseEntity<ResponseMessage> deleteRelationship(@RequestBody String id, Principal principal){
+        try{
+            User user = getCurrentUser(principal);
+
+            // Get id of evaluation
+            Optional<Relationship> optionalRelationship = relationshipService.findById(id);
+            if(optionalRelationship.isPresent()){
+                Relationship relationship = optionalRelationship.get();
+                if(relationship.getAuthor().getId().equals(user.getId())){
+                    relationshipService.delete(id);
+                }
+            }
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseMessage("Error Deleting Relationship", ResponseMessage.Severity.LOW, "Authentication error"));
+
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Saving Evaluation", ResponseMessage.Severity.LOW, "Error deleting evaluation"));
+        }
+    }
+
+    @GetMapping("/relationship/all")
+    public ResponseEntity<?> allRelationships(Principal principal){
+        try{
+            User retrievedUser = getCurrentUser(principal);
+
+            // Get all users from repository
+            List<Relationship> relationships = relationshipService.findAll(retrievedUser);
+
+            return ResponseEntity.ok(relationships);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Relationships", ResponseMessage.Severity.LOW, e.getMessage()));
         }
     }
 }

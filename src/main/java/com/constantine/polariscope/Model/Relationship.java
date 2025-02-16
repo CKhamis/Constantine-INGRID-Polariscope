@@ -14,15 +14,13 @@ import java.util.UUID;
 /**
  * Defines the relationships between two members
  */
-@AllArgsConstructor
 @Getter
 @Setter
 @Entity
 public class Relationship {
     @Id
-    @NonNull
-    @GeneratedValue
-    private UUID id;
+    @NotNull
+    private String id;
 
     @NotNull
     @ManyToOne
@@ -45,6 +43,17 @@ public class Relationship {
     @NotNull
     private LocalDateTime lastModified;
 
+    public Relationship(User author, Member self, Member other, int health, Member.RelationshipType type) {
+        this.id = self.getId().toString() + other.getId().toString();
+        this.author = author;
+        this.self = self;
+        this.other = other;
+        this.health = health;
+        this.type = type;
+        this.created = LocalDateTime.now();
+        this.lastModified = LocalDateTime.now();
+    }
+
     public Relationship() {
         this.created = LocalDateTime.now();
         this.lastModified = LocalDateTime.now();
@@ -54,11 +63,11 @@ public class Relationship {
     @PreUpdate
     private void encrypt() {
         this.lastModified = LocalDateTime.now();
-        this.health = EncryptUtil.encryptInteger(this.health, this.id);
+        this.health = EncryptUtil.encryptInteger(this.health, this.self.getId());
     }
 
     @PostLoad
     private void decrypt() {
-        this.health = EncryptUtil.decryptInteger(this.health, this.id);
+        this.health = EncryptUtil.decryptInteger(this.health, this.self.getId());
     }
 }

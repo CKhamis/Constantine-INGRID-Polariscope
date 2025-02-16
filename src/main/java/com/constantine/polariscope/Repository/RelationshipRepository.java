@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface RelationshipRepository extends JpaRepository<Relationship, UUID> {
+public interface RelationshipRepository extends JpaRepository<Relationship, String> {
     List<Relationship> findAllByAuthor_Id(UUID authorId);
     List<Relationship> findAllBySelf_Id(UUID selfId);
 }
