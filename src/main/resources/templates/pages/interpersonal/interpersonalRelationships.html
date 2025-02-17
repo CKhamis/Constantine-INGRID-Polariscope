@@ -39,6 +39,61 @@
     </div>
 </main>
 
+<div class="modal fade" id="relationship-modal" tabindex="-1" aria-labelledby="relationship-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="relationship-modal-label">Create / Edit Relationship</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to edit the one-way relationship between two Polariscope members. Please review carefully and proceed</p>
+                <div class="d-flex flex-row gap-3 align-items-center justify-content-center py-3 my-2" style="background: linear-gradient(#222, #333); border-bottom: 1px #495057 solid; border-top: 1px #495057 solid;">
+                    <div class="d-flex flex-column align-items-center">
+                        <img id="modal-person-1-img" class="profile-image" alt="person 1" src="/icons/Default%20User.svg" width="100px" />
+                        <p id="modal-person-1-name" class="mb-0 fw-bold">Person 1</p>
+                    </div>
+                    <img src="/icons/Arrow.svg" class="mx-3" style="transform: rotate(-90deg)" width="70px" alt="Arrow pointing right" />
+                    <div class="d-flex flex-column align-items-center">
+                        <img id="modal-person-2-img" class="profile-image" alt="person 2" src="/icons/Default%20User.svg" width="100px" />
+                        <p id="modal-person-2-name" class="mb-0 fw-bold">Person 2</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-row justify-content-between">
+                    <p id="modal-relationship-health"></p>
+                    <p id="modal-relationship-type"></p>
+                </div>
+                <div class="mt-2">
+                    <p class="fs-4 fw-bold">Relationship Details</p>
+                    <div class="mb-3">
+                        <label for="modal-relationship-type-form">Relationship Type</label>
+                        <select class="form-select" id="modal-relationship-type-form" name="relationship" required>
+                            <option value="" disabled="disabled">Select Relationship Type</option>
+                            <th:block th:each="relationshipType : ${relationshipTypes}">
+                                <option th:value="${relationshipType}" th:text="${relationshipType.toString().toLowerCase()}"></option>
+                            </th:block>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modal-relationship-health-form" class="form-label">Relationship Health</label>
+                        <input type="number" class="form-control" id="modal-relationship-health-form" required>
+                    </div>
+
+                    <input type="hidden" id="modal-self" />
+                    <input type="hidden" id="modal-other" />
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="saveRelationship()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
@@ -68,7 +123,8 @@
                 return Promise.all([data[0].json(), data[1].json()]);
             })
             .then(data => {
-                allMembers = data[0];
+                let members = data[0];
+                allMembers = members.sort((a, b) => a.firstName.localeCompare(b.firstName));
                 memberRelationships = data[1];
                 renderTable();
             })
@@ -90,6 +146,44 @@
             });
     }
 
+    function saveRelationship(){
+        let data = {
+            self: document.querySelector("#modal-self").value,
+            other: document.querySelector("#modal-other").value,
+            health: document.querySelector("#modal-relationship-health-form").value,
+            type: document.querySelector("#modal-relationship-type-form").value
+        }
+
+        let errorIcon = document.querySelector("#error-icon");
+        let toastId = createToast("Updating Relationship");
+        postData("/api/interpersonal/relationship/save", data)
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to edit relationship";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => {
+                refresh();
+            });
+    }
+
     function renderTable() {
         let headContent = `<th scope="col"></th>`;
         allMembers.forEach((member) => {
@@ -103,7 +197,7 @@
 
             allMembers.forEach((other) => {
                 let relationship = memberRelationships.find((rel) => rel.id === self.id + other.id);
-                let cellContent = `<div class="d-flex flex-row justify-content-center align-items-center"><button type="button" class="btn btn-secondary only-hover">Edit</button></div>`;
+                let cellContent = `<div class="d-flex flex-row justify-content-center align-items-center"><button type="button" class="btn btn-secondary only-hover" data-bs-toggle="modal" data-bs-target="#relationship-modal" onclick="renderModal('${self.id}', '${other.id}')">Edit</button></div>`;
 
                 bodyContent += `<td style="background-color: ${relationship? getColorGradient(relationship.health, -100, 100) : ((self.id !== other.id)? '#333' : '#000')}">${(self.id !== other.id)? cellContent : "<p class='text-center'>-</p>"}</td>`
             });
@@ -114,16 +208,50 @@
         document.querySelector("#table-body").innerHTML = bodyContent;
     }
 
+    function renderModal(selfId, otherId){
+        let self = allMembers.find((member) => member.id === selfId);
+        let other = allMembers.find((member) => member.id === otherId);
+        let relationship = memberRelationships.find((rel) => rel.id===`${self.id}${other.id}`);
+
+        document.querySelector("#modal-person-1-name").textContent = self.firstName + " " + self.lastName;
+        document.querySelector("#modal-person-2-name").textContent = other.firstName + " " + other.lastName;
+
+        if(relationship){
+            document.querySelector("#modal-relationship-health").textContent = `Relationship Health: ${relationship.health}`;
+            document.querySelector("#modal-relationship-type").textContent = `Relationship Type: ${relationship.type}`;
+
+            document.querySelector("#modal-relationship-health-form").value = relationship.health;
+            document.querySelector("#modal-relationship-type-form").value = relationship.type;
+        }else{
+            document.querySelector("#modal-relationship-health").textContent = "No relationship recorded";
+            document.querySelector("#modal-relationship-type").textContent = "";
+
+            document.querySelector("#modal-relationship-health-form").value = 0;
+            document.querySelector("#modal-relationship-type-form").value = "";
+        }
+
+        document.querySelector("#modal-person-1-img").src = `/api/interpersonal/member/profile-image/${self.id}`;
+        document.querySelector("#modal-person-2-img").src = `/api/interpersonal/member/profile-image/${other.id}`;
+
+        document.querySelector("#modal-self").value = self.id;
+        document.querySelector("#modal-other").value = other.id;
+    }
+
 </script>
 <style>
     .only-hover{
         opacity: 0;
         transition: opacity;
-        transition-duration: 500ms;
+        transition-duration: 400ms;3w222222223w23w3w332w32wws3sw3w33ww2333
     }
 
     .only-hover:hover{
         opacity: 100%;
+    }
+
+    .profile-image{
+        object-fit: cover;
+        aspect-ratio: 1 / 1;
     }
 </style>
 </body>
