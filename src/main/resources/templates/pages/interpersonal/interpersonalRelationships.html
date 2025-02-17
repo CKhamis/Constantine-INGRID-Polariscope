@@ -103,9 +103,9 @@
 
             allMembers.forEach((other) => {
                 let relationship = memberRelationships.find((rel) => rel.id === self.id + other.id);
-                let cellContent = `<button type="button" class="btn btn-primary">Primary</button>`;
+                let cellContent = `<div class="d-flex flex-row justify-content-center align-items-center"><button type="button" class="btn btn-secondary only-hover">Edit</button></div>`;
 
-                bodyContent += `<td style="background-color: ${relationship? getColorGradient(relationship.health, -100, 100) : 'red'}">${(self.id !== other.id)? cellContent : "x"}</td>`
+                bodyContent += `<td style="background-color: ${relationship? getColorGradient(relationship.health, -100, 100) : ((self.id !== other.id)? '#333' : '#000')}">${(self.id !== other.id)? cellContent : "<p class='text-center'>-</p>"}</td>`
             });
 
             bodyContent += `</tr>`;
@@ -115,5 +115,16 @@
     }
 
 </script>
+<style>
+    .only-hover{
+        opacity: 0;
+        transition: opacity;
+        transition-duration: 500ms;
+    }
+
+    .only-hover:hover{
+        opacity: 100%;
+    }
+</style>
 </body>
 </html>
