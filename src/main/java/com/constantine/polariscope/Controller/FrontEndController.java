@@ -100,6 +100,12 @@ public class FrontEndController {
         return "pages/interpersonal/interpersonalGroups";
     }
 
+    @GetMapping("/interpersonal/relationship")
+    public String getRelationships(Model model) {
+        model.addAttribute("relationshipTypes", Member.RelationshipType.values());
+        return "pages/interpersonal/interpersonalRelationships";
+    }
+
     @GetMapping("/interpersonal/import")
     public String getTransferTool() {
         return "pages/interpersonal/Import";

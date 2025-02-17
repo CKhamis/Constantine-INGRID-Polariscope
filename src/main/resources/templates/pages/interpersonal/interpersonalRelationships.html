@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xml:th="https://www.thymeleaf.org">
+<head th:replace="~{components/Header :: head('Relationships')}"></head>
+<body class="bg-2 text-1" data-bs-theme="dark">
+<div th:replace="~{components/Navigation :: vertical}"></div>
+<main class="bg-body px-0 d-flex flex-column" style="height:100vh; margin-left:60px;">
+    <nav class="p-4" style="background: linear-gradient(#222, #333); border-bottom: 1px #495057 solid;">
+        <div class="row mb-2">
+            <div class="col-md-10 d-flex flex-row align-items-center justify-content-start">
+                <img class="square-image me-2" style="height: 50px; width: 50px" alt="Feature image"
+                     th:src="@{/icons/Relationship.svg}">
+                <h1 class="fw-bold">Interpersonal Relationships</h1>
+            </div>
+            <div class="col-md-2 mb-2 d-flex flex-column align-items-start justify-content-center">
+                <p>view</p>
+            </div>
+        </div>
+        <p class="fs-5 mb-2">View the following spreadsheet below. Relationships are depicted as one-directional, with
+            the vertical column being the subject and the horizontal row being the subject's person of interest. Use
+            cells to input their relationship details.</p>
+    </nav>
+    <div class="p-4 h-100">
+
+        <div>
+            <div class="spinner-border d-none" role="status" id="loading-spinner">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px"/>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr id="table-head"></tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{components/Gradient :: gradient}"></div>
+<div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/External :: tooltips}"></div>
+<div th:replace="~{components/Network :: network}"></div>
+<div th:replace="~{components/Network :: data-upload}"></div>
+<div th:replace="~{components/Toast :: toast}"></div>
+<div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
+
+<script>
+    let allMembers, memberRelationships;
+
+    refresh();
+
+    function refresh() {
+        let spinner = document.querySelector("#loading-spinner");
+        let errorIcon = document.querySelector("#error-icon");
+        spinner.classList.add("d-block");
+        spinner.classList.remove("d-none");
+
+        const memberListFetch = fetch("/api/interpersonal/member/all", {});
+        const relFetch = fetch("/api/interpersonal/relationship/all", {});
+        Promise.all([memberListFetch, relFetch])
+            .then(responses => {
+                return Promise.all(responses);
+            })
+            .then(data => {
+                return Promise.all([data[0].json(), data[1].json()]);
+            })
+            .then(data => {
+                allMembers = data[0];
+                memberRelationships = data[1];
+                renderTable();
+            })
+            .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                    });
+            })
+            .finally(() => {
+                spinner.classList.remove("d-block");
+                spinner.classList.add("d-none");
+            });
+    }
+
+    function renderTable() {
+        let headContent = `<th scope="col"></th>`;
+        allMembers.forEach((member) => {
+            headContent += `<th scope="col"><p style="transform: rotate(-45deg); margin-bottom:40px">${member.firstName + " " + member.lastName}</p></th>`
+        });
+        document.querySelector("#table-head").innerHTML = headContent;
+
+        let bodyContent = "";
+        allMembers.forEach((self) => {
+            bodyContent += `<tr><td class="fw-bold">${self.firstName + " " + self.lastName}</td>`;
+
+            allMembers.forEach((other) => {
+                let relationship = memberRelationships.find((rel) => rel.id === self.id + other.id);
+                let cellContent = `<button type="button" class="btn btn-primary">Primary</button>`;
+
+                bodyContent += `<td style="background-color: ${relationship? getColorGradient(relationship.health, -100, 100) : 'red'}">${(self.id !== other.id)? cellContent : "x"}</td>`
+            });
+
+            bodyContent += `</tr>`;
+        });
+
+        document.querySelector("#table-body").innerHTML = bodyContent;
+    }
+
+</script>
+</body>
+</html>

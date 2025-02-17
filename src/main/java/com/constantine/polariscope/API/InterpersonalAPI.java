@@ -799,9 +799,12 @@ public class InterpersonalAPI {
                     relationship.setType(formElements.getType());
                     relationship.setLastModified(LocalDateTime.now());
                     relationshipService.save(relationship);
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Relationship Saved", ResponseMessage.Severity.LOW, "Details have been updated"));
+
                 }else{
                     // Relationship does not exist. Create one
                     relationshipService.save(new Relationship(retrievedUser, self, other, formElements.getHealth(), formElements.getType()));
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Relationship Saved", ResponseMessage.Severity.LOW, "New relationship added"));
                 }
             }
 
