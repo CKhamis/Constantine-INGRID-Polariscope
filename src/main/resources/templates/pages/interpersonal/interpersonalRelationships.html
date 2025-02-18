@@ -4,7 +4,7 @@
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
 <main class="bg-body px-0 d-flex flex-column" style="height:100vh; margin-left:60px;">
-    <nav class="p-4" style="background: linear-gradient(#222, #333); border-bottom: 1px #495057 solid;">
+    <nav class="pt-4 px-4" style="background: linear-gradient(#222, #333); border-bottom: 1px #495057 solid;">
         <div class="row mb-2">
             <div class="col-md-10 d-flex flex-row align-items-center justify-content-start">
                 <img class="square-image me-2" style="height: 50px; width: 50px" alt="Feature image"
@@ -18,23 +18,38 @@
         <p class="fs-5 mb-2">View the following spreadsheet below. Relationships are depicted as one-directional, with
             the vertical column being the subject and the horizontal row being the subject's person of interest. Use
             cells to input their relationship details.</p>
+
+        <ul class="nav nav-underline" id="nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fs-4" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-tab-pane" type="button" role="tab" aria-controls="table-tab-pane" aria-selected="true">Table</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fs-4" id="graph-tab" data-bs-toggle="tab" data-bs-target="#graph-tab-pane" type="button" role="tab" aria-controls="graph-tab-pane" aria-selected="false">Graph</button>
+            </li>
+        </ul>
+
     </nav>
     <div class="p-4 h-100">
-
-        <div>
-            <div class="spinner-border d-none" role="status" id="loading-spinner">
-                <span class="visually-hidden">Loading...</span>
+        <div class="tab-content" id="tab-content">
+            <div class="tab-pane fade show active" id="table-tab-pane" role="tabpanel" aria-labelledby="table-tab" tabindex="0">
+                <div>
+                    <div class="spinner-border d-none" role="status" id="loading-spinner">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <img src="/icons/Error.svg" id="error-icon" alt="error" class="profile-image d-none" height="32px"/>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr id="table-head"></tr>
+                        </thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
             </div>
-            <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px"/>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                <tr id="table-head"></tr>
-                </thead>
-                <tbody id="table-body"></tbody>
-            </table>
+            <div class="tab-pane fade" id="graph-tab-pane" role="tabpanel" aria-labelledby="graph-tab" tabindex="0">
+                Graph view
+            </div>
         </div>
     </div>
 </main>
@@ -101,6 +116,8 @@
 <div th:replace="~{components/Network :: data-upload}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
+<script src="/external/cytoscape.min.js"></script>
+
 
 <script>
     let allMembers, memberRelationships;
@@ -242,7 +259,7 @@
     .only-hover{
         opacity: 0;
         transition: opacity;
-        transition-duration: 400ms;3w222222223w23w3w332w32wws3sw3w33ww2333
+        transition-duration: 400ms;
     }
 
     .only-hover:hover{
