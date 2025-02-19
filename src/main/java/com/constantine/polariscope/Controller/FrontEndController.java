@@ -19,6 +19,7 @@ import static com.constantine.polariscope.Intercept.WebSpyInterceptor.spying;
 @AllArgsConstructor
 public class FrontEndController {
     private final UserService userService;
+    private final MemberGroupService memberGroupService;
     private static final String VERSION = "1.9.0";
 
     private User getCurrentUser(Principal principal){
@@ -101,8 +102,9 @@ public class FrontEndController {
     }
 
     @GetMapping("/interpersonal/relationship")
-    public String getRelationships(Model model) {
+    public String getRelationships(Model model, Principal principal) {
         model.addAttribute("relationshipTypes", Member.RelationshipType.values());
+        model.addAttribute("groups", memberGroupService.findAll(getCurrentUser(principal)));
         return "pages/interpersonal/interpersonalRelationships";
     }
 

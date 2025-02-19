@@ -12,32 +12,40 @@
                 <h1 class="fw-bold">Interpersonal Relationships</h1>
             </div>
             <div class="col-md-2 mb-2 d-flex flex-column align-items-start justify-content-center">
-                <p>view</p>
-            </div>
-        </div>
-        <p class="fs-5 mb-2">View the following spreadsheet below. Relationships are depicted as one-directional, with
-            the vertical column being the subject and the horizontal row being the subject's person of interest. Use
-            cells to input their relationship details.</p>
-
-        <ul class="nav nav-underline" id="nav-tabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active fs-4" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-tab-pane" type="button" role="tab" aria-controls="table-tab-pane" aria-selected="true">Table</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link fs-4" id="graph-tab" data-bs-toggle="tab" data-bs-target="#graph-tab-pane" type="button" role="tab" aria-controls="graph-tab-pane" aria-selected="false">Graph</button>
-            </li>
-        </ul>
-
-    </nav>
-    <div class="p-4 h-100">
-        <div class="tab-content" id="tab-content">
-            <div class="tab-pane fade show active" id="table-tab-pane" role="tabpanel" aria-labelledby="table-tab" tabindex="0">
                 <div>
                     <div class="spinner-border d-none" role="status" id="loading-spinner">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <img src="/icons/Error.svg" id="error-icon" alt="error" class="profile-image d-none" height="32px"/>
                 </div>
+            </div>
+        </div>
+        <p class="fs-5 mb-2">View the following spreadsheet below. Relationships are depicted as one-directional, with
+            the vertical column being the subject and the horizontal row being the subject's person of interest. Use
+            cells to input their relationship details.</p>
+
+        <div class="d-flex flex-row justify-content-between align-items-center">
+            <ul class="nav nav-underline" id="nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fs-4" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-tab-pane" type="button" role="tab" aria-controls="table-tab-pane" aria-selected="true">Table</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fs-4" id="graph-tab" data-bs-toggle="tab" data-bs-target="#graph-tab-pane" type="button" role="tab" aria-controls="graph-tab-pane" aria-selected="false">Graph</button>
+                </li>
+            </ul>
+            <div class="flex-shrink-0">
+                <select class="form-select" id="select-group" name="group" onchange="refresh()" required>
+                    <option value="">All Members</option>
+                    <th:block th:each="group : ${groups}">
+                        <option th:value="${group.getId()}" th:text="${group.getName()}"></option>
+                    </th:block>
+                </select>
+            </div>
+        </div>
+    </nav>
+    <div class="p-4 h-100">
+        <div class="tab-content" id="tab-content">
+            <div class="tab-pane fade show active" id="table-tab-pane" role="tabpanel" aria-labelledby="table-tab" tabindex="0">
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
@@ -83,7 +91,7 @@
                     <div class="mb-3">
                         <label for="modal-relationship-type-form">Relationship Type</label>
                         <select class="form-select" id="modal-relationship-type-form" name="relationship" required>
-                            <option value="" disabled="disabled">Select Relationship Type</option>
+                            <option value="" disabled>Select Relationship Type</option>
                             <th:block th:each="relationshipType : ${relationshipTypes}">
                                 <option th:value="${relationshipType}" th:text="${relationshipType.toString().toLowerCase()}"></option>
                             </th:block>
@@ -130,7 +138,14 @@
         spinner.classList.add("d-block");
         spinner.classList.remove("d-none");
 
-        const memberListFetch = fetch("/api/interpersonal/member/all", {});
+        let memberListFetch = fetch("/api/interpersonal/member/all", {});
+
+        // Get group selected
+        let selectedGroup = document.querySelector("#select-group").value;
+        if(selectedGroup.length > 0){
+            memberListFetch = fetch("/api/interpersonal/member/group/" + selectedGroup, {});
+        }
+
         const relFetch = fetch("/api/interpersonal/relationship/all", {});
         Promise.all([memberListFetch, relFetch])
             .then(responses => {
@@ -204,19 +219,24 @@
     function renderTable() {
         let headContent = `<th scope="col"></th>`;
         allMembers.forEach((member) => {
-            headContent += `<th scope="col"><p style="transform: rotate(-45deg); margin-bottom:40px">${member.firstName + " " + member.lastName}</p></th>`
+            headContent += `
+                <th class="px-0">
+                    <p class="fs-6 mb-0 text-center text-truncate">${member.firstName}</p>
+                    <p class="fs-6 mb-0 text-center text-truncate">${member.lastName}</p>
+                </th>`
+            //headContent += `<th scope="col"><img class="profile-image" alt="${member.firstName}" src="/api/interpersonal/member/profile-image/${member.id}" width="50px" /></th>`
         });
         document.querySelector("#table-head").innerHTML = headContent;
 
         let bodyContent = "";
         allMembers.forEach((self) => {
-            bodyContent += `<tr><td class="fw-bold">${self.firstName + " " + self.lastName}</td>`;
+            bodyContent += `<tr><td><p class="p-0 m-0 text-end fw-bold">${self.firstName + " " + self.lastName}</p></td>`;
 
             allMembers.forEach((other) => {
                 let relationship = memberRelationships.find((rel) => rel.id === self.id + other.id);
                 let cellContent = `<div class="d-flex flex-row justify-content-center align-items-center"><button type="button" class="btn btn-secondary only-hover" data-bs-toggle="modal" data-bs-target="#relationship-modal" onclick="renderModal('${self.id}', '${other.id}')">Edit</button></div>`;
 
-                bodyContent += `<td style="background-color: ${relationship? getColorGradient(relationship.health, -100, 100) : ((self.id !== other.id)? '#333' : '#000')}">${(self.id !== other.id)? cellContent : "<p class='text-center'>-</p>"}</td>`
+                bodyContent += `<td class="p-0" style="background-color: ${relationship? getColorGradient(relationship.health, -100, 100) : ((self.id !== other.id)? '#333' : '#000')}">${(self.id !== other.id)? cellContent : "<p class='text-center p-0'>-</p>"}</td>`
             });
 
             bodyContent += `</tr>`;
