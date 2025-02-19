@@ -155,6 +155,30 @@
     </div>
 </div>
 
+<div class="modal fade" id="imprintRelationshipModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Imprint Relationships</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>This will permanently alter the first member with a relationship marked as 'self'. Please verify the correct member before continuing.</p>
+
+                <div class="progress flex-grow-1" role="progressbar" aria-label="Progress bar" aria-valuemin="0" aria-valuemax="100" style="height: 20px">
+                    <div class="progress-bar" style="width: 0; transition: width 2s ease, background-color 2s ease;" id="imprint-progress-bar"></div>
+                </div>
+                <p id="transfer-log"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="beginImprint()">Begin Imprint</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
@@ -164,7 +188,7 @@
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <script>
-    let enums, events;
+    let enums, events, allMembers;
 
     displayMainMenu();
     function displayMainMenu(){
@@ -210,6 +234,11 @@
                 <a class="col-md-6 col-lg-3 mb-4 px-3" href="/interpersonal/import">
                     <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
                         <p class="fs-4 fs-bold text-center m-0">Import Members</p>
+                    </div>
+                </a>
+                <a class="col-md-6 col-lg-3 mb-4 px-3" onclick="displayRelationshipImprint()">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center py-4 bevel-lg" role="button">
+                        <p class="fs-4 fs-bold text-center m-0">Imprint Relationships</p>
                     </div>
                 </a>
             </div>
@@ -554,6 +583,131 @@
                     });
             })
             .finally(() => {displayGroups()});
+    }
+
+    function displayRelationshipImprint(){
+        document.querySelector("#title").textContent = `Polariscope Settings > Member Settings > Relationship Imprint`;
+        const activityFetch = fetch('/api/interpersonal/member/all')
+
+        let content = "";
+        Promise.all([activityFetch])
+            .then(responses => {
+                return Promise.all(responses);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                allMembers = data[0];
+                let selectedMember = allMembers.find((member) => member.relationship === "SELF");
+
+                if(selectedMember === undefined || selectedMember === null){
+                    content =  `
+                    <h2 class="text-center">Please mark exactly one member as "Self" to continue</h2>
+                    `;
+                    return;
+                }
+
+                let tableContent = "";
+                allMembers.forEach((member) => {
+                    tableContent += `
+                    <tr>
+                        <td scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}?=${new Date().getTime()}"></td>
+                        <td style="vertical-align: middle" class="fw-bold">${member.firstName} ${member.lastName}</td>
+                        <td style="vertical-align: middle" class="fw-bold">${(member.group? member.group.name : "None")}</td>
+                        <td style="vertical-align: middle" class="fw-bold">${member.relationship}</td>
+                        <td style="vertical-align: middle" class="fw-bold">${member.lastEvaluation? member.lastEvaluation.cscore : "None"}</td>
+                    </tr>
+                    `;
+                });
+
+                content = `
+                <div class="row">
+                    <div class="col-md-3 col-lg-2 mb-2">
+                        <a onclick="displayMemberSettings()" class="text-decoration-underline">< Back to Member Settings</a>
+
+                        <div class="border-1 p-3 bg-body-tertiary mt-5">
+                            <p class="fs-2 fw-bold">About</p>
+                            <p>This page will convert your latest cScore values from all members into relationships for your personal member. This is a shortcut intended to make the relationship graph easier to use.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-9 col-lg-10">
+                        <div class="d-flex flex-row justify-content-between mb-2">
+                            <div class="d-flex flex-row justify-content-start align-items-center">
+                                <p class="fs-3 fw-bold mb-0">Importing to: </p>
+                                <a class="d-flex flex-row justify-content-start align-items-center bg-body-tertiary ms-3 p-2" href="/interpersonal/member/view/${selectedMember.id}">
+                                    <img class="square-image" style="height: 25px; width: 25px" alt="profile image" src="/api/interpersonal/member/profile-image/${selectedMember.id}?=${new Date().getTime()}">
+                                    <p class="fw-bold fs-5 ms-2 mb-0">${selectedMember.firstName} ${selectedMember.lastName}</p>
+                                </a>
+                            </div>
+                            <button class="btn btn-secondary" onclick="imprintRelationships()" data-bs-toggle="modal" data-bs-target="#imprintRelationshipModal">Imprint</button>
+                        </div>
+                        <table class="table table-responsive">
+                          <thead>
+                            <tr>
+                              <th scope="col">Icon</th>
+                              <th scope="col">Name</th>
+                              <th scope="col">Group</th>
+                              <th scope="col">Relationship</th>
+                              <th scope="col">cScore</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            ${tableContent}
+                          </tbody>
+                        </table>
+                    </div>
+                </div>
+                `;
+            })
+            .catch((e) => {
+                console.log(e);
+                content =  `
+                <h2 class="text-center">OOPS! There was an error :(</h2>
+                `;
+            })
+            .finally(() => {
+                document.querySelector("#main-content").innerHTML = content;
+            });
+    }
+
+    let memberQueue, memberLength;
+    function beginImprint(){
+        memberQueue = allMembers.filter((member) => member.relationship !== "SELF");
+        memberLength = memberQueue.length;
+        document.querySelector("#imprint-progress-bar").style.width = '0%';
+        imprintRelationships();
+    }
+
+    function imprintRelationships(){
+        if(memberQueue.length === 0){
+            document.querySelector("#transfer-log").innerHTML = "Transfer Complete";
+            document.querySelector("#imprint-progress-bar").classList.add("bg-success");
+            document.querySelector("#imprint-progress-bar").style.width = '100%';
+        }
+
+        let member = memberQueue[0];
+        document.querySelector("#transfer-log").innerHTML = 'Transferring ' + member.firstName + ' ' + member.lastName + ` <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
+
+
+        let relationship = {
+            self: allMembers.find((member) => member.relationship === "SELF").id,
+            other: member.id,
+            health: member.lastEvaluation.cscore,
+            type: member.relationship
+        }
+        postData("/api/interpersonal/relationship/save", relationship)
+            .then((r) => {
+                console.log(r);
+            })
+            .catch((e) => {
+                console.log(e)
+            })
+            .finally(() => {
+                memberQueue.shift();
+                document.querySelector("#imprint-progress-bar").style.width = ((memberLength - memberQueue.length) / memberLength) * 100 + '%';
+                imprintRelationships();
+            })
     }
 
     function modalResetCount(){

@@ -195,6 +195,12 @@ public class Member {
         NONE
     }
 
+    /*
+        To update MySQL table constraint:
+        ALTER TABLE member DROP CONSTRAINT member_chk_1;
+        ALTER TABLE member ADD CONSTRAINT `member_chk_1` CHECK ((`relationship` between 0 and 8));
+     */
+
     public enum RelationshipType{
         FAMILY,
         COWORKER,
@@ -203,5 +209,7 @@ public class Member {
         ENEMY,
         PARTNER,
         INACTIVE,
+        SELF,
+        TEACHER,
     }
 }
