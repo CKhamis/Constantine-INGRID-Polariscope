@@ -137,8 +137,10 @@
             {
                 selector: 'node',
                 style: {
-                    'background-color': '#666',
-                    'label': 'data(id)'
+                    'background-color': 'data(color)',
+                    'label': 'data(name)',
+                    'color': 'white',
+                    'text-wrap': 'ellipsis'
                 }
             },
 
@@ -146,19 +148,13 @@
                 selector: 'edge',
                 style: {
                     'width': 3,
-                    'line-color': '#ccc',
+                    'line-color': 'data(color)',
                     'target-arrow-color': '#ccc',
-                    'target-arrow-shape': 'triangle',
+                    'target-arrow-shape': 'chevron',
                     'curve-style': 'bezier'
                 }
             }
         ],
-
-        layout: {
-            name: 'grid',
-            rows: 1
-        }
-
     });
 
     refresh();
@@ -309,13 +305,17 @@
     function renderGraph(){
         let toAdd = [];
         allMembers.forEach((member) => {
-            toAdd.push({group: 'nodes', data: {id: member.id}, position: {x: 100, y: 100}})
+            toAdd.push({group: 'nodes', data: {id: member.id, name: member.firstName + " " + member.lastName, color: getColorGradient(member.lastEvaluation.cscore, -100, 100)}})
         });
 
         memberRelationships.forEach((relationship) => {
-            toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id } });
+            toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100) } });
         });
         cy.add(toAdd);
+
+        let layout = cy.layout({ name: 'cose', animate: true, padding: 10, fit: true,  nodeRepulsion: function( node ){ return 800408; }});
+
+        layout.run();
     }
 
 </script>
