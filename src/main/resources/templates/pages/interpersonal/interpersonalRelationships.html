@@ -43,8 +43,8 @@
             </div>
         </div>
     </nav>
-    <div class="p-4 h-100">
-        <div class="tab-content" id="tab-content">
+    <div class="p-0 h-100">
+        <div class="tab-content h-100" id="tab-content">
             <div class="tab-pane fade show active" id="table-tab-pane" role="tabpanel" aria-labelledby="table-tab" tabindex="0">
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -55,8 +55,8 @@
                     </table>
                 </div>
             </div>
-            <div class="tab-pane fade" id="graph-tab-pane" role="tabpanel" aria-labelledby="graph-tab" tabindex="0">
-                Graph view
+            <div class="tab-pane fade flex-grow-1 h-100" id="graph-tab-pane" role="tabpanel" aria-labelledby="graph-tab" tabindex="0">
+                <div class="h-100" id="graph-container"></div>
             </div>
         </div>
     </div>
@@ -129,6 +129,37 @@
 
 <script>
     let allMembers, memberRelationships;
+    let cy = cytoscape({
+
+        container: document.getElementById('graph-container'),
+
+        style: [ // the stylesheet for the graph
+            {
+                selector: 'node',
+                style: {
+                    'background-color': '#666',
+                    'label': 'data(id)'
+                }
+            },
+
+            {
+                selector: 'edge',
+                style: {
+                    'width': 3,
+                    'line-color': '#ccc',
+                    'target-arrow-color': '#ccc',
+                    'target-arrow-shape': 'triangle',
+                    'curve-style': 'bezier'
+                }
+            }
+        ],
+
+        layout: {
+            name: 'grid',
+            rows: 1
+        }
+
+    });
 
     refresh();
 
@@ -159,6 +190,7 @@
                 allMembers = members.sort((a, b) => a.firstName.localeCompare(b.firstName));
                 memberRelationships = data[1];
                 renderTable();
+                renderGraph();
             })
             .catch((response) => {
                 errorIcon.classList.add("d-block");
@@ -272,6 +304,18 @@
 
         document.querySelector("#modal-self").value = self.id;
         document.querySelector("#modal-other").value = other.id;
+    }
+
+    function renderGraph(){
+        let toAdd = [];
+        allMembers.forEach((member) => {
+            toAdd.push({group: 'nodes', data: {id: member.id}, position: {x: 100, y: 100}})
+        });
+
+        memberRelationships.forEach((relationship) => {
+            toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id } });
+        });
+        cy.add(toAdd);
     }
 
 </script>
