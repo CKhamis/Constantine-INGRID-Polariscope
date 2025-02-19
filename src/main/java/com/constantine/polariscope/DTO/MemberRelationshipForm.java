@@ -18,8 +18,7 @@ public class MemberRelationshipForm {
     private UUID self;
     @NotNull
     private UUID other;
-    @NotNull
-    private int health;
+    private Integer health;
     @NotNull
     private Member.RelationshipType type;
 

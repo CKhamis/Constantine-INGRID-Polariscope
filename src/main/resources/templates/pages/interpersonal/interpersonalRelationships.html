@@ -110,7 +110,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="saveRelationship()">Save</button>
+                <button type="button" class="btn btn-info" data-bs-dismiss="modal" onclick="saveRelationship()">Save</button>
+                <button type="button" class="btn btn-primary" onclick="saveRelationship(true)">Save & Next</button>
             </div>
         </div>
     </div>
@@ -149,7 +150,7 @@
                 style: {
                     'width': 3,
                     'line-color': 'data(color)',
-                    'target-arrow-color': '#ccc',
+                    'target-arrow-color': 'data(color)',
                     'target-arrow-shape': 'chevron',
                     'curve-style': 'bezier'
                 }
@@ -183,8 +184,9 @@
             })
             .then(data => {
                 let members = data[0];
-                allMembers = members.sort((a, b) => a.firstName.localeCompare(b.firstName));
-                memberRelationships = data[1];
+                allMembers = members.sort((a, b) => (a.firstName + a.lastName).localeCompare(b.firstName + b.lastName));
+                let relationships = data[1];
+                memberRelationships = relationships.sort((a, b) => a.id.localeCompare(b.id));
                 renderTable();
                 renderGraph();
             })
@@ -206,7 +208,7 @@
             });
     }
 
-    function saveRelationship(){
+    function saveRelationship(next=false){
         let data = {
             self: document.querySelector("#modal-self").value,
             other: document.querySelector("#modal-other").value,
@@ -222,6 +224,24 @@
                 document.getElementById(`${toastId}-title`).innerText = message.title;
                 document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
                 document.getElementById(`${toastId}-loading`).style.color = "green";
+
+                if(next){
+                    let otherIndex = allMembers.findIndex((m) => m.id === data.other)
+
+                    console.log(otherIndex);
+
+                    //let nextIndex = Math.min(Math.max(otherIndex+1, 0), allMembers.length);
+                    let nextIndex = (otherIndex+1) % allMembers.length;
+                    console.log(nextIndex);
+
+                    if(allMembers[nextIndex].id === data.self){
+                        console.log("self skip")
+                        nextIndex = (otherIndex+2) % allMembers.length;
+                    }
+
+                    //Math.min(Math.max(allMembers.filter((m) => data.self !== m.id).findIndex((m) => m.id === data.other) + 1, 0), allMembers.length);
+                    renderModal(data.self, allMembers[nextIndex].id);
+                }
             })
             .catch((response) => {
                 errorIcon.classList.add("d-block");
@@ -292,7 +312,7 @@
             document.querySelector("#modal-relationship-type").textContent = "";
 
             document.querySelector("#modal-relationship-health-form").value = 0;
-            document.querySelector("#modal-relationship-type-form").value = "";
+            //document.querySelector("#modal-relationship-type-form").value = "";
         }
 
         document.querySelector("#modal-person-1-img").src = `/api/interpersonal/member/profile-image/${self.id}`;
@@ -305,7 +325,7 @@
     function renderGraph(){
         let toAdd = [];
         allMembers.forEach((member) => {
-            toAdd.push({group: 'nodes', data: {id: member.id, name: member.firstName + " " + member.lastName, color: getColorGradient(member.lastEvaluation.cscore, -100, 100)}})
+            toAdd.push({group: 'nodes', data: {id: member.id, name: member.firstName + " " + member.lastName, color: getColorGradient((member.lastEvaluation.cscore === undefined ||  member.lastEvaluation.cscore === null? "#333" : member.lastEvaluation.cscore), -100, 100)}})
         });
 
         memberRelationships.forEach((relationship) => {

@@ -793,6 +793,13 @@ public class InterpersonalAPI {
                 Optional<Relationship> optionalRelationship = relationshipService.findById(formElements.getSelf().toString() + formElements.getOther().toString());
 
                 if(optionalRelationship.isPresent()){
+                    // Check if deleting
+                    if(formElements.getHealth() == null){
+                        relationshipService.delete(formElements.getSelf().toString() + formElements.getOther().toString());
+                        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Relationship Deleted", ResponseMessage.Severity.LOW, "Details have been updated"));
+                    }
+
+
                     // Relationship exists
                     Relationship relationship = optionalRelationship.get();
                     relationship.setHealth(formElements.getHealth());
