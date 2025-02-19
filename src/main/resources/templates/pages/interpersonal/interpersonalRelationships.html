@@ -110,6 +110,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" onclick="skipRelationship()">Skip</button>
                 <button type="button" class="btn btn-info" data-bs-dismiss="modal" onclick="saveRelationship()">Save</button>
                 <button type="button" class="btn btn-primary" onclick="saveRelationship(true)">Save & Next</button>
             </div>
@@ -208,6 +209,15 @@
             });
     }
 
+    function skipRelationship(){
+        let otherIndex = allMembers.findIndex((m) => m.id === document.querySelector("#modal-other").value)
+        let nextIndex = (otherIndex+1) % allMembers.length;
+        if(allMembers[nextIndex].id === document.querySelector("#modal-self").value){
+            nextIndex = (otherIndex+2) % allMembers.length;
+        }
+        renderModal(document.querySelector("#modal-self").value, allMembers[nextIndex].id);
+    }
+
     function saveRelationship(next=false){
         let data = {
             self: document.querySelector("#modal-self").value,
@@ -227,19 +237,10 @@
 
                 if(next){
                     let otherIndex = allMembers.findIndex((m) => m.id === data.other)
-
-                    console.log(otherIndex);
-
-                    //let nextIndex = Math.min(Math.max(otherIndex+1, 0), allMembers.length);
                     let nextIndex = (otherIndex+1) % allMembers.length;
-                    console.log(nextIndex);
-
                     if(allMembers[nextIndex].id === data.self){
-                        console.log("self skip")
                         nextIndex = (otherIndex+2) % allMembers.length;
                     }
-
-                    //Math.min(Math.max(allMembers.filter((m) => data.self !== m.id).findIndex((m) => m.id === data.other) + 1, 0), allMembers.length);
                     renderModal(data.self, allMembers[nextIndex].id);
                 }
             })
@@ -269,8 +270,7 @@
         allMembers.forEach((member) => {
             headContent += `
                 <th class="px-0">
-                    <p class="fs-6 mb-0 text-center text-truncate">${member.firstName}</p>
-                    <p class="fs-6 mb-0 text-center text-truncate">${member.lastName}</p>
+                    <p class="fs-6 mb-0 text-center text-truncate">${member.firstName.charAt(0)}${member.lastName.charAt(0)}</p>
                 </th>`
             //headContent += `<th scope="col"><img class="profile-image" alt="${member.firstName}" src="/api/interpersonal/member/profile-image/${member.id}" width="50px" /></th>`
         });
@@ -282,7 +282,7 @@
 
             allMembers.forEach((other) => {
                 let relationship = memberRelationships.find((rel) => rel.id === self.id + other.id);
-                let cellContent = `<div class="d-flex flex-row justify-content-center align-items-center"><button type="button" class="btn btn-secondary only-hover" data-bs-toggle="modal" data-bs-target="#relationship-modal" onclick="renderModal('${self.id}', '${other.id}')">Edit</button></div>`;
+                let cellContent = `<div class="d-flex flex-row justify-content-center align-items-center"><button type="button" class="btn btn-secondary only-hover btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#relationship-modal" onclick="renderModal('${self.id}', '${other.id}')">Edit</button></div>`;
 
                 bodyContent += `<td class="p-0" style="background-color: ${relationship? getColorGradient(relationship.health, -100, 100) : ((self.id !== other.id)? '#333' : '#000')}">${(self.id !== other.id)? cellContent : "<p class='text-center p-0'>-</p>"}</td>`
             });
