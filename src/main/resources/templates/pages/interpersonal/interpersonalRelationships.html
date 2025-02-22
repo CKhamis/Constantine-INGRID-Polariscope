@@ -358,7 +358,7 @@
 
         cy.add(toAdd);
 
-
+        // Layout
         cy.nodes(':parent').forEach((parent) => {
             let child_layout = parent.descendants().layout({
                 name: 'circle',
@@ -368,15 +368,16 @@
         });
 
         // might seem to also call on parent nodes
-        let orphan_layout = cy.elements().nodes().orphans().layout({
+        let orphan_layout = cy.elements().orphans().layout({
             name: 'cose',
-            radius: cy.elements().nodes().orphans().length  * 25
+            fit: true,
+            animation: false
         });
 
         orphan_layout.run();
 
         // Does not work yet...
-        // let parent_layout = cy.elements().nodes().ancestors().layout({
+        // let parent_layout = cy.elements().nodes().parents().layout({
         //     name: 'random',
         // });
         //
