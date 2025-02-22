@@ -325,18 +325,37 @@
     }
 
     function renderGraph(){
+        cy.nodes().remove();
+
         let toAdd = [];
         allMembers.forEach((member) => {
-            toAdd.push({group: 'nodes', data: {id: member.id, name: member.firstName + " " + member.lastName, parent: (member.group? member.group.id : ""), color: getColorGradient((member.lastEvaluation === undefined ||  member.lastEvaluation.cscore === null? "#333" : member.lastEvaluation.cscore), -100, 100)}})
+            let lastEval = member.lastEvaluation? member.lastEvaluation : member.mostRecentEval; //todo: [polish] unify the last eval and most recent eval
+            toAdd.push({group: 'nodes', data: {id: member.id, name: member.firstName + " " + member.lastName, parent: (member.group? member.group.id : ""), color: getColorGradient((lastEval === undefined ||  lastEval.cscore === null? "#333" : lastEval.cscore), -100, 100)}})
         });
 
-        enums.groups.forEach((group) => {
-            toAdd.push({group: 'nodes', data: {id: group.id, name: group.name, color: 'rgba(' + group.color.red + ', ' + group.color.green + ', ' + group.color.blue + ', .2)'}});
-        });
+        if(document.querySelector("#select-group").value === ""){
+            enums.groups.forEach((group) => {
+                toAdd.push({group: 'nodes', data: {id: group.id, name: group.name, color: 'rgba(' + group.color.red + ', ' + group.color.green + ', ' + group.color.blue + ', .2)'}});
+            });
+        }else{
+            let selectedGroup = enums.groups.find((g) => g.id === document.querySelector("#select-group").value);
+            toAdd.push({group: 'nodes', data: {id: selectedGroup.id, name: selectedGroup.name, color: 'rgba(' + selectedGroup.color.red + ', ' + selectedGroup.color.green + ', ' + selectedGroup.color.blue + ', .2)'}});
+        }
 
-        memberRelationships.forEach((relationship) => {
-            toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100) } });
-        });
+        if(document.querySelector("#select-group").value === ""){
+            memberRelationships.forEach((relationship) => {
+                toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100) } });
+            });
+        }else{
+            memberRelationships.forEach((relationship) => {
+                let person1 = allMembers.find((x) => x.id === relationship.self.id);
+                let person2 = allMembers.find((x) => x.id === relationship.other.id);
+                if(person1 && person2){
+                    toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100) } });
+                }
+            });
+        }
+
         cy.add(toAdd);
 
 
