@@ -130,7 +130,7 @@
 
 
 <script>
-    let allMembers, memberRelationships;
+    let allMembers, memberRelationships, enums;
     let cy = cytoscape({
 
         container: document.getElementById('graph-container'),
@@ -168,6 +168,7 @@
         spinner.classList.remove("d-none");
 
         let memberListFetch = fetch("/api/interpersonal/member/all", {});
+        let groupListFetch = fetch("/api/interpersonal/enums", {});
 
         // Get group selected
         let selectedGroup = document.querySelector("#select-group").value;
@@ -176,18 +177,19 @@
         }
 
         const relFetch = fetch("/api/interpersonal/relationship/all", {});
-        Promise.all([memberListFetch, relFetch])
+        Promise.all([memberListFetch, relFetch, groupListFetch])
             .then(responses => {
                 return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json(), data[1].json()]);
+                return Promise.all([data[0].json(), data[1].json(), data[2].json()]);
             })
             .then(data => {
                 let members = data[0];
                 allMembers = members.sort((a, b) => (a.firstName + a.lastName).localeCompare(b.firstName + b.lastName));
                 let relationships = data[1];
                 memberRelationships = relationships.sort((a, b) => a.id.localeCompare(b.id));
+                enums = data[2];
                 renderTable();
                 renderGraph();
             })
@@ -325,7 +327,11 @@
     function renderGraph(){
         let toAdd = [];
         allMembers.forEach((member) => {
-            toAdd.push({group: 'nodes', data: {id: member.id, name: member.firstName + " " + member.lastName, color: getColorGradient((member.lastEvaluation.cscore === undefined ||  member.lastEvaluation.cscore === null? "#333" : member.lastEvaluation.cscore), -100, 100)}})
+            toAdd.push({group: 'nodes', data: {id: member.id, name: member.firstName + " " + member.lastName, parent: (member.group? member.group.id : ""), color: getColorGradient((member.lastEvaluation === undefined ||  member.lastEvaluation.cscore === null? "#333" : member.lastEvaluation.cscore), -100, 100)}})
+        });
+
+        enums.groups.forEach((group) => {
+            toAdd.push({group: 'nodes', data: {id: group.id, name: group.name, color: 'rgba(' + group.color.red + ', ' + group.color.green + ', ' + group.color.blue + ', .2)'}});
         });
 
         memberRelationships.forEach((relationship) => {
@@ -333,9 +339,30 @@
         });
         cy.add(toAdd);
 
-        let layout = cy.layout({ name: 'cose', animate: true, padding: 10, fit: true,  nodeRepulsion: function( node ){ return 800408; }});
 
-        layout.run();
+        cy.nodes(':parent').forEach((parent) => {
+            let child_layout = parent.descendants().layout({
+                name: 'circle',
+                radius: parent.descendants().length * 25,
+            });
+            child_layout.run();
+        });
+
+        // might seem to also call on parent nodes
+        let orphan_layout = cy.elements().nodes().orphans().layout({
+            name: 'cose',
+            radius: cy.elements().nodes().orphans().length  * 25
+        });
+
+        orphan_layout.run();
+
+        // Does not work yet...
+        // let parent_layout = cy.elements().nodes().ancestors().layout({
+        //     name: 'random',
+        // });
+        //
+        // parent_layout.run();
+
     }
 
 </script>
