@@ -123,11 +123,21 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="member-modal-label">Relationship Details</h1>
+                <h1 class="modal-title fs-5" id="member-modal-label">View Member</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-
+                <div class="d-flex flex-row gap-3 align-items-center justify-content-center p-4 mt-2 gap-3" style="background: linear-gradient(#222, #333); border-top: 1px #495057 solid;">
+                    <img id="modal-poi-image" class="profile-image" alt="person of interest" src="/icons/Default%20User.svg" width="100px" />
+                    <div class="d-flex flex-column align-items-start justify-content-start">
+                        <p id="modal-poi-name" class="fs-4 mb-0 fw-bold">Person of Interest</p>
+                        <p id="modal-poi-type" class="mb-0">Association</p>
+                        <p id="modal-poi-score" class="mb-0">prev score</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-row justify-content-center align-items-center p-2 mt-1" style="background: #333; border-bottom: 1px #495057 solid;">
+                    <p id="modal-poi-centrality" class="mb-0 fw-bold">prev score</p>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -344,6 +354,33 @@
         document.querySelector("#modal-other").value = other.id;
     }
 
+    function renderMemberModal(id){
+        let poi = allMembers.find((m) => m.id === id);
+        if(poi){
+            let lastEval = poi.lastEvaluation? poi.lastEvaluation : poi.mostRecentEval;
+
+            document.querySelector("#modal-poi-image").src = `/api/interpersonal/member/profile-image/${id}`;
+            document.querySelector("#modal-poi-name").textContent = poi.firstName + " " + poi.lastName;
+            document.querySelector("#modal-poi-type").textContent = poi.relationship;
+
+            if(lastEval !== undefined){
+                document.querySelector("#modal-poi-score").textContent = lastEval.cscore + " | " + formatTimestamp(lastEval.timestamp);
+            }else{
+                document.querySelector("#modal-poi-score").textContent = "No score recorded";
+            }
+
+            document.querySelector("#modal-poi-centrality").textContent = "Centrality: " + cy.$().dc({root: '#' + id}).degree;
+        }else{
+            let group = enums.groups.find((g) => g.id === id);
+            if(group !== undefined){
+                document.querySelector("#modal-poi-image").src = `/api/interpersonal/member/profile-image/${id}`;
+                document.querySelector("#modal-poi-name").textContent = poi.firstName + " " + poi.lastName;
+                document.querySelector("#modal-poi-type").textContent = poi.relationship;
+
+            }
+        }
+    }
+
     function renderGraph(){
         cy.nodes().remove();
 
@@ -402,11 +439,11 @@
         // });
         //
         // parent_layout.run();
-
     }
 
     // Graph callbacks
     cy.on('dbltap', 'node', (event) => {
+        renderMemberModal(event.target._private.data.id);
         let myModal = new bootstrap.Modal(document.getElementById('member-modal'));
         myModal.show();
     });
