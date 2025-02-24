@@ -188,7 +188,7 @@
                     </div>
                 </div>
                 <div class="bg-body-tertiary p-3">
-                    <h4 class="fw-bold">Relationship Tolerance</h4>
+                    <h4 class="fw-bold">Relationship Strength</h4>
                     <p>Displays edges that have an absolute value of above the given amount.</p>
                     <div class="d-flex flex-row justify-content-start align-items-center">
                         <p id="tolerance-indicator" style="width: 40px" class="text-center">0</p>
@@ -486,12 +486,12 @@
         }
 
         if(document.querySelector("#select-group").value === ""){
-            memberRelationships.forEach((relationship) => {
+            memberRelationships.filter((r) => Math.abs(r.health) > document.querySelector("#graph-range-show").value).forEach((relationship) => {
                 toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100), opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)} });
             });
         }else{
             //todo: [immediate] fix this
-            memberRelationships.forEach((relationship) => {
+            memberRelationships.filter((r) => Math.abs(r.health) > document.querySelector("#graph-range-show").value).forEach((relationship) => {
                 let person1 = allMembers.find((x) => x.id === relationship.self.id);
                 let person2 = allMembers.find((x) => x.id === relationship.other.id);
                 if(person1 && person2){
