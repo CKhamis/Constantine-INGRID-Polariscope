@@ -65,8 +65,8 @@
                     <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
                         <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 30px;">
                     </button>
-                    <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
-                        <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 30px;">
+                    <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="modal" data-bs-target="#graph-modal">
+                        <img class="square-image" src="/icons/Settings.svg" alt="refresh" style="width: 30px;">
                     </button>
                 </div>
             </div>
@@ -159,6 +159,55 @@
     </div>
 </div>
 
+<div class="modal fade" id="graph-modal" tabindex="-1" aria-labelledby="graph-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="graph-modal-label">Graph Settings</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column gap-2">
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Show Profile Images</h4>
+                    <p>Shows profile images on top of each node representing a member if applicable.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="graph-checkbox-img">
+                        <label class="form-check-label" for="graph-checkbox-img">
+                            Show profile images
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Show Groups</h4>
+                    <p>Displays groups and places associated members within.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="graph-checkbox-groups" checked>
+                        <label class="form-check-label" for="graph-checkbox-groups">
+                            Show groups
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Relationship Tolerance</h4>
+                    <p>Displays edges that have an absolute value of above the given amount.</p>
+                    <div class="d-flex flex-row justify-content-start align-items-center">
+                        <p id="tolerance-indicator" style="width: 40px" class="text-center">0</p>
+                        <div class="form-check p-0 flex-grow-1">
+                            <label for="graph-range-show" class="form-label">Tolerance level</label>
+                            <input type="range" class="form-range" min="0" max="100" id="graph-range-show" onchange="updateToleranceIndicator()">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" onclick="refresh()" data-bs-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
@@ -184,7 +233,9 @@
                     'color': 'white',
                     'text-wrap': 'ellipsis',
                     'background-opacity': 'data(opacity)',
-                    'shape': 'data(shape)'
+                    'shape': 'data(shape)',
+                    'background-image': 'data(img)',
+                    'background-fit': 'contain'
                 }
             },
 
@@ -202,6 +253,7 @@
         ],
     });
 
+    document.querySelector("#graph-range-show").value = 0;
     refresh();
 
     function refresh() {
@@ -408,16 +460,27 @@
         let toAdd = [];
         allMembers.forEach((member) => {
             let lastEval = member.lastEvaluation? member.lastEvaluation : member.mostRecentEval; //todo: [polish] unify the last eval and most recent eval
-            toAdd.push({group: 'nodes', data: {id: member.id, name: member.firstName + " " + member.lastName, parent: (member.group? member.group.id : ""), opacity: 1, shape: shapeMap(member.sex), color: getColorGradient((lastEval === undefined ||  lastEval.cscore === null? "#333" : lastEval.cscore), -100, 100)}})
+            //todo: [immediate] fix profile image condition
+            toAdd.push({
+                    group: 'nodes',
+                    data: {id: member.id,
+                    name: member.firstName + " " + member.lastName,
+                    parent: (member.group? member.group.id : ""),
+                    img: `/api/interpersonal/member/profile-image/${member.id}`,
+                    opacity: 1,
+                    shape: shapeMap(member.sex),
+                    color: getColorGradient((lastEval === undefined ||  lastEval.cscore === null? "#333" : lastEval.cscore), -100, 100)}})
         });
 
-        if(document.querySelector("#select-group").value === ""){
-            enums.groups.forEach((group) => {
-                toAdd.push({group: 'nodes', data: {id: group.id, name: group.name, color: 'rgba(' + group.color.red + ', ' + group.color.green + ', ' + group.color.blue + ', .2)', opacity: .2, shape: 'rectangle'}});
-            });
-        }else{
-            let selectedGroup = enums.groups.find((g) => g.id === document.querySelector("#select-group").value);
-            toAdd.push({group: 'nodes', data: {id: selectedGroup.id, name: selectedGroup.name, color: 'rgba(' + selectedGroup.color.red + ', ' + selectedGroup.color.green + ', ' + selectedGroup.color.blue + ', .2)', opacity: .2, shape: 'rectangle'}});
+        if(document.querySelector("#graph-checkbox-groups").checked){
+            if(document.querySelector("#select-group").value === ""){
+                enums.groups.forEach((group) => {
+                    toAdd.push({group: 'nodes', data: {id: group.id, name: group.name, color: 'rgba(' + group.color.red + ', ' + group.color.green + ', ' + group.color.blue + ', .2)', opacity: .2, shape: 'rectangle'}});
+                });
+            }else{
+                let selectedGroup = enums.groups.find((g) => g.id === document.querySelector("#select-group").value);
+                toAdd.push({group: 'nodes', data: {id: selectedGroup.id, name: selectedGroup.name, color: 'rgba(' + selectedGroup.color.red + ', ' + selectedGroup.color.green + ', ' + selectedGroup.color.blue + ', .2)', opacity: .2, shape: 'rectangle'}});
+            }
         }
 
         if(document.querySelector("#select-group").value === ""){
@@ -425,7 +488,8 @@
                 toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100), opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)} });
             });
         }else{
-            memberRelationships.forEach((relationship) => {
+            //todo: [immediate] fix this
+            memberRelationships.filter((r) => Math.abs(r.health) > document.querySelector("#graph-range-show").value).forEach((relationship) => {
                 let person1 = allMembers.find((x) => x.id === relationship.self.id);
                 let person2 = allMembers.find((x) => x.id === relationship.other.id);
                 if(person1 && person2){
@@ -474,6 +538,10 @@
         let myModal = new bootstrap.Modal(document.getElementById('relationship-modal'));
         myModal.show();
     });
+
+    function updateToleranceIndicator(){
+        document.querySelector('#tolerance-indicator').textContent = document.querySelector('#graph-range-show').value;
+    }
 
     function shapeMap(sex){
         if(sex === "MALE"){
