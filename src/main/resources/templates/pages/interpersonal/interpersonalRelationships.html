@@ -202,7 +202,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-info" onclick="refresh()" data-bs-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-info" onclick="renderGraph()" data-bs-dismiss="modal">Save</button>
             </div>
         </div>
     </div>
@@ -235,6 +235,7 @@
                     'background-opacity': 'data(opacity)',
                     'shape': 'data(shape)',
                     'background-image': 'data(img)',
+                    'background-image-opacity': 'data(imgOpacity)',
                     'background-fit': 'contain'
                 }
             },
@@ -460,13 +461,14 @@
         let toAdd = [];
         allMembers.forEach((member) => {
             let lastEval = member.lastEvaluation? member.lastEvaluation : member.mostRecentEval; //todo: [polish] unify the last eval and most recent eval
-            //todo: [immediate] fix profile image condition
+            //todo: [immediate] fix profile image condition. only works after reload
             toAdd.push({
                     group: 'nodes',
                     data: {id: member.id,
                     name: member.firstName + " " + member.lastName,
                     parent: (member.group? member.group.id : ""),
                     img: `/api/interpersonal/member/profile-image/${member.id}`,
+                    imgOpacity: document.querySelector("#graph-checkbox-img").checked? "1" : "0",
                     opacity: 1,
                     shape: shapeMap(member.sex),
                     color: getColorGradient((lastEval === undefined ||  lastEval.cscore === null? "#333" : lastEval.cscore), -100, 100)}})
@@ -489,10 +491,11 @@
             });
         }else{
             //todo: [immediate] fix this
-            memberRelationships.filter((r) => Math.abs(r.health) > document.querySelector("#graph-range-show").value).forEach((relationship) => {
+            memberRelationships.forEach((relationship) => {
                 let person1 = allMembers.find((x) => x.id === relationship.self.id);
                 let person2 = allMembers.find((x) => x.id === relationship.other.id);
                 if(person1 && person2){
+                    console.log(Math.abs(relationship.health) + ">? " + document.querySelector("#graph-range-show").value)
                     toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100), opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)} });
                 }
             });
