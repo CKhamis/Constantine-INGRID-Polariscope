@@ -188,6 +188,16 @@
                     </div>
                 </div>
                 <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Show Names</h4>
+                    <p>Display member names as labels on each node.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="graph-checkbox-labels" checked>
+                        <label class="form-check-label" for="graph-checkbox-labels">
+                            Show names
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-body-tertiary p-3">
                     <h4 class="fw-bold">Relationship Strength</h4>
                     <p>Displays edges that have an absolute value of above the given amount.</p>
                     <div class="d-flex flex-row justify-content-start align-items-center">
@@ -461,11 +471,10 @@
         let toAdd = [];
         allMembers.forEach((member) => {
             let lastEval = member.lastEvaluation? member.lastEvaluation : member.mostRecentEval; //todo: [polish] unify the last eval and most recent eval
-            //todo: [immediate] fix profile image condition. only works after reload
             toAdd.push({
                     group: 'nodes',
                     data: {id: member.id,
-                    name: member.firstName + " " + member.lastName,
+                    name: document.querySelector("#graph-checkbox-labels").checked? member.firstName + " " + member.lastName : "",
                     parent: (member.group? member.group.id : ""),
                     img: `/api/interpersonal/member/profile-image/${member.id}`,
                     imgOpacity: document.querySelector("#graph-checkbox-img").checked? "1" : "0",
@@ -474,23 +483,34 @@
                     color: getColorGradient((lastEval === undefined ||  lastEval.cscore === null? "#333" : lastEval.cscore), -100, 100)}})
         });
 
+        // Add in Groups
         if(document.querySelector("#graph-checkbox-groups").checked){
             if(document.querySelector("#select-group").value === ""){
                 enums.groups.forEach((group) => {
-                    toAdd.push({group: 'nodes', data: {id: group.id, name: group.name, color: 'rgba(' + group.color.red + ', ' + group.color.green + ', ' + group.color.blue + ', .2)', opacity: .2, shape: 'rectangle'}});
+                    toAdd.push({group: 'nodes', data: {
+                        id: group.id,
+                        name: document.querySelector("#graph-checkbox-labels").checked? group.name : "",
+                        color: 'rgba(' + group.color.red + ', ' + group.color.green + ', ' + group.color.blue + ', .2)',
+                        opacity: .2,
+                        shape: 'rectangle'}});
                 });
             }else{
                 let selectedGroup = enums.groups.find((g) => g.id === document.querySelector("#select-group").value);
-                toAdd.push({group: 'nodes', data: {id: selectedGroup.id, name: selectedGroup.name, color: 'rgba(' + selectedGroup.color.red + ', ' + selectedGroup.color.green + ', ' + selectedGroup.color.blue + ', .2)', opacity: .2, shape: 'rectangle'}});
+                toAdd.push({group: 'nodes', data: {
+                    id: selectedGroup.id,
+                        name: document.querySelector("#graph-checkbox-labels").checked? selectedGroup.name : "",
+                        color: 'rgba(' + selectedGroup.color.red + ', ' + selectedGroup.color.green + ', ' + selectedGroup.color.blue + ', .2)',
+                        opacity: .2,
+                        shape: 'rectangle'}});
             }
         }
 
+        // Add in relationships
         if(document.querySelector("#select-group").value === ""){
             memberRelationships.filter((r) => Math.abs(r.health) > document.querySelector("#graph-range-show").value).forEach((relationship) => {
                 toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100), opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)} });
             });
         }else{
-            //todo: [immediate] fix this
             memberRelationships.filter((r) => Math.abs(r.health) > document.querySelector("#graph-range-show").value).forEach((relationship) => {
                 let person1 = allMembers.find((x) => x.id === relationship.self.id);
                 let person2 = allMembers.find((x) => x.id === relationship.other.id);
