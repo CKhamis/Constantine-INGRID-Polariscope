@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html xml:th="https://www.thymeleaf.org">
-<head th:replace="~{components/Header :: head('Relationships')}"></head>
+<head th:replace="~{components/Header :: head('Network')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
 <main class="bg-body px-0 d-flex flex-column" style="height:100vh; margin-left:60px;">
     <nav class="pt-4 px-4" style="background: linear-gradient(#222, #333); border-bottom: 1px #495057 solid;">
         <div class="row mb-2">
-            <div class="col-md-10 d-flex flex-row align-items-center justify-content-start">
-                <img class="square-image me-2" style="height: 50px; width: 50px" alt="Feature image"
-                     th:src="@{/icons/Relationship.svg}">
-                <h1 class="fw-bold">Interpersonal Relationships</h1>
+            <div class="col-md-12 d-flex flex-row align-items-center justify-content-between">
+                <div class="d-flex flex-row align-items-center justify-content-start">
+                    <img class="square-image me-2" style="height: 50px; width: 50px" alt="Feature image"
+                         th:src="@{/icons/Relationship.svg}">
+                    <h1 class="fw-bold">Interpersonal Network</h1>
+                </div>
+                <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" onclick="toggleFullscreen()">
+                    <img class="square-image" src="/icons/Fullscreen.svg" alt="refresh" style="width: 30px;">
+                </button>
             </div>
+
             <div class="col-md-2 mb-2 d-flex flex-column align-items-start justify-content-center">
                 <div>
                     <div class="spinner-border d-none" role="status" id="loading-spinner">
@@ -20,11 +26,9 @@
                 </div>
             </div>
         </div>
-        <p class="fs-5 mb-2">View the following spreadsheet below. Relationships are depicted as one-directional, with
-            the vertical column being the subject and the horizontal row being the subject's person of interest. Use
-            cells to input their relationship details.</p>
+        <p class="fs-5 mb-2" id="nav-description">Use the spreadsheet to manage interpersonal relationships between members. Rows represent subjects, and columns represent the individuals they relate to. Use the graph view to visualize relationships as a network.</p>
 
-        <div class="d-flex flex-row justify-content-between align-items-center">
+        <div class="d-flex flex-row justify-content-between align-items-center" id="nav-menu">
             <ul class="nav nav-underline" id="nav-tabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active fs-4" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-tab-pane" type="button" role="tab" aria-controls="table-tab-pane" aria-selected="true">Table</button>
@@ -57,6 +61,14 @@
             </div>
             <div class="tab-pane fade flex-grow-1 h-100" id="graph-tab-pane" role="tabpanel" aria-labelledby="graph-tab" tabindex="0">
                 <div class="h-100" id="graph-container"></div>
+                <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-3 m-3 d-flex flex-row gap-2">
+                    <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
+                        <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 30px;">
+                    </button>
+                    <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
+                        <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 30px;">
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -123,7 +135,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="member-modal-label">View Member</h1>
+                <h1 class="modal-title fs-5" id="member-modal-label">Quick View</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -140,6 +152,7 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <div id="modal-poi-action-button"></div>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
@@ -370,15 +383,23 @@
             }
 
             document.querySelector("#modal-poi-centrality").textContent = "Centrality: " + cy.$().dc({root: '#' + id}).degree;
+            document.querySelector("#modal-poi-action-button").innerHTML = `<a href="/interpersonal/member/view/${id}"><button type="button" class="btn btn-info" data-bs-dismiss="modal">View Member</button></a>`;
         }else{
             let group = enums.groups.find((g) => g.id === id);
             if(group !== undefined){
-                document.querySelector("#modal-poi-image").src = `/api/interpersonal/member/profile-image/${id}`;
-                document.querySelector("#modal-poi-name").textContent = poi.firstName + " " + poi.lastName;
-                document.querySelector("#modal-poi-type").textContent = poi.relationship;
-
+                document.querySelector("#modal-poi-image").src = `/api/interpersonal/group/image/${id}?=${new Date().getTime()}`;
+                document.querySelector("#modal-poi-name").textContent = group.name;
+                document.querySelector("#modal-poi-type").textContent = group.description;
+                document.querySelector("#modal-poi-action-button").innerHTML = `<a href="/interpersonal/groups"><button type="button" class="btn btn-info" data-bs-dismiss="modal">View Groups</button></a>`;
+                document.querySelector("#modal-poi-score").textContent = "";
+                document.querySelector("#modal-poi-centrality").textContent = "Member Count: " + group.numMembers;
             }
         }
+    }
+
+    function toggleFullscreen(){
+        document.querySelector("#nav-menu").classList.toggle("d-none");
+        document.querySelector("#nav-description").classList.toggle("d-none");
     }
 
     function renderGraph(){
