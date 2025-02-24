@@ -36,6 +36,9 @@ public class Relationship {
     @NotNull
     private int health;
 
+    @Column(columnDefinition="text")
+    private String description;
+
     private Member.RelationshipType type;
 
     @NotNull
@@ -43,11 +46,12 @@ public class Relationship {
     @NotNull
     private LocalDateTime lastModified;
 
-    public Relationship(User author, Member self, Member other, int health, Member.RelationshipType type) {
+    public Relationship(User author, Member self, Member other, int health, String description, Member.RelationshipType type) {
         this.id = self.getId().toString() + other.getId().toString();
         this.author = author;
         this.self = self;
         this.other = other;
+        this.description = description;
         this.health = health;
         this.type = type;
         this.created = LocalDateTime.now();

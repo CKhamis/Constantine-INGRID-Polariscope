@@ -21,5 +21,6 @@ public class MemberRelationshipForm {
     private Integer health;
     @NotNull
     private Member.RelationshipType type;
+    private String description;
 
 }

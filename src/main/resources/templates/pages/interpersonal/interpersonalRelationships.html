@@ -115,6 +115,11 @@
                         <input type="number" class="form-control" id="modal-relationship-health-form" required>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="modal-relationship-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="modal-relationship-description" rows="3"></textarea>
+                    </div>
+
                     <input type="hidden" id="modal-self" />
                     <input type="hidden" id="modal-other" />
 
@@ -207,7 +212,6 @@
                             <input type="range" class="form-range" min="0" max="100" id="graph-range-show" onchange="updateToleranceIndicator()">
                         </div>
                     </div>
-
                 </div>
             </div>
             <div class="modal-footer">
@@ -331,7 +335,8 @@
             self: document.querySelector("#modal-self").value,
             other: document.querySelector("#modal-other").value,
             health: document.querySelector("#modal-relationship-health-form").value,
-            type: document.querySelector("#modal-relationship-type-form").value
+            type: document.querySelector("#modal-relationship-type-form").value,
+            description: document.querySelector("#modal-relationship-description").value
         }
 
         let errorIcon = document.querySelector("#error-icon");
@@ -415,12 +420,16 @@
 
             document.querySelector("#modal-relationship-health-form").value = relationship.health;
             document.querySelector("#modal-relationship-type-form").value = relationship.type;
+
+            document.querySelector("#modal-relationship-description").value = relationship.description;
         }else{
             document.querySelector("#modal-relationship-health").textContent = "No relationship recorded";
             document.querySelector("#modal-relationship-type").textContent = "";
 
             document.querySelector("#modal-relationship-health-form").value = 0;
             //document.querySelector("#modal-relationship-type-form").value = "";
+
+            document.querySelector("#modal-relationship-description").value = "";
         }
 
         document.querySelector("#modal-person-1-img").src = `/api/interpersonal/member/profile-image/${self.id}`;
@@ -507,7 +516,7 @@
 
         // Add in relationships
         if(document.querySelector("#select-group").value === ""){
-            memberRelationships.filter((r) => Math.abs(r.health) > document.querySelector("#graph-range-show").value).forEach((relationship) => {
+            memberRelationships.filter((r) => Math.abs(r.health) >= document.querySelector("#graph-range-show").value).forEach((relationship) => {
                 toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100), opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)} });
             });
         }else{

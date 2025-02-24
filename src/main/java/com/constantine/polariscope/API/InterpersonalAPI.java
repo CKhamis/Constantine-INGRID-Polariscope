@@ -810,7 +810,7 @@ public class InterpersonalAPI {
 
                 }else{
                     // Relationship does not exist. Create one
-                    relationshipService.save(new Relationship(retrievedUser, self, other, formElements.getHealth(), formElements.getType()));
+                    relationshipService.save(new Relationship(retrievedUser, self, other, formElements.getHealth(), formElements.getDescription(), formElements.getType()));
                     return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Relationship Saved", ResponseMessage.Severity.LOW, "New relationship added"));
                 }
             }
