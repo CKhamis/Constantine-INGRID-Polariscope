@@ -4,7 +4,7 @@
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
 <main class="bg-body px-0 d-flex flex-column" style="height:100vh;margin-left:60px;">
-    <nav class="p-4" id="header-container">
+    <nav class="px-4 pt-4" id="header-container" style="border-bottom: 1px #495057 solid;">
         <div class="row mb-2">
             <div class="col-md-10 d-flex flex-row align-items-center justify-content-start">
                 <img class="square-image me-2" style="height: 80px; width: 80px" alt="group image" th:src="@{/icons/Default Group.svg}" id="group-image">
@@ -20,28 +20,27 @@
         </div>
         <p class="fs-5 mb-2" id="group-description">Description</p>
         <p id="last-modified" class="mb-0"></p>
-    </nav>
-    <div class="p-4">
-        <div class="row">
-            <div class="col-md-6">
-                <ul class="nav nav-underline" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active fs-3 p-0" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Members</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link fs-3 p-0" id="events-tab" data-bs-toggle="tab" data-bs-target="#events-tab-pane" type="button" role="tab" aria-controls="events-tab-pane" aria-selected="false">Events</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link fs-3 p-0" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis-tab-pane" type="button" role="tab" aria-controls="analysis-tab-pane" aria-selected="false">Statistics</button>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-md-6 d-flex flex-row align-content-center justify-content-end">
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="updateEditGroupModal()">Edit Group</button>
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#member-modal" onclick="renderGroupMemberSelectModal()">Manage Members</button>
-                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="resetEditGroupModal()">+ New Group</button>
+
+        <div class="mb-0 pb-0 mt-4 d-flex justify-content-between align-items-end">
+            <ul class="nav nav-underline" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fs-3 p-0" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Members</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fs-3 p-0" id="events-tab" data-bs-toggle="tab" data-bs-target="#events-tab-pane" type="button" role="tab" aria-controls="events-tab-pane" aria-selected="false">Events</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fs-3 p-0" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis-tab-pane" type="button" role="tab" aria-controls="analysis-tab-pane" aria-selected="false">Statistics</button>
+                </li>
+            </ul>
+            <div class="d-flex flex-row align-content-center justify-content-end pb-2">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="updateEditGroupModal()">Edit Group</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#member-modal" onclick="renderGroupMemberSelectModal()">Manage Members</button>
+                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#saveGroupModal" onclick="resetEditGroupModal()">+ New Group</button>
             </div>
         </div>
+    </nav>
+    <div class="p-4">
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                 <div class="row" id="main-content">
@@ -327,7 +326,7 @@
     function renderBody(){
         const currentGroup = getCurrentGroup(currentGroupId)
         // render header
-        document.querySelector("#header-container").style.background = `linear-gradient(to top right, rgb(${currentGroup.color.red}, ${currentGroup.color.green}, ${currentGroup.color.blue},.5), rgb(${currentGroup.color.red}, ${currentGroup.color.green}, ${currentGroup.color.blue},.05))`;
+        document.querySelector("#header-container").style.background = `linear-gradient(to top right, rgb(${currentGroup.color.red}, ${currentGroup.color.green}, ${currentGroup.color.blue},.3), rgb(${currentGroup.color.red}, ${currentGroup.color.green}, ${currentGroup.color.blue},.05))`;
         document.querySelector("#group-description").textContent = currentGroup.description;
         document.querySelector("#group-name").textContent = currentGroup.name;
         document.querySelector("#group-image").src = `/api/interpersonal/group/image/${currentGroup.id}?=${new Date().getTime()}`;
