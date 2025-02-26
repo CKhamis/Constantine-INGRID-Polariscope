@@ -1339,7 +1339,7 @@
                 imgOpacity: document.querySelector("#graph-checkbox-img").checked? "1" : "0",
                 opacity: 1,
                 shape: shapeMap(memberDetails.sex),
-                color: getColorGradient((memberDetails.mostRecentEval === undefined ||  memberDetails.mostRecentEval.cscore === null? "#222" : memberDetails.mostRecentEval.cscore), -100, 100)
+                color: getColorGradient((memberDetails.mostRecentEval === undefined ||  memberDetails.mostRecentEval.cscore === null? "#333" : memberDetails.mostRecentEval.cscore), -100, 100)
             }
         });
 
@@ -1355,7 +1355,7 @@
                     imgOpacity: document.querySelector("#graph-checkbox-img").checked? "1" : "0",
                     opacity: 1,
                     shape: shapeMap(member.sex),
-                    color: '#333'
+                    color: '#6d6d6d'
                 }
             });
         });
