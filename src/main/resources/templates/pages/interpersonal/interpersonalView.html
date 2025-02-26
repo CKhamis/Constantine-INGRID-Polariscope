@@ -159,7 +159,8 @@
                     <div id="events-container"></div>
                 </div>
                 <div class="tab-pane fade" id="nav-network" role="tabpanel" aria-labelledby="nav-network-tab" tabindex="0">
-                    <div class="h-100" id="graph-container"></div>
+                    <h3 class="fw-bold mt-3">Member Relationships</h3>
+                    <div class="" id="graph-container" style="height: calc(100vh - 13rem)"></div>
                     <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-3 m-3 d-flex flex-row gap-2">
                         <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
                             <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 30px;">
@@ -403,6 +404,113 @@
     </div>
 </div>
 
+<div class="modal fade" id="relationship-modal" tabindex="-1" aria-labelledby="relationship-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="relationship-modal-label">Create / Edit Relationship</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to edit the one-way relationship between two Polariscope members. Please review carefully and proceed</p>
+                <div class="d-flex flex-row gap-3 align-items-center justify-content-center py-3 my-2" style="background: linear-gradient(#222, #333); border-bottom: 1px #495057 solid; border-top: 1px #495057 solid;">
+                    <div class="d-flex flex-column align-items-center">
+                        <img id="modal-person-1-img" class="profile-image" alt="person 1" src="/icons/Default%20User.svg" width="100px" />
+                        <p id="modal-person-1-name" class="mb-0 fw-bold">Person 1</p>
+                    </div>
+                    <img src="/icons/Arrow.svg" class="mx-3" style="transform: rotate(-90deg)" width="70px" alt="Arrow pointing right" />
+                    <div class="d-flex flex-column align-items-center">
+                        <img id="modal-person-2-img" class="profile-image" alt="person 2" src="/icons/Default%20User.svg" width="100px" />
+                        <p id="modal-person-2-name" class="mb-0 fw-bold">Person 2</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-row justify-content-between">
+                    <p id="modal-relationship-health"></p>
+                    <p id="modal-relationship-type"></p>
+                </div>
+                <div class="mt-2">
+                    <p class="fs-4 fw-bold">Relationship Details</p>
+                    <div class="mb-3">
+                        <label for="modal-relationship-type-form">Relationship Type</label>
+                        <select class="form-select" id="modal-relationship-type-form" name="relationship" required>
+                            <option value="" disabled>Select Relationship Type</option>
+                            <th:block th:each="relationshipType : ${relationshipTypes}">
+                                <option th:value="${relationshipType}" th:text="${relationshipType.toString().toLowerCase()}"></option>
+                            </th:block>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modal-relationship-health-form" class="form-label">Relationship Health</label>
+                        <input type="number" class="form-control" id="modal-relationship-health-form" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modal-relationship-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="modal-relationship-description" rows="3"></textarea>
+                    </div>
+
+                    <input type="hidden" id="modal-self" />
+                    <input type="hidden" id="modal-other" />
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" data-bs-dismiss="modal" onclick="saveRelationship()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="graph-modal" tabindex="-1" aria-labelledby="graph-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="graph-modal-label">Graph Settings</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column gap-2">
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Show Profile Images</h4>
+                    <p>Shows profile images on top of each node representing a member if applicable.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="graph-checkbox-img">
+                        <label class="form-check-label" for="graph-checkbox-img">
+                            Show profile images
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Show Names</h4>
+                    <p>Display member names as labels on each node.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="graph-checkbox-labels" checked>
+                        <label class="form-check-label" for="graph-checkbox-labels">
+                            Show names
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Relationship Strength</h4>
+                    <p>Displays edges that have an absolute value of above the given amount.</p>
+                    <div class="d-flex flex-row justify-content-start align-items-center">
+                        <p id="tolerance-indicator" style="width: 40px" class="text-center">0</p>
+                        <div class="form-check p-0 flex-grow-1">
+                            <label for="graph-range-show" class="form-label">Tolerance level</label>
+                            <input type="range" class="form-range" min="0" max="100" id="graph-range-show" onchange="updateToleranceIndicator()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" onclick="renderNetwork()" data-bs-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <input type="hidden" th:value="${id}" id="id-form" />
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Network :: data-upload}"></div>
@@ -413,12 +521,49 @@
 <div th:replace="~{components/Formatting :: time-interval}"></div>
 <div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
+<script src="/external/cytoscape.min.js"></script>
+
 <script>
     let memberList;
     let memberDetails;
     let eventList;
     let enums;
     let evalChartEval, evalChartEvalHome;
+    let memberRelationships;
+
+    let cy = cytoscape({
+
+        container: document.getElementById('graph-container'),
+
+        style: [ // the stylesheet for the graph
+            {
+                selector: 'node',
+                style: {
+                    'background-color': 'data(color)',
+                    'label': 'data(name)',
+                    'color': 'white',
+                    'text-wrap': 'ellipsis',
+                    'background-opacity': 'data(opacity)',
+                    'shape': 'data(shape)',
+                    'background-image': 'data(img)',
+                    'background-image-opacity': 'data(imgOpacity)',
+                    'background-fit': 'contain'
+                }
+            },
+
+            {
+                selector: 'edge',
+                style: {
+                    'width': 3,
+                    'line-color': 'data(color)',
+                    'target-arrow-color': 'data(color)',
+                    'target-arrow-shape': 'chevron',
+                    'curve-style': 'bezier',
+                    'opacity': 'data(opacity)'
+                }
+            }
+        ],
+    });
 
     refresh();
     createEvalChart();
@@ -434,14 +579,16 @@
         const enumFetch = fetch("/api/interpersonal/enums", {});
         const memberDetailFetch = fetch("/api/interpersonal/member/view/" + memberId, {});
         const allEventFetch = fetch("/api/interpersonal/event/all", {});
-        Promise.all([memberListFetch, memberDetailFetch, enumFetch, allEventFetch])
+        const relFetch = fetch("/api/interpersonal/relationship/all", {});
+        Promise.all([memberListFetch, memberDetailFetch, enumFetch, allEventFetch, relFetch])
             .then(responses => {
                 return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json(), data[1].json(), data[2].json(), data[3].json()]);
+                return Promise.all([data[0].json(), data[1].json(), data[2].json(), data[3].json(), data[4].json()]);
             })
             .then(data => {
+                memberRelationships = data[4];
                 tableAddons = "";
                 memberList = data[0];
                 memberDetails = data[1];
@@ -460,6 +607,7 @@
                 updateEventModal();
                 updateGroups();
                 updateEventsTab();
+                renderNetwork();
             })
             .then((response) => {
                 if(memberDetails.group !== null){
@@ -523,8 +671,6 @@
                                 <div style="height: 30px; width:30px; background-color: rgb(${event.color.red}, ${event.color.green}, ${event.color.blue})"></div>
                             </div>
                         </button>`;
-
-            console.log(event);
 
             if(memberDetails.events.some(mem => mem.id === event.id)){
                 included += element;
@@ -1176,6 +1322,176 @@
                 }
             }
         });
+    }
+
+    // Network
+    function renderNetwork(){
+        cy.nodes().remove();
+        let memberId = document.querySelector("#id-form").value;
+
+        // User
+        cy.add({
+            group: 'nodes',
+            data: {
+                id: memberDetails.id,
+                name: document.querySelector("#graph-checkbox-labels").checked? memberDetails.firstName + " " + memberDetails.lastName : "",
+                img: `/api/interpersonal/member/profile-image/${memberDetails.id}`,
+                imgOpacity: document.querySelector("#graph-checkbox-img").checked? "1" : "0",
+                opacity: 1,
+                shape: shapeMap(memberDetails.sex),
+                color: getColorGradient((memberDetails.mostRecentEval === undefined ||  memberDetails.mostRecentEval.cscore === null? "#333" : memberDetails.mostRecentEval.cscore), -100, 100)
+            }
+        });
+
+        // All Connections
+        memberRelationships.filter((r) => r.self.id === memberId).forEach((r) => {
+            let member = memberList.find((m) => m.id === r.other.id);
+            cy.add({
+                group: 'nodes',
+                data: {
+                    id: r.other.id,
+                    name: document.querySelector("#graph-checkbox-labels").checked? member.firstName + " " + member.lastName : "",
+                    img: `/api/interpersonal/member/profile-image/${member.id}`,
+                    imgOpacity: document.querySelector("#graph-checkbox-img").checked? "1" : "0",
+                    opacity: 1,
+                    shape: shapeMap(member.sex),
+                    color: '#333'
+                }
+            });
+        });
+
+        // Connections
+        memberRelationships.filter((r) => Math.abs(r.health) >= document.querySelector("#graph-range-show").value).filter((r) => r.self.id === memberId || r.other.id === memberId).forEach((relationship) => {
+            let person1 = cy.filter('node[id = "' + relationship.self.id + '"]');
+            let person2 = cy.filter('node[id = "' + relationship.other.id + '"]');
+            if(person1.length > 0 && person2.length > 0){
+                cy.add({
+                    group: 'edges',
+                    data: {
+                        id: relationship.id,
+                        source: relationship.self.id,
+                        target: relationship.other.id,
+                        color: getColorGradient(relationship.health, -100, 100),
+                        opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)
+                    }
+                });
+            }
+        });
+
+        // Layout
+        setTimeout(()=>{
+            let main_layout = cy.nodes().layout({
+                name: 'random',
+                fit: true,
+                animation: false
+            });
+
+            main_layout.run();
+        }, 500);
+    }
+
+    function shapeMap(sex){
+        if(sex === "MALE"){
+            return "rectangle";
+        }else if(sex === "FEMALE"){
+            return "ellipse";
+        }else{
+            return "triangle";
+        }
+    }
+
+
+    function renderModal(selfId, otherId){
+        let self = memberList.find((member) => member.id === selfId);
+        let other = memberList.find((member) => member.id === otherId);
+        let relationship = memberRelationships.find((rel) => rel.id===`${self.id}${other.id}`);
+
+        document.querySelector("#modal-person-1-name").textContent = self.firstName + " " + self.lastName;
+        document.querySelector("#modal-person-2-name").textContent = other.firstName + " " + other.lastName;
+
+        if(relationship){
+            document.querySelector("#modal-relationship-health").textContent = `Relationship Health: ${relationship.health}`;
+            document.querySelector("#modal-relationship-type").textContent = `Relationship Type: ${relationship.type}`;
+
+            document.querySelector("#modal-relationship-health-form").value = relationship.health;
+            document.querySelector("#modal-relationship-type-form").value = relationship.type;
+
+            document.querySelector("#modal-relationship-description").value = relationship.description;
+        }else{
+            document.querySelector("#modal-relationship-health").textContent = "No relationship recorded";
+            document.querySelector("#modal-relationship-type").textContent = "";
+
+            document.querySelector("#modal-relationship-health-form").value = 0;
+            //document.querySelector("#modal-relationship-type-form").value = "";
+
+            document.querySelector("#modal-relationship-description").value = "";
+        }
+
+        document.querySelector("#modal-person-1-img").src = `/api/interpersonal/member/profile-image/${self.id}`;
+        document.querySelector("#modal-person-2-img").src = `/api/interpersonal/member/profile-image/${other.id}`;
+
+        document.querySelector("#modal-self").value = self.id;
+        document.querySelector("#modal-other").value = other.id;
+    }
+
+    // Graph callbacks
+    cy.on('dbltap', 'edge', (event) => {
+        renderModal(event.target._private.data.source, event.target._private.data.target);
+        let myModal = new bootstrap.Modal(document.getElementById('relationship-modal'));
+        myModal.show();
+    });
+
+    function saveRelationship(next=false){
+        let data = {
+            self: document.querySelector("#modal-self").value,
+            other: document.querySelector("#modal-other").value,
+            health: document.querySelector("#modal-relationship-health-form").value,
+            type: document.querySelector("#modal-relationship-type-form").value,
+            description: document.querySelector("#modal-relationship-description").value
+        }
+
+        let errorIcon = document.querySelector("#error-icon");
+        let toastId = createToast("Updating Relationship");
+        postData("/api/interpersonal/relationship/save", data)
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+
+                if(next){
+                    let otherIndex = allMembers.findIndex((m) => m.id === data.other)
+                    let nextIndex = (otherIndex+1) % allMembers.length;
+                    if(allMembers[nextIndex].id === data.self){
+                        nextIndex = (otherIndex+2) % allMembers.length;
+                    }
+                    renderModal(data.self, allMembers[nextIndex].id);
+                }
+            })
+            .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to edit relationship";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => {
+                refresh();
+            });
+    }
+
+    // network settings
+    function updateToleranceIndicator(){
+        document.querySelector('#tolerance-indicator').textContent = document.querySelector('#graph-range-show').value;
     }
 </script>
 </body>
