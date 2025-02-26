@@ -43,6 +43,7 @@
                     <button class="nav-link" id="nav-info-tab" data-bs-toggle="tab" data-bs-target="#nav-info" type="button" role="tab" aria-controls="nav-info" aria-selected="false">Information</button>
                     <button class="nav-link" id="nav-events-tab" data-bs-toggle="tab" data-bs-target="#nav-events" type="button" role="tab" aria-controls="nav-events" aria-selected="false">Events</button>
                     <button class="nav-link" id="nav-evaluation-tab" data-bs-toggle="tab" data-bs-target="#nav-evaluation" type="button" role="tab" aria-controls="nav-evaluation" aria-selected="false">Evaluations</button>
+                    <button class="nav-link" id="nav-network-tab" data-bs-toggle="tab" data-bs-target="#nav-network" type="button" role="tab" aria-controls="nav-network" aria-selected="false">Relationships</button>
                     <button class="nav-link" id="nav-settings-tab" data-bs-toggle="tab" data-bs-target="#nav-settings" type="button" role="tab" aria-controls="nav-settings" aria-selected="false">Settings</button>
                 </div>
             </nav>
@@ -156,6 +157,17 @@
                         <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#event-modal">Add/ Remove Events</button>
                     </div>
                     <div id="events-container"></div>
+                </div>
+                <div class="tab-pane fade" id="nav-network" role="tabpanel" aria-labelledby="nav-network-tab" tabindex="0">
+                    <div class="h-100" id="graph-container"></div>
+                    <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-3 m-3 d-flex flex-row gap-2">
+                        <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
+                            <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 30px;">
+                        </button>
+                        <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="modal" data-bs-target="#graph-modal">
+                            <img class="square-image" src="/icons/Settings.svg" alt="refresh" style="width: 30px;">
+                        </button>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
                     <h3 class="fw-bold mt-3">Member Settings</h3>
