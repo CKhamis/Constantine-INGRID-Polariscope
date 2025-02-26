@@ -805,6 +805,7 @@ public class InterpersonalAPI {
                     relationship.setHealth(formElements.getHealth());
                     relationship.setType(formElements.getType());
                     relationship.setLastModified(LocalDateTime.now());
+                    relationship.setDescription(formElements.getDescription());
                     relationshipService.save(relationship);
                     return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Relationship Saved", ResponseMessage.Severity.LOW, "Details have been updated"));
 

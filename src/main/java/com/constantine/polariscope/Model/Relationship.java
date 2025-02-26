@@ -68,10 +68,12 @@ public class Relationship {
     private void encrypt() {
         this.lastModified = LocalDateTime.now();
         this.health = EncryptUtil.encryptInteger(this.health, this.self.getId());
+        this.description = EncryptUtil.encryptString(this.description, this.self.getId());
     }
 
     @PostLoad
     private void decrypt() {
         this.health = EncryptUtil.decryptInteger(this.health, this.self.getId());
+        this.description = EncryptUtil.decryptString(this.description, this.self.getId());
     }
 }
