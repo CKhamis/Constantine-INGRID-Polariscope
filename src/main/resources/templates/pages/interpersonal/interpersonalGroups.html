@@ -1090,6 +1090,7 @@
     function updateToleranceIndicator(){
         document.querySelector('#tolerance-indicator').textContent = document.querySelector('#graph-range-show').value;
     }
+    document.querySelector("#graph-range-show").value = 0;
 
     function shapeMap(sex){
         if(sex === "MALE"){
