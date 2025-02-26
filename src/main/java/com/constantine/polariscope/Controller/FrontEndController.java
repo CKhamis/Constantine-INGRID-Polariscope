@@ -97,7 +97,8 @@ public class FrontEndController {
     }
 
     @GetMapping("/interpersonal/groups")
-    public String getGroups() {
+    public String getGroups(Model model) {
+        model.addAttribute("relationshipTypes", Member.RelationshipType.values());
         return "pages/interpersonal/interpersonalGroups";
     }
 

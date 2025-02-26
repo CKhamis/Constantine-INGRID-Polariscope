@@ -135,7 +135,6 @@
     </div>
 </div>
 
-
 <div class="modal fade" id="member-modal" tabindex="-1" aria-labelledby="member-modal-label" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -524,7 +523,6 @@
                 let person1 = allMembers.find((x) => x.id === relationship.self.id);
                 let person2 = allMembers.find((x) => x.id === relationship.other.id);
                 if(person1 && person2){
-                    console.log(Math.abs(relationship.health) + ">? " + document.querySelector("#graph-range-show").value)
                     toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100), opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)} });
                 }
             });
