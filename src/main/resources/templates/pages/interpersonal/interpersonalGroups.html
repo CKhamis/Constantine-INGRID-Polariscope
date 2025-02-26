@@ -983,7 +983,7 @@
                     color: getColorGradient((lastEval === undefined ||  lastEval.cscore === null? "#333" : lastEval.cscore), -100, 100)}})
         });
 
-        // // Add in relationships
+        // Add in relationships
         if(document.querySelector("#group-form").value === ""){
             memberRelationships.filter((r) => Math.abs(r.health) >= document.querySelector("#graph-range-show").value).forEach((relationship) => {
                 cy.add({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100), opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)} });

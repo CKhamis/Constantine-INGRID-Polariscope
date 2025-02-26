@@ -25,21 +25,40 @@
                 <div>
                     <canvas id="evaluation-history-chart"></canvas>
                 </div>
-                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#member-modal">Select Members</button>
-                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#event-modal">Select Events</button>
-                <h3 class="fw-bold mt-3 mb-2">Notes</h3>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">Timestamp</th>
-                            <th scope="col">Member</th>
-                            <th scope="col">cScore</th>
-                            <th scope="col">note</th>
-                        </tr>
-                        </thead>
-                        <tbody id="timeline-table-container"></tbody>
-                    </table>
+                <div class="d-flex flex-row justify-content-between align-items-end">
+                    <ul class="nav nav-underline" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fs-4" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes-tab-pane" type="button" role="tab" aria-controls="notes-tab-pane" aria-selected="true">Notes</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fs-4" id="network-tab" data-bs-toggle="tab" data-bs-target="#network-tab-pane" type="button" role="tab" aria-controls="network-tab-pane" aria-selected="false">Network</button>
+                        </li>
+                    </ul>
+                    <div class="d-flex flex-row justify-content-end align-items-center">
+                        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#member-modal">Select Members</button>
+                        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#event-modal">Select Events</button>
+                    </div>
+                </div>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="notes-tab-pane" role="tabpanel" aria-labelledby="notes-tab" tabindex="0">
+<!--                        <h3 class="fw-bold mt-3 mb-2">Notes</h3>-->
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Timestamp</th>
+                                    <th scope="col">Member</th>
+                                    <th scope="col">cScore</th>
+                                    <th scope="col">note</th>
+                                </tr>
+                                </thead>
+                                <tbody id="timeline-table-container"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="network-tab-pane" role="tabpanel" aria-labelledby="network-tab" tabindex="0">
+                        <div class="" style="height: 400px" id="network-container"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,18 +161,101 @@
     </div>
 </div>
 
+<div class="modal fade" id="graph-modal" tabindex="-1" aria-labelledby="graph-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="graph-modal-label">Graph Settings</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column gap-2">
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Show Profile Images</h4>
+                    <p>Shows profile images on top of each node representing a member if applicable.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="graph-checkbox-img">
+                        <label class="form-check-label" for="graph-checkbox-img">
+                            Show profile images
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Show Names</h4>
+                    <p>Display member names as labels on each node.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="graph-checkbox-labels" checked>
+                        <label class="form-check-label" for="graph-checkbox-labels">
+                            Show names
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Relationship Strength</h4>
+                    <p>Displays edges that have an absolute value of above the given amount.</p>
+                    <div class="d-flex flex-row justify-content-start align-items-center">
+                        <p id="tolerance-indicator" style="width: 40px" class="text-center">0</p>
+                        <div class="form-check p-0 flex-grow-1">
+                            <label for="graph-range-show" class="form-label">Tolerance level</label>
+                            <input type="range" class="form-range" min="0" max="100" id="graph-range-show" onchange="updateToleranceIndicator()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" onclick="renderGraph()" data-bs-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
 <div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
+<script src="/external/cytoscape.min.js"></script>
 
 <script>
     let memberList, eventList;
     let memberDetailList;
-
     let evalChart, memberCompositionChart;
+
+    let memberRelationships;
+    let cy = cytoscape({
+
+        container: document.getElementById('network-container'),
+
+        style: [ // the stylesheet for the graph
+            {
+                selector: 'node',
+                style: {
+                    'background-color': 'data(color)',
+                    'label': 'data(name)',
+                    'color': 'white',
+                    'text-wrap': 'ellipsis',
+                    'background-opacity': 'data(opacity)',
+                    'shape': 'data(shape)',
+                    'background-image': 'data(img)',
+                    'background-image-opacity': 'data(imgOpacity)',
+                    'background-fit': 'contain'
+                }
+            },
+
+            {
+                selector: 'edge',
+                style: {
+                    'width': 3,
+                    'line-color': 'data(color)',
+                    'target-arrow-color': 'data(color)',
+                    'target-arrow-shape': 'chevron',
+                    'curve-style': 'bezier',
+                    'opacity': 'data(opacity)'
+                }
+            }
+        ],
+    });
 
     createEvalChart();
     refresh();
@@ -193,7 +295,6 @@
                 // Handle the array of data objects
                 dataArray.forEach(data => {
                     memberDetailList.push(data);
-                    console.log(data);
                 });
             })
             .catch(error => {
@@ -217,6 +318,7 @@
                 updateChart();
                 updateTable();
                 updateDemographicList();
+                renderNetwork();
             });
     }
 
@@ -251,7 +353,6 @@
             }))
         );
         const sortedNotes = combinedNotes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        console.log(sortedNotes);
 
         sortedNotes.filter(eval => eval.note.length > 0).forEach((eval) => {
             let row = `
@@ -337,18 +438,21 @@
     function refresh(){
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
         const allEventFetch = fetch("/api/interpersonal/event/all", {});
-        Promise.all([memberListFetch, allEventFetch])
+        const relFetch = fetch("/api/interpersonal/relationship/all", {});
+        Promise.all([memberListFetch, allEventFetch, relFetch])
             .then(responses => {
                 return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json(), data[1].json()]);
+                return Promise.all([data[0].json(), data[1].json(), data[2].json()]);
             })
             .then(data => {
                 memberList = data[0];
                 eventList = data[1];
+                memberRelationships = data[2];
                 renderMemberModal();
                 renderEventModal();
+                renderNetwork();
             })
             .catch((response) => {
                 console.log(response);
@@ -471,6 +575,56 @@
                 }
             }
         });
+    }
+
+    function renderNetwork(){
+        cy.nodes().remove();
+
+        let toAdd = [];
+        memberList.filter((m) => m.included).forEach((member) => {
+            let lastEval = member.lastEvaluation? member.lastEvaluation : member.mostRecentEval;
+            toAdd.push({
+                group: 'nodes',
+                data: {
+                    id: member.id,
+                    name: document.querySelector("#graph-checkbox-labels").checked? member.firstName + " " + member.lastName : "",
+                    parent: (member.group? member.group.id : ""),
+                    img: `/api/interpersonal/member/profile-image/${member.id}`,
+                    imgOpacity: document.querySelector("#graph-checkbox-img").checked? "1" : "0",
+                    opacity: 1,
+                    shape: shapeMap(member.sex),
+                    color: getColorGradient((lastEval === undefined ||  lastEval.cscore === null? "#333" : lastEval.cscore), -100, 100)
+                }
+            });
+        });
+
+        memberRelationships.filter((r) => Math.abs(r.health) > document.querySelector("#graph-range-show").value).forEach((relationship) => {
+            let person1 = memberList.filter((m) => m.included).find((x) => x.id === relationship.self.id);
+            let person2 = memberList.filter((m) => m.included).find((x) => x.id === relationship.other.id);
+            if(person1 && person2){
+                toAdd.push({ group: 'edges', data: { id: relationship.id, source: relationship.self.id, target: relationship.other.id, color: getColorGradient(relationship.health, -100, 100), opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)} });
+            }
+        });
+
+        cy.add(toAdd);
+
+        let orphan_layout = cy.elements().orphans().layout({
+            name: 'circle',
+            fit: true,
+            animation: false
+        });
+
+        orphan_layout.run();
+    }
+
+    function shapeMap(sex){
+        if(sex === "MALE"){
+            return "rectangle";
+        }else if(sex === "FEMALE"){
+            return "ellipse";
+        }else{
+            return "triangle";
+        }
     }
 </script>
 </body>
