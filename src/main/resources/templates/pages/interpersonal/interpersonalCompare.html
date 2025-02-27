@@ -58,6 +58,14 @@
                     </div>
                     <div class="tab-pane fade" id="network-tab-pane" role="tabpanel" aria-labelledby="network-tab" tabindex="0">
                         <div class="" style="height: 400px" id="network-container"></div>
+                        <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-3 m-3 d-flex flex-row gap-2">
+                            <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
+                                <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 30px;">
+                            </button>
+                            <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="modal" data-bs-target="#graph-modal">
+                                <img class="square-image" src="/icons/Settings.svg" alt="refresh" style="width: 30px;">
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -203,7 +211,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-info" onclick="renderGraph()" data-bs-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-info" onclick="renderNetwork()" data-bs-dismiss="modal">Save</button>
             </div>
         </div>
     </div>
@@ -626,6 +634,13 @@
             return "triangle";
         }
     }
+
+    document.querySelector("#graph-range-show").value = 0;
+    function updateToleranceIndicator(){
+        document.querySelector('#tolerance-indicator').textContent = document.querySelector('#graph-range-show').value;
+    }
+
+
 </script>
 </body>
 </html>
