@@ -3,45 +3,59 @@
 <head th:replace="~{components/Header :: head('Compare')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
-<main class="bg-2 text-1" style="margin-left: 60px">
-    <div class="container-fluid bg-body">
-        <div class="row my-3">
-            <div class="col-lg-3 d-none d-lg-block">
-                <p class="fs-4 fw-bold text-center mb-4">Demographic Summary</p>
-                <canvas id="composition-canvas"></canvas>
-                <div class="list-group mt-4" id="member-list-side"></div>
-            </div>
-            <div class="col-12 col-lg-9 px-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="fw-bold">Member Compare</h2>
-                    <div>
-                        <div class="spinner-border d-none" role="status" id="loading-spinner">
-                            <span class="visually-hidden">Loading...</span>
+<main class="bg-2 text-1" style="margin-left: 60px; height: 100vh;">
+    <div class="w-100 h-100 row m-0">
+        <div class="col-lg-2 d-none d-lg-block h-100 overflow-y-scroll border-end px-0 pt-4">
+            <p class="fs-4 fw-bold text-center mb-4">Demographic Info</p>
+            <canvas id="composition-canvas"></canvas>
+            <div class="list-group mt-4" id="member-list-side"></div>
+        </div>
+        <div class="col-12 col-lg-10 px-0 h-100 overflow-y-scroll d-flex flex-column justify-content-start">
+            <nav class="pt-4 px-4 border-bottom flex-shrink-1" style="background: linear-gradient(#222, #333);">
+                <div class="row mb-2">
+                    <div class="col-md-12 d-flex flex-row align-items-center justify-content-between">
+                        <div class="d-flex flex-row align-items-center justify-content-start">
+                            <img class="square-image me-2" style="height: 50px; width: 50px" alt="Feature image"
+                                 th:src="@{/icons/Compare.svg}">
+                            <h1 class="fw-bold">Member Compare</h1>
                         </div>
-                        <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
+
+                        <div class="col-md-2 mb-2 d-flex flex-row align-items-center justify-content-end gap-3">
+                            <div>
+                                <div class="spinner-border d-none" role="status" id="loading-spinner">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <img src="/icons/Error.svg" id="error-icon" alt="error" class="profile-image d-none" height="32px"/>
+                            </div>
+<!--                            <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" onclick="toggleFullscreen()">-->
+<!--                                <img class="square-image" src="/icons/Fullscreen.svg" alt="refresh" style="width: 30px;">-->
+<!--                            </button>-->
+                        </div>
                     </div>
                 </div>
+                <p class="fs-5 mb-2">Select individual members and events to view a chronological timeline, cScores, notes, and interpersonal network.</p>
 
-                <div>
-                    <canvas id="evaluation-history-chart"></canvas>
-                </div>
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-end">
                     <ul class="nav nav-underline" id="myTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active fs-4" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes-tab-pane" type="button" role="tab" aria-controls="notes-tab-pane" aria-selected="true">Notes</button>
+                            <button class="nav-link active fs-4" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes-tab-pane" type="button" role="tab" aria-controls="notes-tab-pane" aria-selected="true">Overview</button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fs-4" id="network-tab" data-bs-toggle="tab" data-bs-target="#network-tab-pane" type="button" role="tab" aria-controls="network-tab-pane" aria-selected="false">Network</button>
                         </li>
                     </ul>
-                    <div class="d-flex flex-row justify-content-end align-items-center">
-                        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#member-modal">Select Members</button>
-                        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#event-modal">Select Events</button>
+                    <div class="d-flex flex-row justify-content-end align-items-center mb-2">
+                        <button type="button" class="btn btn-primary mt-3 btn-sm" data-bs-toggle="modal" data-bs-target="#member-modal">Select Members</button>
+                        <button type="button" class="btn btn-primary mt-3 btn-sm" data-bs-toggle="modal" data-bs-target="#event-modal">Select Events</button>
                     </div>
                 </div>
+            </nav>
+            <div class="bg-dark flex-grow-1">
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="notes-tab-pane" role="tabpanel" aria-labelledby="notes-tab" tabindex="0">
-<!--                        <h3 class="fw-bold mt-3 mb-2">Notes</h3>-->
+                        <h3 class="fw-bold mt-3 mb-2 ms-3">Evaluation History</h3>
+                        <canvas id="evaluation-history-chart"></canvas>
+                        <h3 class="fw-bold mb-2 ms-3 mt-5">Notes</h3>
                         <div class="table-responsive">
                             <table class="table">
                                 <thead>
@@ -57,7 +71,7 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="network-tab-pane" role="tabpanel" aria-labelledby="network-tab" tabindex="0">
-                        <div class="" style="height: 400px" id="network-container"></div>
+                        <div class="w-100 h-100" id="network-container"></div>
                         <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-3 m-3 d-flex flex-row gap-2">
                             <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
                                 <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 30px;">
@@ -68,7 +82,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 </main>
@@ -335,7 +348,7 @@
         let content = ``;
         memberDetailList.forEach((member) => {
             content += `
-                <a type="button" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" href="/interpersonal/member/view/${member.id}">
+                <a type="button" class="border-end-0 list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2" href="/interpersonal/member/view/${member.id}">
                     <div class="d-flex justify-content-start gap-2 align-items-center">
                         <img class="square-image img-fluid" style="width: 40px; height: 40px;" alt="pfp" src="/api/interpersonal/member/profile-image/${member.id}" />
                         <p class="mb-0 fw-bold ms-2 fs-4">${member.firstName} ${member.lastName}</p>
