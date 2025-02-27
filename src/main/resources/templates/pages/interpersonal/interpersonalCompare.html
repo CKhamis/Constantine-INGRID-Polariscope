@@ -51,9 +51,9 @@
                 </div>
             </nav>
             <div class="bg-dark flex-grow-1">
-                <div class="tab-content" id="myTabContent">
+                <div class="tab-content h-100" id="myTabContent">
                     <div class="tab-pane fade show active" id="notes-tab-pane" role="tabpanel" aria-labelledby="notes-tab" tabindex="0">
-                        <h3 class="fw-bold mt-3 mb-2 ms-3">Evaluation History</h3>
+                        <h3 class="fw-bold mt-5 mb-3 ms-3">Evaluation History</h3>
                         <canvas id="evaluation-history-chart"></canvas>
                         <h3 class="fw-bold mb-2 ms-3 mt-5">Notes</h3>
                         <div class="table-responsive">
@@ -70,7 +70,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="network-tab-pane" role="tabpanel" aria-labelledby="network-tab" tabindex="0">
+                    <div class="tab-pane fade h-100" id="network-tab-pane" role="tabpanel" aria-labelledby="network-tab" tabindex="0">
                         <div class="w-100 h-100" id="network-container"></div>
                         <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-3 m-3 d-flex flex-row gap-2">
                             <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
@@ -556,11 +556,12 @@
             type: 'line',
             data:scores,
             options: {
-                aspectRatio: 3,
+                aspectRatio: 2.5,
                 responsive: true,
                 plugins: {
                     legend: {
-                        display: true
+                        display: true,
+                        position: 'bottom'
                     }
                 },
                 scales: {
