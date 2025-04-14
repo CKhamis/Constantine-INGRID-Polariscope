@@ -64,8 +64,9 @@
                             <img class="square-image" style="width: 60px" alt="Member Group" th:src="@{/icons/Logo.svg}" id="overview-group" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Group"/>
                         </div>
                     </div>
-                    <p id="overview-description" class="fs-5">Member Description</p>
-                    <div class="row mt-5 w-100 mx-0" id="member-chips"></div>
+                    <p id="overview-description" class="fs-5 mx-3">Member Description</p>
+                    <div class="row mt-4 mb-3 w-100 mx-0" id="member-chips"></div>
+                    <h2 class="fw-bold border-bottom mb-2 mx-3">Evaluation Scores</h2>
                     <canvas id="evaluation-history-chart-home"></canvas>
                     <div id="event-info-1" class="alert alert-secondary mt-2">Hover over event to see additional info</div>
                     <h3 class="fw-bold mt-3">Note History</h3>
@@ -909,36 +910,75 @@
             rhBackground = "danger";
         }
 
+        let sortedEditCounters = memberList.map((m) => m.editCount).sort((a, b) => a - b);
+        let lowestEditCount = 0, highestEditCount = 0, medianEditCount = 0, medianEditIndex = 0, highestEditIndex = 0, selectedEditIndex = 0, editBackground="secondary";
+        if(sortedEditCounters.length > 3){
+            lowestEditCount = sortedEditCounters[0];
+            highestEditCount = sortedEditCounters[sortedEditCounters.length-1];
+            medianEditCount = sortedEditCounters[Math.floor(sortedEditCounters.length / 2)];
+            medianEditIndex = sortedEditCounters.indexOf(medianEditCount);
+            highestEditIndex = memberList.length;
+            selectedEditIndex = sortedEditCounters.indexOf(memberDetails.editCount);
+            if(memberDetails.editCount === sortedEditCounters[sortedEditCounters.length-1]){
+                editBackground = "primary";
+            }else if(memberDetails.editCount === sortedEditCounters[0]){
+                editBackground = "danger";
+            }else if(memberDetails.editCount > medianEditCount){
+                editBackground = "success";
+            }else if(memberDetails.editCount < medianEditCount){
+                editBackground = "warning";
+            }else{
+                editBackground = "info";
+            }
+        }
 
         let memberChipHTML = `
             <div class="col-12 col-lg-3">
-                <div class="mx-2 alert alert-${rhBackground}">
-                <div class="d-flex flex-col w-100">
-                    <div class="d-flex flex-row align-items-start justify-content-between w-100">
-                        <h6 class="text-center fw-bold">Current Evaluation</h6>
-                        <p class="text-end fs-2 mb-0" style="margin-top: -10px">${memberDetails.mostRecentEval.cscore}</p>
+                <div class="alert alert-${rhBackground}">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Current Evaluation</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${memberDetails.mostRecentEval.cscore}</p>
+                        </div>
                     </div>
-                </div>
                     <div class="w-100 position-relative">
                         <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${memberDetails.mostRecentEval.cscore/2 + 50}%" alt="arrow" />
                     </div>
                     <div class="bg-${rhBackground} w-100 mt-4" style="height: 10px;"></div>
+                    <div class="w-100 position-relative">
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">-100</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">0</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">100</p>
+                    </div>
                 </div>
             </div>
             <div class="col-12 col-lg-3">
-                <div class="mx-2 alert alert-secondary">
-                    <h6 class="text-center fw-bold">Edit Counter</h6>
-                    <p class="text-center fs-2 mb-0">${memberDetails.editCount}</p>
-                </div>
-            </div>
-            <div class="col-12 col-lg-3">
-                <div class="mx-2 alert alert-secondary">
+                <div class="alert alert-secondary">
                     <h6 class="text-center fw-bold">cScore Entries</h6>
                     <p class="text-center fs-2 mb-0">${memberDetails.fullTimeline.length}</p>
                 </div>
             </div>
             <div class="col-12 col-lg-3">
-                <div class="mx-2 alert alert-secondary">
+                <div class="alert alert-${editBackground}">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Member Edits</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${memberDetails.editCount}</p>
+                        </div>
+                    </div>
+                    <div class="w-100 position-relative">
+                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${(selectedEditIndex/highestEditIndex) * 100}%" alt="arrow" />
+                    </div>
+                    <div class="bg-${editBackground} w-100 mt-4" style="height: 10px;"></div>
+                    <div class="w-100 position-relative">
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${lowestEditCount}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: ${(medianEditIndex/highestEditIndex) * 100}%">${medianEditCount}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${highestEditCount}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-3">
+                <div class="alert alert-secondary">
                     <h6 class="text-center fw-bold">Record Age</h6>
                     <p class="text-center fs-2 mb-0">${timeSince(memberDetails.created)}</p>
                 </div>
