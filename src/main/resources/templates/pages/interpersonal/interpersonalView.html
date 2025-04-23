@@ -66,14 +66,14 @@
                     </div>
                     <p id="overview-description" class="fs-5 mx-3">Member Description</p>
                     <div class="row mt-4 mb-3 w-100 mx-0" id="member-chips"></div>
-                    <h2 class="fw-bold border-bottom mb-2 mx-3">Evaluation Scores</h2>
+                    <h2 class="fw-bold border-bottom mb-2">Evaluation Scores</h2>
                     <canvas id="evaluation-history-chart-home"></canvas>
                     <div id="event-info-1" class="alert alert-secondary mt-2">Hover over event to see additional info</div>
-                    <h3 class="fw-bold mt-3">Note History</h3>
+                    <h3 class="fw-bold border-bottom mb-2 mt-4">Note History</h3>
                     <div id="note-list-home"></div>
                 </div>
-                <div class="tab-pane fade" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab" tabindex="0">
-                    <h3 class="fw-bold mt-3">Member Information</h3>
+                <div class="tab-pane fade p-2 contain" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab" tabindex="0">
+                    <h3 class="fw-bold border-bottom mb-3">Member Information</h3>
                     <div class="row mt-2">
                         <div class="col-12 mb-3">
                             <label for="pfp-file" class="form-label">Upload profile image for member</label>
@@ -150,16 +150,15 @@
                     <button type="submit" class="btn btn-primary" onclick="saveMember()" id="submit-button">Submit</button>
                 </div>
                 <div class="tab-pane fade" id="nav-evaluation" role="tabpanel" aria-labelledby="nav-evaluation-tab" tabindex="0">
-                    <h3 class="fw-bold mt-3">Evaluation Records</h3>
-                    <div>
+                    <h3 class="fw-bold border-bottom mb-4 p-2">Evaluation Records</h3>
+                    <div class="px-2">
                         <canvas id="evaluation-history-chart"></canvas>
                     </div>
                     <div>
                         <div id="event-info-2" class="alert alert-secondary mt-2">Hover over event to see additional info</div>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="fw-bold mt-3">All Evaluations</h2>
-
+                    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+                        <h3 class="fw-bold">All Evaluations</h3>
                         <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button" data-bs-toggle="modal" data-bs-target="#filterModal">
                             <p class="mb-0 mx-2 fs-5 fw-bold">Filter</p>
                             <img class="square-image" th:src="@{/icons/Filter.svg}" alt="edit" style="width: 30px;"/>
@@ -167,15 +166,15 @@
                     </div>
                     <div id="eval-table-container"></div>
                 </div>
-                <div class="tab-pane fade" id="nav-events" role="tabpanel" aria-labelledby="nav-events-tab" tabindex="0">
-                    <div class="d-flex flex-row justify-content-between align-items-center">
-                        <h3 class="fw-bold mt-3">All Events</h3>
+                <div class="tab-pane fade p-2" id="nav-events" role="tabpanel" aria-labelledby="nav-events-tab" tabindex="0">
+                    <div class="d-flex flex-row justify-content-between align-items-center mb-3 mt-2">
+                        <h3 class="fw-bold">All Events</h3>
                         <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#event-modal">Add/ Remove Events</button>
                     </div>
                     <div id="events-container"></div>
                 </div>
                 <div class="tab-pane fade" id="nav-network" role="tabpanel" aria-labelledby="nav-network-tab" tabindex="0">
-                    <h3 class="fw-bold mt-3">Member Relationships</h3>
+                    <h3 class="fw-bold border-bottom p-2 mb-4">Member Relationships</h3>
                     <div class="" id="graph-container" style="height: calc(100vh - 13rem)"></div>
                     <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-3 m-3 d-flex flex-row gap-2">
                         <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
@@ -187,35 +186,37 @@
                     </div>
                 </div>
                 <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
-                    <h3 class="fw-bold mt-3">Member Settings</h3>
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">Add or Remove Events</h5>
-                            <p class="card-text">This will add or remove markers on the member's evaluation graphs. Use this to highlight important events.</p>
-                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#event-modal">Add/ Remove Events</button>
+                    <h3 class="fw-bold border-bottom mb-3 p-2">Member Settings</h3>
+                    <div class="px-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">Add or Remove Events</h5>
+                                <p class="card-text">This will add or remove markers on the member's evaluation graphs. Use this to highlight important events.</p>
+                                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#event-modal">Add/ Remove Events</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card mt-3">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">Score Hold</h5>
-                            <p class="card-text">This will remove the member's appearance in the Batch Evaluate feature. Use this option if you do not anticipate not updating evaluations as frequently.</p>
-                            <input type="checkbox" class="btn-check" id="score-hold-check" autocomplete="off">
-                            <label class="btn btn-primary" for="score-hold-check" onclick="scoreHold()" id="hold-label">Score Hold</label>
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">Score Hold</h5>
+                                <p class="card-text">This will remove the member's appearance in the Batch Evaluate feature. Use this option if you do not anticipate not updating evaluations as frequently.</p>
+                                <input type="checkbox" class="btn-check" id="score-hold-check" autocomplete="off">
+                                <label class="btn btn-primary" for="score-hold-check" onclick="scoreHold()" id="hold-label">Score Hold</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card mt-3">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">Archive Member</h5>
-                            <p class="card-text">Removes appearances of member from all menus except for the all members feature. Does not delete the member.</p>
-                            <input type="checkbox" class="btn-check" id="archive-member-check" autocomplete="off">
-                            <label class="btn btn-primary" for="archive-member-check" onclick="archive()" id="archive-label">Archive Member</label>
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">Archive Member</h5>
+                                <p class="card-text">Removes appearances of member from all menus except for the all members feature. Does not delete the member.</p>
+                                <input type="checkbox" class="btn-check" id="archive-member-check" autocomplete="off">
+                                <label class="btn btn-primary" for="archive-member-check" onclick="archive()" id="archive-label">Archive Member</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card mt-3">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">Delete Member</h5>
-                            <p class="card-text">Deletes a member from database permanently. This procedure deletes the member as well as associated data such as evaluations. Not recommended for almost any scenario</p>
-                            <button class="btn btn-danger bevel-sm" data-bs-toggle="modal" data-bs-target="#deleteMemberModal">Delete Member</button>
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">Delete Member</h5>
+                                <p class="card-text">Deletes a member from database permanently. This procedure deletes the member as well as associated data such as evaluations. Not recommended for almost any scenario</p>
+                                <button class="btn btn-danger bevel-sm" data-bs-toggle="modal" data-bs-target="#deleteMemberModal">Delete Member</button>
+                            </div>
                         </div>
                     </div>
                 </div>
