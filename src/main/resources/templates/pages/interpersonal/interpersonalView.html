@@ -74,24 +74,24 @@
                 </div>
                 <div class="tab-pane fade p-2 contain" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab" tabindex="0">
                     <h3 class="fw-bold border-bottom mb-3">Member Information</h3>
-                    <div class="row mt-2">
-                        <div class="col-12 mb-3">
+                    <div class="row mt-2 w-100 px-0">
+                        <div class="col-12 mb-3 pe-0">
                             <label for="pfp-file" class="form-label">Upload profile image for member</label>
                             <input class="form-control" type="file" name="file" accept="image/*" id="pfp-file">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="fnf">First name</label>
                             <input type="text" class="form-control" id="fnf" name="firstName" placeholder="First name" required>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="lnf">Last name</label>
                             <input type="text" class="form-control" id="lnf" name="lastName" placeholder="Last name">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="mnf">Middle name</label>
                             <input type="text" class="form-control" id="mnf" name="middleName" placeholder="Middle name">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="relationf">Relationship Type</label>
                             <select class="form-select" id="relationf" name="relationship" required>
                                 <option value="" disabled="disabled">Select Relationship Type</option>
@@ -100,7 +100,7 @@
                                 </th:block>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="sexf">Sex</label>
                             <select class="form-select" id="sexf" name="relationship">
                                 <option value="">Decline to state</option>
@@ -109,7 +109,7 @@
                                 </th:block>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="sexualityf">Sexuality</label>
                             <select class="form-select" id="sexualityf" name="sexuality">
                                 <option value="">Decline to state</option>
@@ -118,31 +118,31 @@
                                 </th:block>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="mbp">MB Personality</label>
                             <input type="text" class="form-control" id="mbp" name="personality" placeholder="ENFJ">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="fcf">Favorite Color</label>
                             <input type="text" class="form-control" id="fcf" name="favoriteColor" placeholder="Red">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="amf">Year Met</label>
                             <input type="number" class="form-control" id="amf" name="ageMet" placeholder="2001" required>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="bdf">Birthday</label>
                             <input type="date" class="form-control" id="bdf" name="birthday">
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 pe-0">
                             <label for="group-form">Primary Group</label>
                             <select class="form-select" id="group-form">
                                 <option value="" selected>None</option>
                             </select>
                         </div>
 
-                        <div class="col-12 mb-3">
+                        <div class="col-12 mb-3 pe-0">
                             <label for="df">Description</label>
                             <input type="text" class="form-control" id="df" name="description" placeholder="Description of member">
                         </div>
@@ -247,7 +247,7 @@
                     </div>
                     <div class="col-12">
                         <label for="note-form-modal" class="form-label">Note</label>
-                        <textarea class="form-control" id="note-form-modal" rows="3"></textarea>
+                        <textarea class="form-control" id="note-form-modal" rows="10"></textarea>
                     </div>
                     <input type="hidden" id="id-evaluation-modal" />
                 </div>
