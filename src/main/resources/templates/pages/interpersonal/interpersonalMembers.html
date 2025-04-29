@@ -3,53 +3,52 @@
 <head th:replace="~{components/Header :: head('Members')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
-<main class="px-4 pt-2" style="margin-left: 60px">
-    <div class="row">
-        <div class="col-md-3 col-lg-2 mb-4 d-none d-md-block" id="left-pane">
+<main class="bg-2" style="margin-left: 60px; height: 100vh;">
+    <div class="w-100 h-100 row m-0">
+        <div class="col-md-3 col-lg-2 mb-4 d-none d-md-block border-end h-100" id="left-pane">
             <p class="fs-4 fw-bold text-center mb-4">Member Composition</p>
             <canvas id="composition-canvas"></canvas>
             <canvas id="gender-canvas" class="mt-4"></canvas>
-<!--            <p class="fs-4 fw-bold text-center mb-4">Member Composition</p>-->
+            <!--            <p class="fs-4 fw-bold text-center mb-4">Member Composition</p>-->
         </div>
-        <div class="col-md-9 col-lg-10 px-lg-3" id="right-pane">
-            <div class="container-fluid">
-                <nav class="navbar d-flex justify-content-between align-items-center">
-                    <h2 class="fw-bold">All Members</h2>
-                    <div>
-                        <div class="spinner-border d-none" role="status" id="loading-spinner">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
+        <div class="col-md-9 col-lg-10 overflow-y-scroll h-100 p-0" id="right-pane">
+            <nav class="navbar d-flex justify-content-between align-items-center border-bottom px-3 position-sticky top-0" style="background: linear-gradient(#222, #2c2c2c); border-bottom: 1px #495057 solid;">
+                <h2 class="fw-bold">All Members</h2>
+                <div>
+                    <div class="spinner-border d-none" role="status" id="loading-spinner">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                    <div class="d-flex justify-content-start align-items-center">
-                        <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2 me-2" role="button" onclick="refresh()">
-                            <img class="square-image" th:src="@{/icons/Refresh.svg}" alt="refresh" style="width: 30px;"/>
-                        </div>
-                        <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button" data-bs-toggle="modal" data-bs-target="#filterModal">
-                            <p class="mb-0 mx-2 fs-5 fw-bold">Filter</p>
-                            <img class="square-image" th:src="@{/icons/Filter.svg}" alt="edit" style="width: 30px;"/>
-                        </div>
-                    </div>
-                </nav>
-                <div class="table-responsive px-0">
-                    <table class="table table-hover align-middle table-responsive">
-                        <thead>
-                        <tr>
-                            <th scope="col">Photo</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Group</th>
-                            <th scope="col"></th>
-                            <th scope="col" class="text-center">Archive</th>
-                            <th scope="col" class="text-center">Hold</th>
-                            <th scope="col">Relationship</th>
-                            <th scope="col">Sex</th>
-                            <th scope="col">Sexuality</th>
-                            <th scope="col">View</th>
-                        </tr>
-                        </thead>
-                        <tbody id="table-body"></tbody>
-                    </table>
+                    <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
                 </div>
+                <div class="d-flex justify-content-start align-items-center">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2 me-2" role="button" onclick="refresh()">
+                        <img class="square-image" th:src="@{/icons/Refresh.svg}" alt="refresh" style="width: 30px;"/>
+                    </div>
+                    <div class="bg-light-subtle d-flex justify-content-between align-items-center p-2" role="button" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <p class="mb-0 mx-2 fs-5 fw-bold">Filter</p>
+                        <img class="square-image" th:src="@{/icons/Filter.svg}" alt="edit" style="width: 30px;"/>
+                    </div>
+                </div>
+            </nav>
+            <div class="table-responsive px-0">
+                <table class="table table-hover align-middle table-responsive">
+                    <thead>
+                    <tr>
+                        <th scope="col">Photo</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Group</th>
+                        <th scope="col"></th>
+                        <th scope="col">Eval</th>
+                        <th scope="col" class="text-center">Archive</th>
+                        <th scope="col" class="text-center">Hold</th>
+                        <th scope="col">Relationship</th>
+                        <th scope="col">Sex</th>
+                        <th scope="col">Sexuality</th>
+                        <th scope="col">View</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -140,6 +139,7 @@
 </div>
 
 <div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/External :: external}"></div>
@@ -221,6 +221,7 @@
                     <td>${member.firstName} ${member.lastName}</td>
                     <td style="vertical-align: middle">${member.group == null ? "" : '<img class="square-image float-start me-2" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/group/image/' + member.group.id + '">'}</td>
                     <td style="vertical-align: middle">${member.group == null ? "" : '<p class="mb-0">' + member.group.name + '</p>'}</td>
+                    <td style="vertical-align: middle; color: ${getColorGradient(member.lastEvaluation.cscore, -100, 100)}" class="fw-bold">${member.lastEvaluation? member.lastEvaluation.cscore : "N/A"}</td>
                     <td class="text-center">${member.archive? "A" : ""}</td>
                     <td class="text-center">${member.scoreHold? "H" : ""}</td>
                     <td>${member.relationship}</td>
