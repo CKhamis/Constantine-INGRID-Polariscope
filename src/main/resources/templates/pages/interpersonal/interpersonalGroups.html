@@ -550,10 +550,11 @@
         document.querySelector("#main-content").innerHTML = memberListContent;
 
         // Evaluation Information
-        let lowestEvaluated = null, highestEvaluated = null;
+        let lowestEvaluated = null, highestEvaluated = null, totalScore = 0;
 
         groupMemberList.forEach((member) => {
             if(member.mostRecentEval !== undefined && member.mostRecentEval !== null && member.mostRecentEval.cscore !== null){
+                totalScore += member.mostRecentEval.cscore;
                 // Initialize values to first non-null score
                 if(lowestEvaluated === null && highestEvaluated === null){
                     lowestEvaluated = member;
@@ -605,12 +606,12 @@
                 <div class="alert alert-${"danger"} h-100">
                     <div class="d-flex flex-col w-100">
                         <div class="d-flex flex-row align-items-start justify-content-between w-100">
-                            <h6 class="text-center fw-bold">Current Evaluation</h6>
-                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${100}</p>
+                            <h6 class="text-center fw-bold">cScore Average</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${(totalScore/groupMemberList.length).toFixed(2)}</p>
                         </div>
                     </div>
                     <div class="w-100 position-relative">
-                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${2/2 + 50}%" alt="arrow" />
+                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${totalScore/(2 * groupMemberList.length) + 50}%" alt="arrow" />
                     </div>
                     <div class="bg-${"danger"} w-100 mt-4" style="height: 10px;"></div>
                     <div class="w-100 position-relative">
