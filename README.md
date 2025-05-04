@@ -6,6 +6,8 @@ With this tool, you can track a person's basic information like their names, pro
 More specifically, Polariscope allows you to write evaluations about individuals. These evaluations include a timestamp, score, and an optional note.
 
 ## Features
+### Interpersonal Network
+This new feature allows users to map their interpersonal connections between others. Works closely with the groups feature to give you a better look at the social atmosphere you're in.
 ### Password-Based Encryption
 Sensitive data entries in this program are encrypted using an object's randomized ID as well as a hash of the user's password different than the one persisted into memory. This effectively makes malicious decryption far less practical without knowing the user password.
 ### Privacy Screen
@@ -22,5 +24,5 @@ This feature allows you to combine like members into a grouping to see their col
 This feature allows you to add evaluations to all members in a queue. This makes it simpler and faster if you want to add evaluations to everyone at once.
 ### Member Compare
 This feature allows you to select as many or little members as you want and display their evaluation scores in a graph to compare with each-other. Below this graph, a comprehensive timeline is displayed with all notes that have ever been written about the members you selected in chronological order.
-### New Member
+### Add Members
 This feature allows you to add new members to your account. It is a very simple feature and only requires basic information to complete.
