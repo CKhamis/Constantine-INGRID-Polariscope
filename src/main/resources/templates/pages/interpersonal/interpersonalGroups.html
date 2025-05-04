@@ -545,7 +545,7 @@
                     `;
         });
 
-        document.querySelector("#av-edits").textContent = editCountTotal / groupMemberList.length;
+        document.querySelector("#av-edits").textContent = (editCountTotal / groupMemberList.length).toFixed(2);
         document.querySelector("#tot-edits").textContent = editCountTotal;
 
         document.querySelector("#main-content").innerHTML = memberListContent;
@@ -638,7 +638,7 @@
                 <div class="alert alert-${rhBackground} h-100">
                     <div class="d-flex flex-col w-100">
                         <div class="d-flex flex-row align-items-start justify-content-between w-100">
-                            <h6 class="text-center fw-bold">cScore Average</h6>
+                            <h6 class="text-center fw-bold">Evaluation Average</h6>
                             <p class="text-end fs-2 mb-0" style="margin-top: -10px">${(totalScore/groupMemberList.length).toFixed(2)}</p>
                         </div>
                     </div>
@@ -663,6 +663,7 @@
                 <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}"></th>
                 <td style="vertical-align: middle" class="fw-bold">${member.firstName} ${member.lastName}</td>
                 <td style="vertical-align: middle; color: ${getColorGradient(member.mostRecentEval.cscore, -100, 100)}" class="fw-bold">${member.mostRecentEval? member.mostRecentEval.cscore : "N/A"}</td>
+                <td style="vertical-align: middle">${member.editCount}</td>
                 <td style="vertical-align: middle">${member.relationship}</td>
                 <td style="vertical-align: middle">${member.sex}</td>
                 <td style="vertical-align: middle"><a href="/interpersonal/member/view/${member.id}" target="_blank">View Member ></a></td>
@@ -676,7 +677,8 @@
                     <tr>
                       <th scope="col">Photo</th>
                       <th scope="col">Name</th>
-                      <th scope="col">cScore</th>
+                      <th scope="col">Eval</th>
+                      <th scope="col">Edits</th>
                       <th scope="col">Relationship</th>
                       <th scope="col">Sex</th>
                       <th scope="col">View</th>
