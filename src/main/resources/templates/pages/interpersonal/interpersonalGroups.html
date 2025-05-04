@@ -90,6 +90,7 @@
 
                 <h2 class="fw-bold border-bottom mb-4 mt-3">Evaluation Information</h2>
                 <div class="row align-items-stretch" id="evaluation-information-section"></div>
+                <div class="mt-3" id="evaluation-table"></div>
             </div>
             <div class="tab-pane fade flex-grow-1 h-100" id="network-tab-pane" role="tabpanel" aria-labelledby="network-tab-pane" tabindex="0">
                 <div class="h-100" id="network-container"></div>
@@ -550,7 +551,7 @@
         document.querySelector("#main-content").innerHTML = memberListContent;
 
         // Evaluation Information
-        let lowestEvaluated = null, highestEvaluated = null, totalScore = 0;
+        let lowestEvaluated = null, highestEvaluated = null, totalScore = 0, leastRecentlyEdited = null;
 
         groupMemberList.forEach((member) => {
             if(member.mostRecentEval !== undefined && member.mostRecentEval !== null && member.mostRecentEval.cscore !== null){
@@ -559,6 +560,7 @@
                 if(lowestEvaluated === null && highestEvaluated === null){
                     lowestEvaluated = member;
                     highestEvaluated = member;
+                    leastRecentlyEdited = member;
                 }
 
                 if(member.mostRecentEval.cscore > highestEvaluated.mostRecentEval.cscore){
@@ -568,42 +570,72 @@
                 if(member.mostRecentEval.cscore < lowestEvaluated.mostRecentEval.cscore){
                     highestEvaluated = member;
                 }
+
+                if(new Date(member.mostRecentEval.modified) < new Date(leastRecentlyEdited.mostRecentEval.modified)){
+                    leastRecentlyEdited = member;
+                }
             }
         });
 
+        let avg = totalScore / groupMemberList.length;
+        let rhBackground;
+        if(avg > 100 || avg < -100){
+            rhBackground = "light";
+        }else if(avg >= 99){
+            rhBackground = "primary";
+        }else if(avg >= 80){
+            rhBackground = "info";
+        }else if(avg >= 30){
+            rhBackground = "success";
+        }else if(avg >= -30){
+            rhBackground = "warning";
+        }else{
+            rhBackground = "danger";
+        }
+
         document.querySelector("#evaluation-information-section").innerHTML = `
-            <div class="col-lg-3 col-12">
-                <div class="px-3 h-100 alert alert-primary rounded-0">
-                    <h6 class="fw-bold text-center mb-2">Highest Evaluated</h6>
-                    <a class="mt-3 d-flex justify-content-center align-items-center gap-2" href="/interpersonal/member/view/${highestEvaluated.id}" target="_blank">
+            <div class="col-lg-3 col-12 mb-3">
+                <div class="px-3 h-100 alert alert-secondary rounded-0">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Highest Evaluated</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${highestEvaluated.mostRecentEval.cscore}</p>
+                        </div>
+                    </div>
+                    <a class="d-flex justify-content-center align-items-center gap-2 text-decoration-none" href="/interpersonal/member/view/${highestEvaluated.id}" target="_blank">
                         <img class="square-image me-2" style="height: 40px; width: 40px" alt="Highest evaluated member of group image" src="/api/interpersonal/member/profile-image/${highestEvaluated.id}">
                         <p class="fw-bold m-0 fs-3 text-truncate">${highestEvaluated.firstName + " " + highestEvaluated.lastName}</p>
                     </a>
                 </div>
             </div>
 
-            <div class="col-lg-3 col-12">
-                <div class="px-3 h-100 alert alert-primary rounded-0">
-                    <h6 class="fw-bold text-center mb-2">Lowest Evaluated</h6>
-                    <a class="mt-3 d-flex justify-content-center align-items-center gap-2" href="/interpersonal/member/view/${lowestEvaluated.id}" target="_blank">
-                        <img class="square-image me-2" style="height: 40px; width: 40px" alt="Member inmage" src="/api/interpersonal/member/profile-image/${lowestEvaluated.id}">
-                        <p class="fw-bold m-0 fs-3 text-truncate">${lowestEvaluated.firstName + " " + lowestEvaluated.lastName}</p>
+            <div class="col-lg-3 col-12 mb-3">
+                <div class="px-3 h-100 alert alert-secondary rounded-0">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Lowest Evaluated</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${lowestEvaluated.mostRecentEval.cscore}</p>
+                        </div>
+                    </div>
+                    <a class="d-flex justify-content-center align-items-center gap-2 text-decoration-none" href="/interpersonal/member/view/${lowestEvaluated.id}" target="_blank">
+                        <img class="square-image me-2" style="height: 40px; width: 40px" alt="Highest evaluated member of group image" src="/api/interpersonal/member/profile-image/${lowestEvaluated.id}">
+                        <p class="fw-bold m-0 fs-3 text-truncate">${lowestEvaluated.firstName + " " + highestEvaluated.lastName}</p>
                     </a>
                 </div>
             </div>
 
-            <div class="col-lg-3 col-12">
-                <div class="px-3 h-100 alert alert-primary rounded-0">
-                    <h6 class="fw-bold text-center mb-2">Lowest Evaluated</h6>
-                    <a class="mt-3 d-flex justify-content-center align-items-center gap-2" href="/interpersonal/member/view/${"a"}">
-                        <img class="square-image me-2" style="height: 40px; width: 40px" alt="Member inmage" src="/api/interpersonal/group/image/0ece2d6f-c470-4ff3-a946-d429b6e2e3ac?=1746146477136" id="highest-member-image">
-                        <p class="fw-bold m-0 fs-3 text-truncate">Terence Bird</p>
+            <div class="col-lg-3 col-12 mb-3">
+                <div class="px-3 h-100 alert alert-secondary rounded-0">
+                    <h6 class="fw-bold text-center mb-2">Oldest Evaluation</h6>
+                    <a class="mt-3 d-flex justify-content-center align-items-center gap-2 text-decoration-none" href="/interpersonal/member/view/${leastRecentlyEdited.id}" target="_blank">
+                        <img class="square-image me-2" style="height: 40px; width: 40px" alt="Member inmage" src="/api/interpersonal/group/image/${leastRecentlyEdited.id}">
+                        <p class="fw-bold m-0 fs-3 text-truncate">${leastRecentlyEdited.firstName + " " + leastRecentlyEdited.lastName}</p>
                     </a>
                 </div>
             </div>
 
-            <div class="col-12 col-lg-3">
-                <div class="alert alert-${"danger"} h-100">
+            <div class="col-12 col-lg-3 mb-3">
+                <div class="alert alert-${rhBackground} h-100">
                     <div class="d-flex flex-col w-100">
                         <div class="d-flex flex-row align-items-start justify-content-between w-100">
                             <h6 class="text-center fw-bold">cScore Average</h6>
@@ -613,7 +645,7 @@
                     <div class="w-100 position-relative">
                         <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${totalScore/(2 * groupMemberList.length) + 50}%" alt="arrow" />
                     </div>
-                    <div class="bg-${"danger"} w-100 mt-4" style="height: 10px;"></div>
+                    <div class="bg-${rhBackground} w-100 mt-4" style="height: 10px;"></div>
                     <div class="w-100 position-relative">
                         <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">-100</p>
                         <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">0</p>
@@ -621,6 +653,39 @@
                     </div>
                 </div>
             </div>
+        `;
+
+
+        let tableContent = "";
+        groupMemberList.forEach((member) => {
+            tableContent += `
+            <tr>
+                <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}"></th>
+                <td style="vertical-align: middle" class="fw-bold">${member.firstName} ${member.lastName}</td>
+                <td style="vertical-align: middle; color: ${getColorGradient(member.mostRecentEval.cscore, -100, 100)}" class="fw-bold">${member.mostRecentEval? member.mostRecentEval.cscore : "N/A"}</td>
+                <td style="vertical-align: middle">${member.relationship}</td>
+                <td style="vertical-align: middle">${member.sex}</td>
+                <td style="vertical-align: middle"><a href="/interpersonal/member/view/${member.id}" target="_blank">View Member ></a></td>
+            </tr>
+            `;
+        });
+
+        document.querySelector("#evaluation-table").innerHTML = `
+            <table class="table">
+                <thead>
+                    <tr>
+                      <th scope="col">Photo</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">cScore</th>
+                      <th scope="col">Relationship</th>
+                      <th scope="col">Sex</th>
+                      <th scope="col">View</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableContent}
+                </tbody>
+            </table>
         `;
 
         // Event content
