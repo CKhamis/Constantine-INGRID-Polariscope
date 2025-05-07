@@ -857,4 +857,11 @@ public class InterpersonalAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Retrieving Relationships", ResponseMessage.Severity.LOW, e.getMessage()));
         }
     }
+
+    @GetMapping("/reports/quarterly")
+    public ResponseEntity<?> quarterly(Principal principal){
+        User retrievedUser = getCurrentUser(principal);
+
+
+    }
 }
