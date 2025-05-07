@@ -619,7 +619,7 @@
                     </div>
                     <a class="d-flex justify-content-center align-items-center gap-2 text-decoration-none" href="/interpersonal/member/view/${lowestEvaluated.id}" target="_blank">
                         <img class="square-image me-2" style="height: 40px; width: 40px" alt="Highest evaluated member of group image" src="/api/interpersonal/member/profile-image/${lowestEvaluated.id}">
-                        <p class="fw-bold m-0 fs-3 text-truncate">${lowestEvaluated.firstName + " " + highestEvaluated.lastName}</p>
+                        <p class="fw-bold m-0 fs-3 text-truncate">${lowestEvaluated.firstName + " " + lowestEvaluated.lastName}</p>
                     </a>
                 </div>
             </div>
@@ -672,22 +672,25 @@
         });
 
         document.querySelector("#evaluation-table").innerHTML = `
-            <table class="table">
-                <thead>
-                    <tr>
-                      <th scope="col">Photo</th>
-                      <th scope="col">Name</th>
-                      <th scope="col">Eval</th>
-                      <th scope="col">Edits</th>
-                      <th scope="col">Relationship</th>
-                      <th scope="col">Sex</th>
-                      <th scope="col">View</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableContent}
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                          <th scope="col">Photo</th>
+                          <th scope="col">Name</th>
+                          <th scope="col">Eval</th>
+                          <th scope="col">Edits</th>
+                          <th scope="col">Relationship</th>
+                          <th scope="col">Sex</th>
+                          <th scope="col">View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableContent}
+                    </tbody>
+                </table>
+            </div>
+
         `;
 
         // Event content
