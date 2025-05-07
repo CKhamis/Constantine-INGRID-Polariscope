@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
@@ -20,5 +22,10 @@ public class UserService implements UserDetailsService {
 
     public void save(User user){
         userRepository.save(user);
+    }
+
+    // ONLY used for report generation; should not be used for anything else for security reasons
+    public List<User> getAll(){
+        return userRepository.findAll();
     }
 }

@@ -70,4 +70,16 @@ public class MemberService {
             memberRepository.save(member);
         }
     }
+
+    // FOR REPORT ONLY!
+    public List<Member> report(){
+        List<Member> members = memberRepository.findAll();
+        for(Member member : members){
+
+        }
+        List<Evaluation> evals = evaluationRepository.findAllByMemberOrderByTimestampDesc(m);
+        m.setTimeline(evals);
+        m.setTimelineSize(evals.size());
+        return m;
+    }
 }
