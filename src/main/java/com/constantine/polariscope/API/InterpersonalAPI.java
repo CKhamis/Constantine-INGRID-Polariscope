@@ -1,5 +1,6 @@
 package com.constantine.polariscope.API;
 
+import com.constantine.polariscope.Comprehension.ReportGenerator;
 import com.constantine.polariscope.DTO.*;
 import com.constantine.polariscope.Model.*;
 import com.constantine.polariscope.Model.Event;
@@ -28,7 +29,6 @@ import java.util.*;
 import java.util.List;
 
 @Controller
-@AllArgsConstructor
 @RequestMapping("/api/interpersonal")
 public class InterpersonalAPI {
     private final MemberService memberService;
@@ -39,6 +39,19 @@ public class InterpersonalAPI {
     private final MemberGroupService memberGroupService;
     private final EventService eventService;
     private final RelationshipService relationshipService;
+
+    public InterpersonalAPI(MemberService memberService, UserService userService, EvaluationService evaluationService, MemberGroupService groupService, ActivityLogService activityLogService, MemberGroupService memberGroupService, EventService eventService, RelationshipService relationshipService) {
+        this.memberService = memberService;
+        this.userService = userService;
+        this.evaluationService = evaluationService;
+        this.groupService = groupService;
+        this.activityLogService = activityLogService;
+        this.memberGroupService = memberGroupService;
+        this.eventService = eventService;
+        this.relationshipService = relationshipService;
+
+        ReportGenerator.generateReport();
+    }
 
     private User getCurrentUser(Principal principal) throws Exception{
         if(principal == null){
@@ -860,8 +873,12 @@ public class InterpersonalAPI {
 
     @GetMapping("/reports/quarterly")
     public ResponseEntity<?> quarterly(Principal principal){
-        User retrievedUser = getCurrentUser(principal);
+        try{
+            User retrievedUser = getCurrentUser(principal);
 
-
+            return null;
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Getting Report", ResponseMessage.Severity.LOW, e.getMessage()));
+        }
     }
 }
