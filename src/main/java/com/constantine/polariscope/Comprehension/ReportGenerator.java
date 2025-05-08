@@ -2,8 +2,10 @@ package com.constantine.polariscope.Comprehension;
 
 import com.constantine.polariscope.DTO.StatisticReport;
 import com.constantine.polariscope.Model.ActivityLog;
+import com.constantine.polariscope.Model.Evaluation;
 import com.constantine.polariscope.Model.Member;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,11 +17,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Component
@@ -82,9 +83,7 @@ public class ReportGenerator {
         List<ActivityLog> activityLogListSegment = activityLogList.stream().filter((log) ->  log.getCreated().isBefore(endDate.atStartOfDay()) && log.getCreated().isAfter(startDate.atStartOfDay())).toList();
         HashMap<String, Integer> activityTypeScores = new HashMap<>();
 
-        for(ActivityLog activityLog : activityLogListSegment) {
-            System.out.println(activityLog.getCreated());
-            String type = activityLog.getActivityType().toString();
+        for(ActivityLog activityLog : activityLogListSegment) {String type = activityLog.getActivityType().toString();
 
             if(activityTypeScores.containsKey(type)){
                 activityTypeScores.put(type, activityTypeScores.get(type) + 1);
@@ -105,6 +104,10 @@ public class ReportGenerator {
         double smallestSTD = Double.MAX_VALUE;
         UUID scoreMaxId = null;
         int scoreMax = 0;
+        UUID topGrossing = null;
+        double topGrossingSlope = 0;
+        UUID antiGrossing = null;
+        double antiGrossingSlope = Double.MAX_VALUE;
 
         List<Integer> allScores = new ArrayList<>();
 
@@ -121,15 +124,32 @@ public class ReportGenerator {
 
             // Calculating cScore
             List<Integer> memberScores = new ArrayList<>();
+            SimpleRegression regression = new SimpleRegression();
 
-            member.getTimeline().stream().filter((eval) -> eval.getTimestamp().isBefore(endDate.atStartOfDay()) && eval.getTimestamp().isAfter(startDate.atStartOfDay())).forEach((eval) -> {
-                memberScores.add(eval.getCScore());
-                System.out.print(eval.getCScore() + " ");
-            });
+            List<Evaluation> scopedTimeline = member.getTimeline().stream().filter((eval) -> eval.getTimestamp().isBefore(endDate.atStartOfDay()) && eval.getTimestamp().isAfter(startDate.atStartOfDay())).sorted(Comparator.comparing(Evaluation::getTimestamp)).toList();
+
+            for (Evaluation evaluation : scopedTimeline) {
+                long x = ChronoUnit.DAYS.between(startDate, evaluation.getTimestamp().toLocalDate());
+                int y = evaluation.getCScore();
+                memberScores.add(y);
+                regression.addData(x, y);
+            }
 
             double[] memberArray = memberScores.stream().mapToDouble(value -> (double) value).toArray();
             StandardDeviation sd = new StandardDeviation(false);
             double std = sd.evaluate(memberArray);
+
+            double bfs = regression.getSlope();
+
+            if(bfs > topGrossingSlope){
+                topGrossingSlope = bfs;
+                topGrossing = member.getId();
+            }
+
+            if(bfs < antiGrossingSlope){
+                antiGrossingSlope = bfs;
+                antiGrossing = member.getId();
+            }
 
             if(std < smallestSTD && memberArray.length > 3){
                 smallestSTD = std;
@@ -148,10 +168,28 @@ public class ReportGenerator {
             }
 
             allScores.addAll(memberScores);
-            System.out.println(std);
         }
 
-        // Calculate cScore average
+        // Write accumulated data to report
+        statisticReport.setNewMembers(newMembers);
+        statisticReport.setTotalMembers(totalMembers);
+
+        statisticReport.setStable(smallestSTDId);
+        statisticReport.setStableSTD(smallestSTD);
+
+        statisticReport.setUnstable(largestSTDId);
+        statisticReport.setUnstableSTD(largestSTD);
+
+        statisticReport.setTopMemberScore(scoreMax);
+        statisticReport.setTopMember(scoreMaxId);
+
+        statisticReport.setTopGrossing(topGrossing);
+        statisticReport.setTopScoreIncrease(topGrossingSlope);
+
+        statisticReport.setAntiGrossing(antiGrossing);
+        statisticReport.setAntiScoreDecrease(antiGrossingSlope);
+
+        // todo: Calculate cScore average
 
         // Calculate overall sd
         double[] totalScoreArray = allScores.stream().mapToDouble(value -> (double) value).toArray();
@@ -166,19 +204,6 @@ public class ReportGenerator {
 
         statisticReport.setOverallScoreCount(totalScore);
         statisticReport.setOverallScoreAverage((double) totalScore /allScores.size());
-
-        // Write accumulated data to report
-        statisticReport.setNewMembers(newMembers);
-        statisticReport.setTotalMembers(totalMembers);
-
-        statisticReport.setStable(smallestSTDId);
-        statisticReport.setStableSTD(smallestSTD);
-
-        statisticReport.setUnstable(largestSTDId);
-        statisticReport.setUnstableSTD(largestSTD);
-
-        statisticReport.setTopMemberScore(scoreMax);
-        statisticReport.setTopMember(scoreMaxId);
 
         return statisticReport;
     }
