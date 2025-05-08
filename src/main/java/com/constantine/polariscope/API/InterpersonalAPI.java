@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.List;
 
 @Controller
+@AllArgsConstructor
 @RequestMapping("/api/interpersonal")
 public class InterpersonalAPI {
     private final MemberService memberService;
@@ -39,19 +40,6 @@ public class InterpersonalAPI {
     private final MemberGroupService memberGroupService;
     private final EventService eventService;
     private final RelationshipService relationshipService;
-
-    public InterpersonalAPI(MemberService memberService, UserService userService, EvaluationService evaluationService, MemberGroupService groupService, ActivityLogService activityLogService, MemberGroupService memberGroupService, EventService eventService, RelationshipService relationshipService) {
-        this.memberService = memberService;
-        this.userService = userService;
-        this.evaluationService = evaluationService;
-        this.groupService = groupService;
-        this.activityLogService = activityLogService;
-        this.memberGroupService = memberGroupService;
-        this.eventService = eventService;
-        this.relationshipService = relationshipService;
-
-        ReportGenerator.generateReport();
-    }
 
     private User getCurrentUser(Principal principal) throws Exception{
         if(principal == null){

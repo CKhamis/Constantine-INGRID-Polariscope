@@ -15,6 +15,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @AllArgsConstructor
 public class SecurityConfig {
+
+    private final PolariscopeAuthenticationSuccessHandler successHandler;
+
     @Bean
     SecurityFilterChain web(HttpSecurity http) throws Exception {
         http
@@ -25,8 +28,8 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
+                        .successHandler(successHandler)
                         .permitAll()
-                        .defaultSuccessUrl("/interpersonal")
                 )
                 .logout(form -> form
                         .logoutUrl("/logout")

@@ -2,9 +2,6 @@ package com.constantine.polariscope.DTO;
 
 import java.util.HashMap;
 
-/***
- * A quarterly report of all input information. Cached in ram and most recent is regenerated
- */
 public class QuarterlyReport {
     int newMembers;
     int totalMembers;

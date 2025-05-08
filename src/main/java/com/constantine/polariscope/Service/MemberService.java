@@ -72,14 +72,14 @@ public class MemberService {
     }
 
     // FOR REPORT ONLY!
-    public List<Member> report(){
-        List<Member> members = memberRepository.findAll();
+    public List<Member> report(User user){
+        List<Member> members = memberRepository.findAllByAuthorOrderByLastModifiedDesc(user);
+        // Include the evaluations along with the member themselves.
         for(Member member : members){
-
+            List<Evaluation> evals = evaluationRepository.findAllByMemberOrderByTimestampDesc(member);
+            member.setTimeline(evals);
+            member.setTimelineSize(evals.size());
         }
-        List<Evaluation> evals = evaluationRepository.findAllByMemberOrderByTimestampDesc(m);
-        m.setTimeline(evals);
-        m.setTimelineSize(evals.size());
-        return m;
+        return members;
     }
 }
