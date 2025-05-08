@@ -18,14 +18,15 @@ public class StatisticReport {
     HashMap<String, Integer> activityTypeScores; // works
 
     // cScore
-    double overallSTD;
+    double overallSTD; // works
+    double overallScoreAverage; //works
+    long overallScoreCount; //works
     UUID topGrossing;
     int topScoreIncrease;
     UUID antiGrossing;
     int antiScoreDecrease;
     UUID topMember;// works
     int topMemberScore;// works
-    double scoreAverage;
     UUID stable;// works
     double stableSTD;// works
     UUID unstable;// works
@@ -55,14 +56,16 @@ public class StatisticReport {
                 ", totalMembers=" + totalMembers +
                 ", events=" + events +
                 ", activityScore=" + activityScore +
+                ", activityTypeScores=" + activityTypeScores +
                 ", overallSTD=" + overallSTD +
-                ", topGrossing='" + topGrossing + '\'' +
+                ", overallScoreAverage=" + overallScoreAverage +
+                ", overallScoreCount=" + overallScoreCount +
+                ", topGrossing=" + topGrossing +
                 ", topScoreIncrease=" + topScoreIncrease +
-                ", antiGrossing='" + antiGrossing + '\'' +
+                ", antiGrossing=" + antiGrossing +
                 ", antiScoreDecrease=" + antiScoreDecrease +
-                ", topMember='" + topMember + '\'' +
+                ", topMember=" + topMember +
                 ", topMemberScore=" + topMemberScore +
-                ", scoreAverage=" + scoreAverage +
                 ", stable=" + stable +
                 ", stableSTD=" + stableSTD +
                 ", unstable=" + unstable +
@@ -80,7 +83,6 @@ public class StatisticReport {
                 ", groupAverageScoreChange=" + groupAverageScoreChange +
                 ", mostCohesive='" + mostCohesive + '\'' +
                 ", mostCohesiveSTD=" + mostCohesiveSTD +
-                ", activityScores=" + activityTypeScores.size() +
                 '}';
     }
 }

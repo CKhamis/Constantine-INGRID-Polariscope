@@ -153,6 +153,20 @@ public class ReportGenerator {
 
         // Calculate cScore average
 
+        // Calculate overall sd
+        double[] totalScoreArray = allScores.stream().mapToDouble(value -> (double) value).toArray();
+        StandardDeviation sd = new StandardDeviation(false);
+        statisticReport.setOverallSTD(sd.evaluate(totalScoreArray));
+
+        // Calculate overall score average
+        long totalScore = 0;
+        for(int s : allScores){
+            totalScore += s;
+        }
+
+        statisticReport.setOverallScoreCount(totalScore);
+        statisticReport.setOverallScoreAverage((double) totalScore /allScores.size());
+
         // Write accumulated data to report
         statisticReport.setNewMembers(newMembers);
         statisticReport.setTotalMembers(totalMembers);
