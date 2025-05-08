@@ -11,24 +11,25 @@ import java.util.UUID;
 @Getter
 @Setter
 public class StatisticReport {
-    int newMembers; // inconclusive
-    int totalMembers; // does not work
+    int newMembers; // works
+    int totalMembers; // works
     int events;
-    int activityScore;
+    int activityScore; // works
+    HashMap<String, Integer> activityTypeScores; // works
 
     // cScore
     double overallSTD;
-    String topGrossing;
+    UUID topGrossing;
     int topScoreIncrease;
-    String antiGrossing;
+    UUID antiGrossing;
     int antiScoreDecrease;
-    String topMember;// does not work
-    int topMemberScore;// does not work
+    UUID topMember;// works
+    int topMemberScore;// works
     double scoreAverage;
-    UUID stable;// wrong
-    double stableSTD;// wrong
-    UUID unstable;// does not work
-    double unstableSTD;// does not work
+    UUID stable;// works
+    double stableSTD;// works
+    UUID unstable;// works
+    double unstableSTD;// works
 
     // Network
     String mostConnections;
@@ -79,6 +80,7 @@ public class StatisticReport {
                 ", groupAverageScoreChange=" + groupAverageScoreChange +
                 ", mostCohesive='" + mostCohesive + '\'' +
                 ", mostCohesiveSTD=" + mostCohesiveSTD +
+                ", activityScores=" + activityTypeScores.size() +
                 '}';
     }
 }

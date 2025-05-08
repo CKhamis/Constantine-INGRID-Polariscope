@@ -1,6 +1,7 @@
 package com.constantine.polariscope.Comprehension;
 
 import com.constantine.polariscope.DTO.StatisticReport;
+import com.constantine.polariscope.Model.ActivityLog;
 import com.constantine.polariscope.Model.Member;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,7 @@ import org.springframework.web.context.annotation.SessionScope;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,6 +35,7 @@ public class ReportGenerator {
     private final RelationshipService relationshipService;
 
     private List<Member> memberList;
+    private List<ActivityLog> activityLogList;
 
     /**
      * Generates ALL quarterly reports for the logged in user.
@@ -64,14 +67,35 @@ public class ReportGenerator {
         // Get list of members along with their associated evaluations
         memberList = memberService.report(currentUser);
 
+        // Get list of activities
+        activityLogList = activityLogService.findAll(currentUser);
+
         // Create date intervals from when user was created to today
         //run report for those intervals; persist them in database
-        StatisticReport report = generateStatisticReport(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 3, 31));
+        StatisticReport report = generateStatisticReport(LocalDate.of(2019, 1, 1), LocalDate.of(2025, 3, 31));
         System.out.println(report);
     }
 
     private StatisticReport generateStatisticReport(LocalDate startDate, LocalDate endDate) {
         StatisticReport statisticReport = new StatisticReport();
+
+        List<ActivityLog> activityLogListSegment = activityLogList.stream().filter((log) ->  log.getCreated().isBefore(endDate.atStartOfDay()) && log.getCreated().isAfter(startDate.atStartOfDay())).toList();
+        HashMap<String, Integer> activityTypeScores = new HashMap<>();
+
+        for(ActivityLog activityLog : activityLogListSegment) {
+            System.out.println(activityLog.getCreated());
+            String type = activityLog.getActivityType().toString();
+
+            if(activityTypeScores.containsKey(type)){
+                activityTypeScores.put(type, activityTypeScores.get(type) + 1);
+            }else{
+                activityTypeScores.put(type, 1);
+            }
+        }
+
+        statisticReport.setActivityScore(activityLogListSegment.size());
+        statisticReport.setActivityTypeScores(activityTypeScores);
+
 
         int newMembers = 0;
         int totalMembers = 0;
@@ -107,12 +131,12 @@ public class ReportGenerator {
             StandardDeviation sd = new StandardDeviation(false);
             double std = sd.evaluate(memberArray);
 
-            if(std > smallestSTD && memberArray.length > 3){
+            if(std < smallestSTD && memberArray.length > 3){
                 smallestSTD = std;
                 smallestSTDId = member.getId();
             }
 
-            if(std < largestSTD && memberArray.length > 3){
+            if(std > largestSTD && memberArray.length > 3){
                 largestSTD = std;
                 largestSTDId = member.getId();
             }
@@ -129,7 +153,7 @@ public class ReportGenerator {
 
         // Calculate cScore average
 
-
+        // Write accumulated data to report
         statisticReport.setNewMembers(newMembers);
         statisticReport.setTotalMembers(totalMembers);
 
@@ -138,6 +162,9 @@ public class ReportGenerator {
 
         statisticReport.setUnstable(largestSTDId);
         statisticReport.setUnstableSTD(largestSTD);
+
+        statisticReport.setTopMemberScore(scoreMax);
+        statisticReport.setTopMember(scoreMaxId);
 
         return statisticReport;
     }
