@@ -1,16 +1,13 @@
 package com.constantine.polariscope.Comprehension;
 
 import com.constantine.polariscope.DTO.StatisticReport;
-import com.constantine.polariscope.Model.ActivityLog;
-import com.constantine.polariscope.Model.Evaluation;
-import com.constantine.polariscope.Model.Member;
+import com.constantine.polariscope.Model.*;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.constantine.polariscope.Model.User;
 import com.constantine.polariscope.Service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -37,6 +34,7 @@ public class ReportGenerator {
 
     private List<Member> memberList;
     private List<ActivityLog> activityLogList;
+    private List<Relationship> relationshipList;
 
     /**
      * Generates ALL quarterly reports for the logged in user.
@@ -70,6 +68,9 @@ public class ReportGenerator {
 
         // Get list of activities
         activityLogList = activityLogService.findAll(currentUser);
+
+        // Get list of relationships
+        relationshipList = relationshipService.findAll(currentUser);
 
         // Create date intervals from when user was created to today
         //run report for those intervals; persist them in database
@@ -170,7 +171,7 @@ public class ReportGenerator {
             allScores.addAll(memberScores);
         }
 
-        // Write accumulated data to report
+        // Write accumulated cScore data to report
         statisticReport.setNewMembers(newMembers);
         statisticReport.setTotalMembers(totalMembers);
 
@@ -189,8 +190,6 @@ public class ReportGenerator {
         statisticReport.setAntiGrossing(antiGrossing);
         statisticReport.setAntiScoreDecrease(antiGrossingSlope);
 
-        // todo: Calculate cScore average
-
         // Calculate overall sd
         double[] totalScoreArray = allScores.stream().mapToDouble(value -> (double) value).toArray();
         StandardDeviation sd = new StandardDeviation(false);
@@ -205,6 +204,35 @@ public class ReportGenerator {
         statisticReport.setOverallScoreCount(totalScore);
         statisticReport.setOverallScoreAverage((double) totalScore /allScores.size());
 
+        // Member network information
+        HashMap<UUID, Integer> connectionTotal = new HashMap<>();
+        HashMap<UUID, HashSet<Integer>> incomingRatings = new HashMap<>();
+        HashMap<String, HashSet<Integer>> relationshipTypeRatings = new HashMap<>();
+
+        for(Relationship r : relationshipList){
+            UUID receiver = r.getOther().getId();
+
+            if(connectionTotal.containsKey(receiver)){
+                connectionTotal.put(receiver, connectionTotal.get(receiver) + 1);
+            }else{
+                connectionTotal.put(receiver, 1);
+            }
+
+            if(incomingRatings.containsKey(receiver)){
+                incomingRatings.get(receiver).add(r.getHealth());
+            }else{
+                incomingRatings.put(receiver, new HashSet<>());
+                incomingRatings.get(receiver).add(r.getHealth());
+            }
+
+            if(relationshipTypeRatings.containsKey(String.valueOf(r.getType()))){
+                relationshipTypeRatings.get(String.valueOf(r.getType())).add(r.getHealth());
+            }else{
+                relationshipTypeRatings.put(String.valueOf(r.getType()), new HashSet<>());
+                relationshipTypeRatings.get(String.valueOf(r.getType())).add(r.getHealth());
+            }
+        }
+        System.out.println(statisticReport);
         return statisticReport;
     }
 }
