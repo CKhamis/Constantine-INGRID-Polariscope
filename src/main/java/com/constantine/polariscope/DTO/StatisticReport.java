@@ -13,7 +13,7 @@ import java.util.UUID;
 public class StatisticReport {
     int newMembers; // works
     int totalMembers; // works
-    int events;
+    int events; // works
     int activityScore; // works
     HashMap<String, Integer> activityTypeScores; // works
 

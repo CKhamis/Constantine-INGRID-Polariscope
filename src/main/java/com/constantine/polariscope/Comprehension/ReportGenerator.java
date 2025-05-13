@@ -35,6 +35,7 @@ public class ReportGenerator {
     private List<Member> memberList;
     private List<ActivityLog> activityLogList;
     private List<Relationship> relationshipList;
+    private List<Event> eventList;
 
     /**
      * Generates ALL quarterly reports for the logged in user.
@@ -71,6 +72,9 @@ public class ReportGenerator {
 
         // Get list of relationships
         relationshipList = relationshipService.findAll(currentUser);
+
+        // Get list of events
+        eventList = eventService.findAllByAuthor(currentUser);
 
         // Create date intervals from when user was created to today
         //run report for those intervals; persist them in database
@@ -353,6 +357,9 @@ public class ReportGenerator {
         statisticReport.setLeastCohesive(leastCohesiveGroup);
         statisticReport.setMostCohesiveSTD(mostCohesiveScore);
         statisticReport.setLeastCohesiveSTD(leastCohesiveScore);
+
+        List<Event> scopedEventList = eventList.stream().filter((log) ->  log.getCreated().isBefore(endDate.atStartOfDay()) && log.getCreated().isAfter(startDate.atStartOfDay())).toList();
+        statisticReport.setEvents(scopedEventList.size());
 
         System.out.println(statisticReport);
         return statisticReport;
