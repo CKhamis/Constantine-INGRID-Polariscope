@@ -2,6 +2,7 @@ package com.constantine.polariscope.Comprehension;
 
 import com.constantine.polariscope.DTO.StatisticReport;
 import com.constantine.polariscope.Model.*;
+import lombok.Getter;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,7 +44,11 @@ public class ReportGenerator {
     private List<Relationship> relationshipList;
     private List<Event> eventList;
 
+    @Getter
     private List<StatisticReport> quarterlyReportList;
+    @Getter
+    private boolean quarterlyReportFinished = false;
+    @Getter
     private HashMap<String, StatisticReport> customReports;
 
     /**
@@ -91,6 +96,7 @@ public class ReportGenerator {
 
     private void generateQuarterlyReports() {
         quarterlyReportList = new ArrayList<>();
+        quarterlyReportFinished = false;
 
         // get creation date of user
         LocalDate start = loggedInUser.getCreated().toLocalDate();
@@ -111,9 +117,7 @@ public class ReportGenerator {
 
             start = start.plusMonths(3);
         }
-
-
-        System.out.println("done");
+        quarterlyReportFinished = true;
     }
 
     private LocalDate getQuarterStart(LocalDate date) {

@@ -40,6 +40,7 @@ public class InterpersonalAPI {
     private final MemberGroupService memberGroupService;
     private final EventService eventService;
     private final RelationshipService relationshipService;
+    private final ReportGenerator reportGenerator;
 
     private User getCurrentUser(Principal principal) throws Exception{
         if(principal == null){
@@ -864,7 +865,12 @@ public class InterpersonalAPI {
         try{
             User retrievedUser = getCurrentUser(principal);
 
-            return null;
+            if(reportGenerator.isQuarterlyReportFinished()){
+                return ResponseEntity.ok(reportGenerator.getQuarterlyReportList());
+            }
+
+            return ResponseEntity.status(HttpStatus.LOCKED).body(new ResponseMessage("Error Getting Report", ResponseMessage.Severity.LOW, "Quarterly Reports have not yet been generated. Please check back soon."));
+
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Error Getting Report", ResponseMessage.Severity.LOW, e.getMessage()));
         }
