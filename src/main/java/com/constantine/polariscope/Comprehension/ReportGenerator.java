@@ -35,6 +35,7 @@ public class ReportGenerator {
     private List<Member> memberList;
     private List<ActivityLog> activityLogList;
     private List<Relationship> relationshipList;
+    private List<MemberGroup> groupList;
 
     /**
      * Generates ALL quarterly reports for the logged in user.
@@ -71,6 +72,9 @@ public class ReportGenerator {
 
         // Get list of relationships
         relationshipList = relationshipService.findAll(currentUser);
+
+        // Get list of groups
+        groupList = groupService.findAll(currentUser);
 
         // Create date intervals from when user was created to today
         //run report for those intervals; persist them in database
@@ -212,39 +216,45 @@ public class ReportGenerator {
         HashMap<UUID, Integer> connectionTotal = new HashMap<>();
         HashMap<UUID, HashSet<Integer>> incomingRatings = new HashMap<>();
         HashMap<String, HashSet<Integer>> relationshipTypeRatings = new HashMap<>();
+        long relationCount = 0;
 
         for(Relationship r : relationshipList){
             UUID receiver = r.getOther().getId();
+            // filter out all dates that are not in the right period
+            if(r.getLastModified().isAfter(startDate.atStartOfDay()) && r.getLastModified().isBefore(endDate.atStartOfDay())){
+                relationCount++;
 
-            if(connectionTotal.containsKey(receiver)){
-                connectionTotal.put(receiver, connectionTotal.get(receiver) + 1);
-            }else{
-                connectionTotal.put(receiver, 1);
-            }
+                if(connectionTotal.containsKey(receiver)){
+                    connectionTotal.put(receiver, connectionTotal.get(receiver) + 1);
+                }else{
+                    connectionTotal.put(receiver, 1);
+                }
 
-            if(connectionTotal.get(receiver) > mostConnectionsCount){
-                mostConnectionsCount = connectionTotal.get(receiver);
-                mostConnectionsId = receiver;
-            }
-            if(connectionTotal.get(receiver) < leastConnectionsCount){
-                leastConnectionsCount = connectionTotal.get(receiver);
-                leastConnectionsId = receiver;
-            }
+                if(connectionTotal.get(receiver) > mostConnectionsCount){
+                    mostConnectionsCount = connectionTotal.get(receiver);
+                    mostConnectionsId = receiver;
+                }
+                if(connectionTotal.get(receiver) < leastConnectionsCount){
+                    leastConnectionsCount = connectionTotal.get(receiver);
+                    leastConnectionsId = receiver;
+                }
 
-            if(incomingRatings.containsKey(receiver)){
-                incomingRatings.get(receiver).add(r.getHealth());
-            }else{
-                incomingRatings.put(receiver, new HashSet<>());
-                incomingRatings.get(receiver).add(r.getHealth());
-            }
+                if(incomingRatings.containsKey(receiver)){
+                    incomingRatings.get(receiver).add(r.getHealth());
+                }else{
+                    incomingRatings.put(receiver, new HashSet<>());
+                    incomingRatings.get(receiver).add(r.getHealth());
+                }
 
-            if(relationshipTypeRatings.containsKey(String.valueOf(r.getType()))){
-                relationshipTypeRatings.get(String.valueOf(r.getType())).add(r.getHealth());
-            }else{
-                relationshipTypeRatings.put(String.valueOf(r.getType()), new HashSet<>());
-                relationshipTypeRatings.get(String.valueOf(r.getType())).add(r.getHealth());
+                if(relationshipTypeRatings.containsKey(String.valueOf(r.getType()))){
+                    relationshipTypeRatings.get(String.valueOf(r.getType())).add(r.getHealth());
+                }else{
+                    relationshipTypeRatings.put(String.valueOf(r.getType()), new HashSet<>());
+                    relationshipTypeRatings.get(String.valueOf(r.getType())).add(r.getHealth());
+                }
             }
         }
+        statisticReport.setNumConnections(relationCount);
 
         // Calculate category scores
         HashMap<String, Double> categoryScore = new HashMap<>();
@@ -264,6 +274,10 @@ public class ReportGenerator {
         double leastControversialScore = Double.MAX_VALUE;
 
         for(UUID memberId : incomingRatings.keySet()){
+            if(incomingRatings.get(memberId).size() < 3){
+                // remove all members who do not have enough evals
+                continue;
+            }
             StandardDeviation incomingSD = new StandardDeviation(false);
             double[] data = new double[incomingRatings.get(memberId).size()];
             int i = 0;
@@ -284,7 +298,7 @@ public class ReportGenerator {
             }
         }
         statisticReport.setMostControversial(mostControversialId);
-        statisticReport.setMostCohesiveSTD(mostControversialScore);
+        statisticReport.setMostControversialSTD(mostControversialScore);
         statisticReport.setLeastControversial(leastControversialId);
         statisticReport.setLeastControversialSTD(leastControversialScore);
 
@@ -292,6 +306,19 @@ public class ReportGenerator {
         statisticReport.setMostConnectionsCount(mostConnectionsCount);
         statisticReport.setLeastConnections(leastConnectionsId);
         statisticReport.setLeastConnectionsCount(leastConnectionsCount);
+
+        UUID highestRatedGroup = null;
+        double highestRatedScore = 0;
+        UUID lowestRatedGroup = null;
+        double lowestRatedScore = Double.MAX_VALUE;
+        HashMap<UUID, Double> averageGroupRatings = new HashMap<>();
+        UUID mostCohesiveGroup = null;
+        double mostCohesiveScore = 0;
+        UUID leastCohesiveGroup = null;
+        double leastCohesiveScore = Double.MAX_VALUE;
+
+        for()
+
 
         System.out.println(statisticReport);
         return statisticReport;

@@ -33,23 +33,28 @@ public class StatisticReport {
     double unstableSTD;// works
 
     // Network
-    UUID mostConnections;//
-    long mostConnectionsCount;//
-    UUID leastConnections;//
-    long leastConnectionsCount;//
+    long numConnections;//works
+    UUID mostConnections;//works
+    long mostConnectionsCount;//works
+    UUID leastConnections;//works
+    long leastConnectionsCount;//works
     //String popular;
-    HashMap<String, Double> categoryScoreAverage;//
-    UUID mostControversial;//
-    double mostControversialSTD;//
-    UUID leastControversial;//
-    double leastControversialSTD;//
+    HashMap<String, Double> categoryScoreAverage;//works
+    UUID mostControversial;//works
+    double mostControversialSTD;//works
+    UUID leastControversial;//works
+    double leastControversialSTD;//works
 
     // Group
-    String highestRated;
+    UUID highestRated;
     double highestRatedScore;
-    HashMap<String, Integer> groupAverageScoreChange;
-    String mostCohesive;
+    UUID lowestRated;
+    double lowestRatedScore;
+    HashMap<UUID, Double> groupAverageScore;
+    UUID mostCohesive;
     double mostCohesiveSTD;
+    UUID leastCohesive;
+    double leastCohesiveSTD;
 
     @Override
     public String toString() {
