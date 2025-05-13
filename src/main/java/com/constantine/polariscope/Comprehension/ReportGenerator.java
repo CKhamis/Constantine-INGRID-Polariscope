@@ -205,6 +205,10 @@ public class ReportGenerator {
         statisticReport.setOverallScoreAverage((double) totalScore /allScores.size());
 
         // Member network information
+        UUID mostConnectionsId = null;
+        long mostConnectionsCount = 0;
+        UUID leastConnectionsId = null;
+        long leastConnectionsCount = Long.MAX_VALUE;
         HashMap<UUID, Integer> connectionTotal = new HashMap<>();
         HashMap<UUID, HashSet<Integer>> incomingRatings = new HashMap<>();
         HashMap<String, HashSet<Integer>> relationshipTypeRatings = new HashMap<>();
@@ -216,6 +220,15 @@ public class ReportGenerator {
                 connectionTotal.put(receiver, connectionTotal.get(receiver) + 1);
             }else{
                 connectionTotal.put(receiver, 1);
+            }
+
+            if(connectionTotal.get(receiver) > mostConnectionsCount){
+                mostConnectionsCount = connectionTotal.get(receiver);
+                mostConnectionsId = receiver;
+            }
+            if(connectionTotal.get(receiver) < leastConnectionsCount){
+                leastConnectionsCount = connectionTotal.get(receiver);
+                leastConnectionsId = receiver;
             }
 
             if(incomingRatings.containsKey(receiver)){
@@ -232,6 +245,54 @@ public class ReportGenerator {
                 relationshipTypeRatings.get(String.valueOf(r.getType())).add(r.getHealth());
             }
         }
+
+        // Calculate category scores
+        HashMap<String, Double> categoryScore = new HashMap<>();
+        for(String key : relationshipTypeRatings.keySet()){
+            int total = 0;
+            for(Integer score : relationshipTypeRatings.get(key)){
+                total += score;
+            }
+            categoryScore.put(key, (double) total / relationshipTypeRatings.get(key).size());
+        }
+        statisticReport.setCategoryScoreAverage(categoryScore);
+
+        // Calculate controversial members
+        UUID mostControversialId = null;
+        double mostControversialScore = 0;
+        UUID leastControversialId = null;
+        double leastControversialScore = Double.MAX_VALUE;
+
+        for(UUID memberId : incomingRatings.keySet()){
+            StandardDeviation incomingSD = new StandardDeviation(false);
+            double[] data = new double[incomingRatings.get(memberId).size()];
+            int i = 0;
+            for(int score : incomingRatings.get(memberId)){
+                data[i] = score;
+                i++;
+            }
+            double memberSD = incomingSD.evaluate(data);
+
+            if(memberSD > mostControversialScore){
+                mostControversialId = memberId;
+                mostControversialScore = memberSD;
+            }
+
+            if(memberSD < leastControversialScore){
+                leastControversialId = memberId;
+                leastControversialScore = memberSD;
+            }
+        }
+        statisticReport.setMostControversial(mostControversialId);
+        statisticReport.setMostCohesiveSTD(mostControversialScore);
+        statisticReport.setLeastControversial(leastControversialId);
+        statisticReport.setLeastControversialSTD(leastControversialScore);
+
+        statisticReport.setMostConnections(mostConnectionsId);
+        statisticReport.setMostConnectionsCount(mostConnectionsCount);
+        statisticReport.setLeastConnections(leastConnectionsId);
+        statisticReport.setLeastConnectionsCount(leastConnectionsCount);
+
         System.out.println(statisticReport);
         return statisticReport;
     }

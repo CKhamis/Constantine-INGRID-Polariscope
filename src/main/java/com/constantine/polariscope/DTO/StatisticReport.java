@@ -21,10 +21,10 @@ public class StatisticReport {
     double overallSTD; // works
     double overallScoreAverage; //works
     long overallScoreCount; //works
-    UUID topGrossing;
-    int topScoreIncrease;
-    UUID antiGrossing;
-    int antiScoreDecrease;
+    UUID topGrossing; // prob works
+    double topScoreIncrease; // prob works
+    UUID antiGrossing; // prob works
+    double antiScoreDecrease; // prob works
     UUID topMember;// works
     int topMemberScore;// works
     UUID stable;// works
@@ -33,14 +33,16 @@ public class StatisticReport {
     double unstableSTD;// works
 
     // Network
-    String mostConnections;
-    int mostConnectionsCount;
-    String leastConnections;
-    int leastConnectionsCount;
-    String popular;
-    HashMap<String, Integer> categoryScore;
-    String mostControversial;
-    double mostControversialSTD;
+    UUID mostConnections;//
+    long mostConnectionsCount;//
+    UUID leastConnections;//
+    long leastConnectionsCount;//
+    //String popular;
+    HashMap<String, Double> categoryScoreAverage;//
+    UUID mostControversial;//
+    double mostControversialSTD;//
+    UUID leastControversial;//
+    double leastControversialSTD;//
 
     // Group
     String highestRated;
@@ -70,14 +72,15 @@ public class StatisticReport {
                 ", stableSTD=" + stableSTD +
                 ", unstable=" + unstable +
                 ", unstableSTD=" + unstableSTD +
-                ", mostConnections='" + mostConnections + '\'' +
+                ", mostConnections=" + mostConnections +
                 ", mostConnectionsCount=" + mostConnectionsCount +
-                ", leastConnections='" + leastConnections + '\'' +
+                ", leastConnections=" + leastConnections +
                 ", leastConnectionsCount=" + leastConnectionsCount +
-                ", popular='" + popular + '\'' +
-                ", categoryScore=" + categoryScore +
-                ", mostControversial='" + mostControversial + '\'' +
+                ", categoryScoreAverage=" + categoryScoreAverage +
+                ", mostControversial=" + mostControversial +
                 ", mostControversialSTD=" + mostControversialSTD +
+                ", leastControversial=" + leastControversial +
+                ", leastControversialSTD=" + leastControversialSTD +
                 ", highestRated='" + highestRated + '\'' +
                 ", highestRatedScore=" + highestRatedScore +
                 ", groupAverageScoreChange=" + groupAverageScoreChange +
