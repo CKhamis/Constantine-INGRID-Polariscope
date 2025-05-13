@@ -14,36 +14,43 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
 @Component
 @SessionScope
 public class ReportGenerator {
     private final MemberService memberService;
     private final UserService userService;
-    private final EvaluationService evaluationService;
-    private final MemberGroupService groupService;
     private final ActivityLogService activityLogService;
-    private final MemberGroupService memberGroupService;
     private final EventService eventService;
     private final RelationshipService relationshipService;
 
+    public ReportGenerator(MemberService memberService, UserService userService, ActivityLogService activityLogService, EventService eventService, RelationshipService relationshipService) {
+        this.memberService = memberService;
+        this.userService = userService;
+        this.activityLogService = activityLogService;
+        this.eventService = eventService;
+        this.relationshipService = relationshipService;
+    }
+
+    private User loggedInUser;
     private List<Member> memberList;
     private List<ActivityLog> activityLogList;
     private List<Relationship> relationshipList;
     private List<Event> eventList;
+
+    private List<StatisticReport> quarterlyReportList;
+    private HashMap<String, StatisticReport> customReports;
 
     /**
      * Generates ALL quarterly reports for the logged in user.
      */
     public void generateReport() {
         System.out.println("Generating Quarterly report");
-
-        // todo: Put in a check to see if they are already made
 
         // Fetch currently logged in user information
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -63,6 +70,7 @@ public class ReportGenerator {
         }
 
         User currentUser = (User) userService.loadUserByUsername(username);
+        loggedInUser = currentUser;
 
         // Get list of members along with their associated evaluations
         memberList = memberService.report(currentUser);
@@ -78,12 +86,47 @@ public class ReportGenerator {
 
         // Create date intervals from when user was created to today
         //run report for those intervals; persist them in database
-        StatisticReport report = generateStatisticReport(LocalDate.of(2019, 1, 1), LocalDate.of(2025, 3, 31));
-        System.out.println(report);
+        generateQuarterlyReports();
+    }
+
+    private void generateQuarterlyReports() {
+        quarterlyReportList = new ArrayList<>();
+
+        // get creation date of user
+        LocalDate start = loggedInUser.getCreated().toLocalDate();
+        start = getQuarterStart(start);
+
+        LocalDate now = LocalDate.now();
+
+        while(start.isBefore(now)){
+            LocalDate end = start.plusMonths(3).minusDays(1);
+            if(end.isAfter(now)){
+                end = now;
+            }
+
+            //System.out.println(start.getMonthValue() + "/"+ start.getDayOfMonth() + "/"+ start.getYear()+" to "  + end.getMonthValue() + "/"+ end.getDayOfMonth() + "/"+ end.getYear());
+            StatisticReport report = generateStatisticReport(start, end);
+
+            quarterlyReportList.add(report);
+
+            start = start.plusMonths(3);
+        }
+
+
+        System.out.println("done");
+    }
+
+    private LocalDate getQuarterStart(LocalDate date) {
+        int month = date.getMonthValue();
+        int quarterStartMonth = ((month - 1) / 3) * 3 + 1;
+        return LocalDate.of(date.getYear(), quarterStartMonth, 1);
     }
 
     private StatisticReport generateStatisticReport(LocalDate startDate, LocalDate endDate) {
         StatisticReport statisticReport = new StatisticReport();
+
+        statisticReport.setStartDate(startDate);
+        statisticReport.setEndDate(endDate);
 
         List<ActivityLog> activityLogListSegment = activityLogList.stream().filter((log) ->  log.getCreated().isBefore(endDate.atStartOfDay()) && log.getCreated().isAfter(startDate.atStartOfDay())).toList();
         HashMap<String, Integer> activityTypeScores = new HashMap<>();
@@ -135,7 +178,7 @@ public class ReportGenerator {
 
             List<Evaluation> scopedTimeline = member.getTimeline().stream().filter((eval) -> eval.getTimestamp().isBefore(endDate.atStartOfDay()) && eval.getTimestamp().isAfter(startDate.atStartOfDay())).sorted(Comparator.comparing(Evaluation::getTimestamp)).toList();
 
-            if(member.getGroup()!=null){
+            if(member.getGroup()!=null && !scopedTimeline.isEmpty()){
                 if(!groupScores.containsKey(member.getGroup().getId())){
                     groupScores.put(member.getGroup().getId(), new ArrayList<>());
                 }

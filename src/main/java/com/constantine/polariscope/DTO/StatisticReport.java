@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -11,44 +12,46 @@ import java.util.UUID;
 @Getter
 @Setter
 public class StatisticReport {
-    int newMembers; // works
-    int totalMembers; // works
-    int events; // works
-    int activityScore; // works
-    HashMap<String, Integer> activityTypeScores; // works
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private int newMembers; // works
+    private int totalMembers; // works
+    private int events; // works
+    private int activityScore; // works
+    private HashMap<String, Integer> activityTypeScores; // works
 
     // cScore
-    double overallSTD; // works
-    double overallScoreAverage; //works
-    long overallScoreCount; //works
-    UUID topGrossing; // prob works
-    double topScoreIncrease; // prob works
-    UUID antiGrossing; // prob works
-    double antiScoreDecrease; // prob works
-    UUID topMember;// works
-    int topMemberScore;// works
-    UUID stable;// works
-    double stableSTD;// works
-    UUID unstable;// works
-    double unstableSTD;// works
+    private double overallSTD; // works
+    private double overallScoreAverage; //works
+    private long overallScoreCount; //works
+    private UUID topGrossing; // prob works
+    private double topScoreIncrease; // prob works
+    private UUID antiGrossing; // prob works
+    private double antiScoreDecrease; // prob works
+    private UUID topMember;// works
+    private int topMemberScore;// works
+    private UUID stable;// works
+    private double stableSTD;// works
+    private UUID unstable;// works
+    private double unstableSTD;// works
 
     // Network
-    long numConnections;//works
-    UUID mostConnections;//works
-    long mostConnectionsCount;//works
-    UUID leastConnections;//works
-    long leastConnectionsCount;//works
+    private long numConnections;//works
+    private UUID mostConnections;//works
+    private long mostConnectionsCount;//works
+    private UUID leastConnections;//works
+    private long leastConnectionsCount;//works
     //String popular;
-    HashMap<String, Double> categoryScoreAverage;//works
-    UUID mostControversial;//works
-    double mostControversialSTD;//works
-    UUID leastControversial;//works
-    double leastControversialSTD;//works
+    private HashMap<String, Double> categoryScoreAverage;//works
+    private UUID mostControversial;//works
+    private double mostControversialSTD;//works
+    private UUID leastControversial;//works
+    private double leastControversialSTD;//works
 
     // Group
-    HashMap<UUID, Double> groupAverageScore;//works
-    UUID mostCohesive;//works
-    double mostCohesiveSTD;//works
-    UUID leastCohesive;//works
-    double leastCohesiveSTD;//works
+    private HashMap<UUID, Double> groupAverageScore;//works
+    private UUID mostCohesive;//works
+    private double mostCohesiveSTD;//works
+    private UUID leastCohesive;//works
+    private double leastCohesiveSTD;//works
 }
