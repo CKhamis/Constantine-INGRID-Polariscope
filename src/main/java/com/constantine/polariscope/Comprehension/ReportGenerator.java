@@ -35,7 +35,6 @@ public class ReportGenerator {
     private List<Member> memberList;
     private List<ActivityLog> activityLogList;
     private List<Relationship> relationshipList;
-    private List<MemberGroup> groupList;
 
     /**
      * Generates ALL quarterly reports for the logged in user.
@@ -72,9 +71,6 @@ public class ReportGenerator {
 
         // Get list of relationships
         relationshipList = relationshipService.findAll(currentUser);
-
-        // Get list of groups
-        groupList = groupService.findAll(currentUser);
 
         // Create date intervals from when user was created to today
         //run report for those intervals; persist them in database
@@ -116,6 +112,8 @@ public class ReportGenerator {
 
         List<Integer> allScores = new ArrayList<>();
 
+        HashMap<UUID, ArrayList<Integer>> groupScores = new HashMap<>();
+
         for(Member member : memberList) {
             // Check for member creation
             if(member.getCreated().isAfter(startDate.atStartOfDay()) && member.getCreated().isBefore(endDate.atStartOfDay())){
@@ -132,6 +130,13 @@ public class ReportGenerator {
             SimpleRegression regression = new SimpleRegression();
 
             List<Evaluation> scopedTimeline = member.getTimeline().stream().filter((eval) -> eval.getTimestamp().isBefore(endDate.atStartOfDay()) && eval.getTimestamp().isAfter(startDate.atStartOfDay())).sorted(Comparator.comparing(Evaluation::getTimestamp)).toList();
+
+            if(member.getGroup()!=null){
+                if(!groupScores.containsKey(member.getGroup().getId())){
+                    groupScores.put(member.getGroup().getId(), new ArrayList<>());
+                }
+                groupScores.get(member.getGroup().getId()).add(scopedTimeline.getLast().getCScore());
+            }
 
             for (Evaluation evaluation : scopedTimeline) {
                 long x = ChronoUnit.DAYS.between(startDate, evaluation.getTimestamp().toLocalDate());
@@ -307,18 +312,47 @@ public class ReportGenerator {
         statisticReport.setLeastConnections(leastConnectionsId);
         statisticReport.setLeastConnectionsCount(leastConnectionsCount);
 
-        UUID highestRatedGroup = null;
-        double highestRatedScore = 0;
-        UUID lowestRatedGroup = null;
-        double lowestRatedScore = Double.MAX_VALUE;
+        // Group analytics
         HashMap<UUID, Double> averageGroupRatings = new HashMap<>();
         UUID mostCohesiveGroup = null;
-        double mostCohesiveScore = 0;
+        double mostCohesiveScore = Double.MAX_VALUE;
         UUID leastCohesiveGroup = null;
-        double leastCohesiveScore = Double.MAX_VALUE;
+        double leastCohesiveScore = 0;
 
-        for()
+        Set<UUID> groupIds = groupScores.keySet();
+        for(UUID groupId : groupIds){
+            ArrayList<Integer> array = groupScores.get(groupId);
 
+            StandardDeviation incomingSD = new StandardDeviation(false);
+            double[] scores = new double[array.size()];
+            long total = 0;
+
+            for(int j = 0; j < array.size(); j++){
+                scores[j] = array.get(j);
+                total += array.get(j);
+            }
+
+            double groupSD = incomingSD.evaluate(scores);
+            double average = (double) total / array.size();
+
+            if(groupSD < mostCohesiveScore){
+                mostCohesiveScore = groupSD;
+                mostCohesiveGroup = groupId;
+            }
+
+            if(groupSD > leastCohesiveScore){
+                leastCohesiveScore = groupSD;
+                leastCohesiveGroup = groupId;
+            }
+
+            averageGroupRatings.put(groupId, average);
+        }
+
+        statisticReport.setGroupAverageScore(averageGroupRatings);
+        statisticReport.setMostCohesive(mostCohesiveGroup);
+        statisticReport.setLeastCohesive(leastCohesiveGroup);
+        statisticReport.setMostCohesiveSTD(mostCohesiveScore);
+        statisticReport.setLeastCohesiveSTD(leastCohesiveScore);
 
         System.out.println(statisticReport);
         return statisticReport;

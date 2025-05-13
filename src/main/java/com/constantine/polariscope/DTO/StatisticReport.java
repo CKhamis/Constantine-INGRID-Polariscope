@@ -46,51 +46,9 @@ public class StatisticReport {
     double leastControversialSTD;//works
 
     // Group
-    UUID highestRated;
-    double highestRatedScore;
-    UUID lowestRated;
-    double lowestRatedScore;
-    HashMap<UUID, Double> groupAverageScore;
-    UUID mostCohesive;
-    double mostCohesiveSTD;
-    UUID leastCohesive;
-    double leastCohesiveSTD;
-
-    @Override
-    public String toString() {
-        return "StatisticReport{" +
-                "newMembers=" + newMembers +
-                ", totalMembers=" + totalMembers +
-                ", events=" + events +
-                ", activityScore=" + activityScore +
-                ", activityTypeScores=" + activityTypeScores +
-                ", overallSTD=" + overallSTD +
-                ", overallScoreAverage=" + overallScoreAverage +
-                ", overallScoreCount=" + overallScoreCount +
-                ", topGrossing=" + topGrossing +
-                ", topScoreIncrease=" + topScoreIncrease +
-                ", antiGrossing=" + antiGrossing +
-                ", antiScoreDecrease=" + antiScoreDecrease +
-                ", topMember=" + topMember +
-                ", topMemberScore=" + topMemberScore +
-                ", stable=" + stable +
-                ", stableSTD=" + stableSTD +
-                ", unstable=" + unstable +
-                ", unstableSTD=" + unstableSTD +
-                ", mostConnections=" + mostConnections +
-                ", mostConnectionsCount=" + mostConnectionsCount +
-                ", leastConnections=" + leastConnections +
-                ", leastConnectionsCount=" + leastConnectionsCount +
-                ", categoryScoreAverage=" + categoryScoreAverage +
-                ", mostControversial=" + mostControversial +
-                ", mostControversialSTD=" + mostControversialSTD +
-                ", leastControversial=" + leastControversial +
-                ", leastControversialSTD=" + leastControversialSTD +
-                ", highestRated='" + highestRated + '\'' +
-                ", highestRatedScore=" + highestRatedScore +
-                ", groupAverageScoreChange=" + groupAverageScoreChange +
-                ", mostCohesive='" + mostCohesive + '\'' +
-                ", mostCohesiveSTD=" + mostCohesiveSTD +
-                '}';
-    }
+    HashMap<UUID, Double> groupAverageScore;//works
+    UUID mostCohesive;//works
+    double mostCohesiveSTD;//works
+    UUID leastCohesive;//works
+    double leastCohesiveSTD;//works
 }
