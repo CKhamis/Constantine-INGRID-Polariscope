@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html xml:th="https://www.thymeleaf.org">
-<head th:replace="~{components/Header :: head('Home')}"></head>
+<head th:replace="~{components/Header :: head('Analysis')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
 <main class="bg-2" style="margin-left: 60px; height: 100vh;">
     <div class="w-100 h-100 m-0">
         <nav class="navbar d-flex justify-content-between align-items-center border-bottom px-3 position-sticky top-0" style="background: linear-gradient(#222, #2c2c2c); border-bottom: 1px #495057 solid;">
-            <h2 class="fw-bold">Member Reports</h2>
+            <h2 class="fw-bold">Polariscope Analysis</h2>
             <div>
                 <div class="spinner-border d-none" role="status" id="loading-spinner">
                     <span class="visually-hidden">Loading...</span>
@@ -14,7 +14,7 @@
                 <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
             </div>
             <div class="d-flex justify-content-start align-items-center">
-                <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2 me-2" role="button" onclick="refresh()">
+                <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="refresh()">
                     <img class="square-image" th:src="@{/icons/Refresh.svg}" alt="refresh" style="width: 30px;"/>
                 </div>
             </div>
@@ -22,47 +22,74 @@
         <div class="container-fluid mt-2">
             <div class="d-flex flex-row justify-content-between align-items-center gap-3 w-100">
                 <div class="pb-2 flex-grow-1 d-flex overflow-x-scroll flex-row gap-3 align-items-center justify-content-start" id="report-toggles"></div>
-                <div class="mb-2 bg-light-subtle d-flex justify-content-center align-items-center p-2 me-2" role="button" onclick="refresh()">
+                <div class="mb-2 bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="refresh()">
                     <img class="square-image" th:src="@{/icons/Plus.svg}" alt="New Report" style="width: 20px;"/>
                 </div>
             </div>
-            <h1>terence</h1>
+
+            <h2 class="fw-bold border-bottom mb-2 mt-2">Current Quarter</h2>
         </div>
     </div>
 </main>
 <div th:replace="~{components/External :: external}"></div>
+<div th:replace="~{components/Formatting :: date-formatting}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/Network :: data-upload}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 
 <script>
-    document.querySelector("#report-toggles").innerHTML = `
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>
-  <button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button">Toggle button</button>`;
+    let quarterlyReports = [];
+
+    refresh();
+
+    function refresh(){
+        let spinner = document.querySelector("#loading-spinner");
+        let errorIcon = document.querySelector("#error-icon");
+        spinner.classList.add("d-block");
+        spinner.classList.remove("d-none");
+
+        const quarterlyFetch = fetch("/api/interpersonal/reports/quarterly", {});
+
+        Promise.all([quarterlyFetch])
+            .then(responses => {
+                return Promise.all(responses);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                console.log(data);
+
+                if(data[0]){
+                    quarterlyReports = data[0];
+                }
+                renderChips();
+            })
+            .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                    });
+            })
+            .finally(() => {
+                spinner.classList.remove("d-block");
+                spinner.classList.add("d-none");
+            });
+
+        function renderChips(){
+            let buttonHTML = "";
+            quarterlyReports.forEach((report, index) => {
+                buttonHTML += `<button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button" id="report-button-${index}">${formatDate(report.startDate)} - ${formatDate(report.endDate)}</button>`;
+            });
+            document.querySelector("#report-toggles").innerHTML = buttonHTML;
+        }
+    }
 </script>
 </body>
 </html>
