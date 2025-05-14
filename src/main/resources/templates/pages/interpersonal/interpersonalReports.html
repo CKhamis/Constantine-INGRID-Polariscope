@@ -4,32 +4,40 @@
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
 <main class="bg-2" style="margin-left: 60px; height: 100vh;">
-    <div class="w-100 h-100 m-0">
-        <nav class="navbar d-flex justify-content-between align-items-center border-bottom px-3 position-sticky top-0" style="background: linear-gradient(#222, #2c2c2c); border-bottom: 1px #495057 solid;">
-            <h2 class="fw-bold">Polariscope Analysis</h2>
-            <div>
-                <div class="spinner-border d-none" role="status" id="loading-spinner">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" />
+    <nav class="container-fluid pt-2 position-sticky top-0 border-bottom" style="background: linear-gradient(#222, #2c2c2c);">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="col-md-10 d-flex flex-row align-items-center justify-content-start">
+                <img class="square-image me-2" style="height: 40px; width: 40px" alt="Analysis image" th:src="@{/icons/Reports.svg}">
+                <h1 class="fw-bold">Polariscope Analysis</h1>
             </div>
-            <div class="d-flex justify-content-start align-items-center">
-                <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="refresh()">
-                    <img class="square-image" th:src="@{/icons/Refresh.svg}" alt="refresh" style="width: 30px;"/>
-                </div>
+            <div class="spinner-border d-none" role="status" id="loading-spinner">
+                <span class="visually-hidden">Loading...</span>
             </div>
-        </nav>
-        <div class="container-fluid mt-2">
-            <div class="d-flex flex-row justify-content-between align-items-center gap-3 w-100">
-                <div class="pb-2 flex-grow-1 d-flex overflow-x-scroll flex-row gap-3 align-items-center justify-content-start" id="report-toggles"></div>
-                <div class="mb-2 bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="refresh()">
-                    <img class="square-image" th:src="@{/icons/Plus.svg}" alt="New Report" style="width: 20px;"/>
-                </div>
-            </div>
-
-            <h2 class="fw-bold border-bottom mb-2 mt-2">Current Quarter</h2>
+            <img src="/icons/Error.svg" id="error-icon" alt="error" class="square-image d-none" height="32px" width="32px" />
         </div>
-    </div>
+        <div class="mb-0 pb-0 d-flex justify-content-between align-items-end">
+            <ul class="nav nav-underline" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fs-3 p-0" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-tab-pane" type="button" role="tab" aria-controls="overview-tab-pane" aria-selected="true">Overview</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fs-3 p-0" id="details-tab" data-bs-toggle="tab" data-bs-target="#details-tab-pane" type="button" role="tab" aria-controls="details-tab-pane" aria-selected="false">Details</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fs-3 p-0" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom-tab-pane" type="button" role="tab" aria-controls="custom-tab-pane" aria-selected="false">Custom</button>
+                </li>
+            </ul>
+            <div class="d-flex flex-row align-content-center justify-content-end pb-2 gap-3">
+                <div class="mb-2 bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="refresh()">
+                    <img class="square-image" src="/icons/Plus.svg" alt="New Report" style="width: 20px;">
+                </div>
+                <div class="mb-2 bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="refresh()">
+                    <img class="square-image" src="/icons/Refresh.svg" alt="New Report" style="width: 20px;">
+                </div>
+            </div>
+        </div>
+    </nav>
+
 </main>
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
