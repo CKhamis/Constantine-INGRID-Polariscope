@@ -26,7 +26,7 @@ public class FrontEndController {
         if(principal == null){
             return new User();
         }
-        String username = principal.getName();;
+        String username = principal.getName();
         return (User) userService.loadUserByUsername(username);
     }
 
@@ -56,6 +56,11 @@ public class FrontEndController {
     @GetMapping("/interpersonal/settings")
     public String getInterpersonalSettings() {
         return "pages/interpersonal/interpersonalSettings";
+    }
+
+    @GetMapping("/interpersonal/reports")
+    public String getInterpersonalReports() {
+        return "pages/interpersonal/interpersonalReports";
     }
 
     @GetMapping("/interpersonal/members")
