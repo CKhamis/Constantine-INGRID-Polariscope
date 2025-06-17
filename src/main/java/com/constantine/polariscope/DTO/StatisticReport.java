@@ -54,4 +54,45 @@ public class StatisticReport {
     private double mostCohesiveSTD;//works
     private UUID leastCohesive;//works
     private double leastCohesiveSTD;//works
+
+    @Override
+    public String toString() {
+        return "StatisticReport{" +
+                "startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", newMembers=" + newMembers +
+                ", totalMembers=" + totalMembers +
+                ", events=" + events +
+                ", activityScore=" + activityScore +
+                ", activityTypeScores=" + activityTypeScores +
+                ", overallSTD=" + overallSTD +
+                ", overallScoreAverage=" + overallScoreAverage +
+                ", overallScoreCount=" + overallScoreCount +
+                ", topGrossing=" + topGrossing +
+                ", topScoreIncrease=" + topScoreIncrease +
+                ", antiGrossing=" + antiGrossing +
+                ", antiScoreDecrease=" + antiScoreDecrease +
+                ", topMember=" + topMember +
+                ", topMemberScore=" + topMemberScore +
+                ", stable=" + stable +
+                ", stableSTD=" + stableSTD +
+                ", unstable=" + unstable +
+                ", unstableSTD=" + unstableSTD +
+                ", numConnections=" + numConnections +
+                ", mostConnections=" + mostConnections +
+                ", mostConnectionsCount=" + mostConnectionsCount +
+                ", leastConnections=" + leastConnections +
+                ", leastConnectionsCount=" + leastConnectionsCount +
+                ", categoryScoreAverage=" + categoryScoreAverage +
+                ", mostControversial=" + mostControversial +
+                ", mostControversialSTD=" + mostControversialSTD +
+                ", leastControversial=" + leastControversial +
+                ", leastControversialSTD=" + leastControversialSTD +
+                ", groupAverageScore=" + groupAverageScore +
+                ", mostCohesive=" + mostCohesive +
+                ", mostCohesiveSTD=" + mostCohesiveSTD +
+                ", leastCohesive=" + leastCohesive +
+                ", leastCohesiveSTD=" + leastCohesiveSTD +
+                '}';
+    }
 }

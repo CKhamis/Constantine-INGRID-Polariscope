@@ -37,7 +37,16 @@
             </div>
         </div>
     </nav>
+    <div class="tab-content container-fluid">
+        <div class="tab-pane fade show active p-2" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
+            <div class="pb-2 flex-grow-1 d-flex overflow-x-scroll flex-row gap-3 align-items-center justify-content-start" id="report-selectors"></div>
 
+            <!-- Statistics Table -->
+            <div id="overview-stats-table" class="table-responsive"></div>
+        </div>
+        <div class="tab-pane fade" id="details-tab-pane" role="tabpanel" aria-labelledby="details-tab" tabindex="0">...</div>
+        <div class="tab-pane fade" id="custom-tab-pane" role="tabpanel" aria-labelledby="custom-tab" tabindex="0">...</div>
+    </div>
 </main>
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
@@ -72,7 +81,7 @@
                 if(data[0]){
                     quarterlyReports = data[0];
                 }
-                renderChips();
+                renderOverviewTab();
             })
             .catch((response) => {
                 errorIcon.classList.add("d-block");
@@ -90,12 +99,35 @@
                 spinner.classList.add("d-none");
             });
 
+
+        function renderOverviewTab(){
+            renderChips();
+            renderOverviewTable();
+        }
+
+        // Helper functions
+
         function renderChips(){
             let buttonHTML = "";
             quarterlyReports.forEach((report, index) => {
-                buttonHTML += `<button type="button" class="btn btn-dark text-nowrap active" data-bs-toggle="button" id="report-button-${index}">${formatDate(report.startDate)} - ${formatDate(report.endDate)}</button>`;
+                buttonHTML += `<button type="button" class="btn btn-secondary text-nowrap" id="report-button-${index}">${formatDate(report.startDate)} - ${formatDate(report.endDate)}</button>`;
             });
-            document.querySelector("#report-toggles").innerHTML = buttonHTML;
+            document.querySelector("#report-selectors").innerHTML = buttonHTML;
+        }
+
+        function renderOverviewTable(){
+            let tableContent = ``;
+
+            // Top row
+            let header = "<th></th>"
+            quarterlyReports.forEach((report, index) => {
+                header += `
+                    <th>${formatDate(report.startDate)}</th>
+                `;
+            });
+            tableContent += `<thead><tr>${header}</tr></thead>`;
+
+            document.querySelector("#overview-stats-table").innerHTML = `<table class="table">${tableContent}</table>`;
         }
     }
 </script>
