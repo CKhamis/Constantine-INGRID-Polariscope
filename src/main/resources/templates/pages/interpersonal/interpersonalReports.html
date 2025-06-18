@@ -119,15 +119,108 @@
             let tableContent = ``;
 
             // Top row
-            let header = "<th></th>"
+            let header = ""
             quarterlyReports.forEach((report, index) => {
                 header += `
                     <th>${formatDate(report.startDate)}</th>
                 `;
             });
-            tableContent += `<thead><tr>${header}</tr></thead>`;
 
-            document.querySelector("#overview-stats-table").innerHTML = `<table class="table">${tableContent}</table>`;
+            // Activity Score
+            let activityScoreRow = ""
+            quarterlyReports.forEach((report, index) => {
+                activityScoreRow += `
+                    <td>${report.activityScore}</td>
+                `;
+            });
+
+            // Activity Score
+            let eventsRow = ""
+            quarterlyReports.forEach((report, index) => {
+                eventsRow += `
+                    <td>${report.events}</td>
+                `;
+            });
+
+            // New Members
+            let newMembersRow = ""
+            quarterlyReports.forEach((report, index) => {
+                newMembersRow += `
+                    <td>${report.newMembers}</td>
+                `;
+            });
+
+            // Standard Deviation Row
+            let SDRow = ""
+            quarterlyReports.forEach((report, index) => {
+                SDRow += `
+                    <td>${report.overallSTD}</td>
+                `;
+            });
+
+            // Score Av Row
+            let scoreAverageRow = ""
+            quarterlyReports.forEach((report, index) => {
+                scoreAverageRow += `
+                    <td>${report.overallScoreAverage}</td>
+                `;
+            });
+
+            // Score Total Row
+            let scoreTotalRow = ""
+            quarterlyReports.forEach((report, index) => {
+                scoreTotalRow += `
+                    <td>${report.overallScoreCount}</td>
+                `;
+            });
+
+            // Total Members Row
+            let totalMembersRow = ""
+            quarterlyReports.forEach((report, index) => {
+                totalMembersRow += `
+                    <td>${report.totalMembers}</td>
+                `;
+            });
+
+            document.querySelector("#overview-stats-table").innerHTML = `
+                <table class="table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        ${header}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Activity Score</th>
+                        ${activityScoreRow}
+                    </tr>
+                    <tr>
+                        <th>New Members</th>
+                        ${newMembersRow}
+                    </tr>
+                    <tr>
+                        <th>Total Members</th>
+                        ${newMembersRow}
+                    </tr>
+                    <tr>
+                        <th>Score Standard Deviation</th>
+                        ${SDRow}
+                    </tr>
+                    <tr>
+                        <th>Score Average</th>
+                        ${scoreAverageRow}
+                    </tr>
+                    <tr>
+                        <th>Score Total</th>
+                        ${scoreTotalRow}
+                    </tr>
+                    <tr>
+                        <th>Events</th>
+                        ${eventsRow}
+                    </tr>
+                </tbody>
+            </table>`;
         }
     }
 </script>
