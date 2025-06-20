@@ -1,5 +1,6 @@
 package com.constantine.polariscope.Comprehension;
 
+import com.constantine.polariscope.DTO.MemberReport;
 import com.constantine.polariscope.DTO.StatisticReport;
 import com.constantine.polariscope.Model.*;
 import lombok.Getter;
@@ -126,7 +127,40 @@ public class ReportGenerator {
         return LocalDate.of(date.getYear(), quarterStartMonth, 1);
     }
 
+
     private StatisticReport generateStatisticReport(LocalDate startDate, LocalDate endDate) {
+        StatisticReport statisticReport = new StatisticReport();
+        statisticReport.setStartDate(startDate);
+        statisticReport.setEndDate(endDate);
+
+        ArrayList<MemberReport> memberReports = new ArrayList<>();
+
+        for(Member member : memberList) {
+            MemberReport memberReport = new MemberReport();
+            memberReport.setId(member.getId());
+            memberReport.setFirstName(member.getFirstName());
+            memberReport.setLastName(member.getLastName());
+
+            List<Evaluation> scopedTimeline = member.getTimeline().stream().filter((eval) -> eval.getTimestamp().isBefore(endDate.atStartOfDay()) && eval.getTimestamp().isAfter(startDate.atStartOfDay())).sorted(Comparator.comparing(Evaluation::getTimestamp)).toList();
+
+            if(!scopedTimeline.isEmpty()) {
+                memberReport.setStartScore(scopedTimeline.get(0));
+                memberReport.setEndScore(scopedTimeline.get(scopedTimeline.size() - 1));
+            }
+
+
+
+            // Yes, I know this is O(n^2) cry about it.
+            for(Evaluation evaluation : scopedTimeline) {
+
+            }
+        }
+
+        return statisticReport;
+    }
+
+
+        private StatisticReport generateStatisticReportOld(LocalDate startDate, LocalDate endDate) {
         StatisticReport statisticReport = new StatisticReport();
 
         statisticReport.setStartDate(startDate);
