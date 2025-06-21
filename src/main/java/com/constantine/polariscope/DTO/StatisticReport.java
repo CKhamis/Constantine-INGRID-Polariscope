@@ -7,7 +7,6 @@ import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @NoArgsConstructor
 @Getter
@@ -23,7 +22,7 @@ public class StatisticReport {
     private int activityScore; // cumulative
 
     // cScore
-    private double overallSD;
+    private double overallScoreSD;
     private double overallScoreAverage;
     private long overallScoreTotal;
     private long overallScoreCount;

@@ -126,7 +126,15 @@
                 `;
             });
 
-            // Activity Score
+            // New Activity Score
+            let newActivityScoreRow = ""
+            quarterlyReports.forEach((report, index) => {
+                newActivityScoreRow += `
+                    <td>${report.newActivityScore}</td>
+                `;
+            });
+
+            // Total Activity Score
             let activityScoreRow = ""
             quarterlyReports.forEach((report, index) => {
                 activityScoreRow += `
@@ -134,98 +142,165 @@
                 `;
             });
 
-            // Activity Score
-            let eventsRow = ""
-            quarterlyReports.forEach((report, index) => {
-                eventsRow += `
-                    <td>${report.events}</td>
-                `;
-            });
-
             // New Members
-            let newMembersRow = ""
+            let newMemberCountRow = ""
             quarterlyReports.forEach((report, index) => {
-                newMembersRow += `
-                    <td>${report.newMembers}</td>
+                newMemberCountRow += `
+                    <td>${report.newMemberCount}</td>
                 `;
             });
 
-            // Standard Deviation Row
-            let SDRow = ""
+            // Member Total
+            let memberCountRow = ""
             quarterlyReports.forEach((report, index) => {
-                SDRow += `
-                    <td>${report.overallSTD}</td>
+                memberCountRow += `
+                    <td>${report.memberCount}</td>
                 `;
             });
 
-            // Score Av Row
+            // Connection Average
+            let connectionAverageRow = ""
+            quarterlyReports.forEach((report, index) => {
+                if(report.overallConnectionCount === 0){
+                    connectionAverageRow += `
+                        <td>N/A</td>
+                    `;
+                }else{
+                    connectionAverageRow += `
+                    <td>${report.overallConnectionAverage.toFixed(3)}</td>
+                `;
+                }
+            });
+
+            // Connection Standard Deviation
+            let connectionSDRow = ""
+            quarterlyReports.forEach((report, index) => {
+                if(report.overallConnectionSD === "NaN"){
+                    connectionSDRow += `
+                        <td>N/A</td>
+                    `;
+                }else{
+                    connectionSDRow += `
+                        <td>${report.overallConnectionSD.toFixed(3)}</td>
+                    `;
+                }
+            });
+
+            // Connection Total
+            let connectionTotalRow = ""
+            quarterlyReports.forEach((report, index) => {
+                connectionTotalRow += `
+                    <td>${report.overallConnectionCount}</td>
+                `;
+            });
+
+            // Score Standard Deviation
+            let scoreSDRow = ""
+            quarterlyReports.forEach((report, index) => {
+                scoreSDRow += `
+                    <td>${report.overallScoreSD.toFixed(3)}</td>
+                `;
+            });
+
+            // Score Average
             let scoreAverageRow = ""
             quarterlyReports.forEach((report, index) => {
                 scoreAverageRow += `
-                    <td>${report.overallScoreAverage}</td>
+                    <td>${report.overallScoreAverage.toFixed(3)}</td>
                 `;
             });
 
-            // Score Total Row
+            // Score Total
             let scoreTotalRow = ""
             quarterlyReports.forEach((report, index) => {
                 scoreTotalRow += `
-                    <td>${report.overallScoreCount}</td>
+                    <td>${report.overallScoreTotal}</td>
                 `;
             });
 
-            // Total Members Row
-            let totalMembersRow = ""
-            quarterlyReports.forEach((report, index) => {
-                totalMembersRow += `
-                    <td>${report.totalMembers}</td>
-                `;
-            });
-
-            // Human metrics
-
-            // Most Stable Member
-            let mostStableRow = ""
-            quarterlyReports.forEach((report, index) => {
-                let imageSrc = report.stable? `/api/interpersonal/member/profile-image/${report.stable}` : "/icons/Error.svg";
-                mostStableRow += `
-                    <td>
-                        <a class="d-flex flex-column" href="/interpersonal/member/view/${report.stable}">
-                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=${imageSrc}>
-                            <p class="p-0">${report.stableSTD.toFixed(4)}</p>
-                        </a>
-                    </td>
-                `;
-            });
-
-            // Top-Grossing Member
-            let topGrossingRow = ""
-            quarterlyReports.forEach((report, index) => {
-                let imageSrc = report.topGrossing? `/api/interpersonal/member/profile-image/${report.topGrossing}` : "/icons/Error.svg";
-                topGrossingRow += `
-                    <td>
-                        <a class="d-flex flex-column" href="/interpersonal/member/view/${report.topGrossing}">
-                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=${imageSrc}>
-                            <p class="p-0">${report.topScoreIncrease.toFixed(4)}</p>
-                        </a>
-                    </td>
-                `;
-            });
-
-            // Anti-Grossing Member
-            let antiGrossingRow = ""
-            quarterlyReports.forEach((report, index) => {
-                let imageSrc = report.antiGrossing? `/api/interpersonal/member/profile-image/${report.antiGrossing}` : "/icons/Error.svg";
-                antiGrossingRow += `
-                    <td>
-                        <a class="d-flex flex-column" href="/interpersonal/member/view/${report.antiGrossing}">
-                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=${imageSrc}>
-                            <p class="p-0">${report.antiScoreDecrease.toFixed(4)}</p>
-                        </a>
-                    </td>
-                `;
-            });
-
+            // // New Members
+            // let newMembersRow = ""
+            // quarterlyReports.forEach((report, index) => {
+            //     newMembersRow += `
+            //         <td>${report.newMembers}</td>
+            //     `;
+            // });
+            //
+            // // Standard Deviation Row
+            // let SDRow = ""
+            // quarterlyReports.forEach((report, index) => {
+            //     SDRow += `
+            //         <td>${report.overallSTD}</td>
+            //     `;
+            // });
+            //
+            // // Score Av Row
+            // let scoreAverageRow = ""
+            // quarterlyReports.forEach((report, index) => {
+            //     scoreAverageRow += `
+            //         <td>${report.overallScoreAverage}</td>
+            //     `;
+            // });
+            //
+            // // Score Total Row
+            // let scoreTotalRow = ""
+            // quarterlyReports.forEach((report, index) => {
+            //     scoreTotalRow += `
+            //         <td>${report.overallScoreCount}</td>
+            //     `;
+            // });
+            //
+            // // Total Members Row
+            // let totalMembersRow = ""
+            // quarterlyReports.forEach((report, index) => {
+            //     totalMembersRow += `
+            //         <td>${report.totalMembers}</td>
+            //     `;
+            // });
+            //
+            // // Human metrics
+            //
+            // // Most Stable Member
+            // let mostStableRow = ""
+            // quarterlyReports.forEach((report, index) => {
+            //     let imageSrc = report.stable? `/api/interpersonal/member/profile-image/${report.stable}` : "/icons/Error.svg";
+            //     mostStableRow += `
+            //         <td>
+            //             <a class="d-flex flex-column" href="/interpersonal/member/view/${report.stable}">
+            //                 <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=${imageSrc}>
+            //                 <p class="p-0">${report.stableSTD.toFixed(4)}</p>
+            //             </a>
+            //         </td>
+            //     `;
+            // });
+            //
+            // // Top-Grossing Member
+            // let topGrossingRow = ""
+            // quarterlyReports.forEach((report, index) => {
+            //     let imageSrc = report.topGrossing? `/api/interpersonal/member/profile-image/${report.topGrossing}` : "/icons/Error.svg";
+            //     topGrossingRow += `
+            //         <td>
+            //             <a class="d-flex flex-column" href="/interpersonal/member/view/${report.topGrossing}">
+            //                 <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=${imageSrc}>
+            //                 <p class="p-0">${report.topScoreIncrease.toFixed(4)}</p>
+            //             </a>
+            //         </td>
+            //     `;
+            // });
+            //
+            // // Anti-Grossing Member
+            // let antiGrossingRow = ""
+            // quarterlyReports.forEach((report, index) => {
+            //     let imageSrc = report.antiGrossing? `/api/interpersonal/member/profile-image/${report.antiGrossing}` : "/icons/Error.svg";
+            //     antiGrossingRow += `
+            //         <td>
+            //             <a class="d-flex flex-column" href="/interpersonal/member/view/${report.antiGrossing}">
+            //                 <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=${imageSrc}>
+            //                 <p class="p-0">${report.antiScoreDecrease.toFixed(4)}</p>
+            //             </a>
+            //         </td>
+            //     `;
+            // });
 
             document.querySelector("#overview-stats-table").innerHTML = `
                 <table class="table">
@@ -238,44 +313,43 @@
                 <tbody>
                     <tr>
                         <th>Activity Score</th>
+                        ${newActivityScoreRow}
+                    </tr>
+                    <tr>
+                        <th>Activity Total</th>
                         ${activityScoreRow}
                     </tr>
                     <tr>
-                        <th>New Members</th>
-                        ${newMembersRow}
+                        <th>Added Members</th>
+                        ${newMemberCountRow}
                     </tr>
                     <tr>
-                        <th>Total Members</th>
-                        ${newMembersRow}
+                        <th>Member Total</th>
+                        ${memberCountRow}
                     </tr>
                     <tr>
-                        <th>Score Standard Deviation</th>
-                        ${SDRow}
+                        <th>Connection Average</th>
+                        ${connectionAverageRow}
                     </tr>
                     <tr>
-                        <th>Score Average</th>
+                        <th>Connection SD</th>
+                        ${connectionSDRow}
+                    </tr>
+                    <tr>
+                        <th>Added Connections</th>
+                        ${connectionTotalRow}
+                    </tr>
+                    <tr>
+                        <th>Evaluation Average</th>
                         ${scoreAverageRow}
                     </tr>
                     <tr>
-                        <th>Score Total</th>
+                        <th>Evaluation SD</th>
+                        ${scoreSDRow}
+                    </tr>
+                    <tr>
+                        <th>Evaluation Total</th>
                         ${scoreTotalRow}
-                    </tr>
-                    <tr>
-                        <th>Events</th>
-                        ${eventsRow}
-                    </tr>
-
-                    <tr>
-                        <th>Top Grossing</th>
-                        ${topGrossingRow}
-                    </tr>
-                    <tr>
-                        <th>Most Stable</th>
-                        ${mostStableRow}
-                    </tr>
-                    <tr>
-                        <th>Bottom Grossing</th>
-                        ${antiGrossingRow}
                     </tr>
                 </tbody>
             </table>`;

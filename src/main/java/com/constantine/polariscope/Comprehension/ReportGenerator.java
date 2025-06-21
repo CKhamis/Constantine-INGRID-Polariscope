@@ -11,16 +11,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.constantine.polariscope.Service.*;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Component
 @SessionScope
@@ -243,7 +239,7 @@ public class ReportGenerator {
 
         double[] scoreArray = allScores.stream().mapToDouble(value -> (double) value).toArray();
         StandardDeviation sd = new StandardDeviation(false);
-        statisticReport.setOverallSD(sd.evaluate(scoreArray));
+        statisticReport.setOverallScoreSD(sd.evaluate(scoreArray));
 
         statisticReport.setOverallScoreAverage((double) scoreTotal / allScores.size());
         statisticReport.setOverallScoreCount(allScores.size());
