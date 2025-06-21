@@ -148,13 +148,59 @@ public class ReportGenerator {
                 memberReport.setEndScore(scopedTimeline.get(scopedTimeline.size() - 1));
             }
 
+            SimpleRegression regression = new SimpleRegression();
+            List<Integer> memberScores = new ArrayList<>();
+            Long memberTotal = 0L;
 
-
-            // Yes, I know this is O(n^2) cry about it.
+            // Go through all evals for each member
             for(Evaluation evaluation : scopedTimeline) {
+                memberScores.add(evaluation.getCScore());
+                memberTotal += evaluation.getCScore();
 
+                long x = ChronoUnit.DAYS.between(startDate, evaluation.getTimestamp().toLocalDate());
+                int y = evaluation.getCScore();
+                regression.addData(x, y);
             }
+
+            memberReport.setScoreAverage((double) memberTotal /scopedTimeline.size());
+            memberReport.setScoreTotal(memberScores.get(0));
+            memberReport.setScoreCount(memberScores.size());
+
+            double slope = regression.getSlope();
+            memberReport.setScoreSlope(slope);
+
+            double[] memberArray = memberScores.stream().mapToDouble(value -> (double) value).toArray();
+            StandardDeviation standardDeviation = new StandardDeviation(false);
+            double sd = standardDeviation.evaluate(memberArray);
+            memberReport.setScoreSD(sd);
+
+            // events
+            memberReport.setEventsIncluded(member.getEvents().size());
+
+            // network
+            List<Relationship> incomingRelationships = relationshipList.stream().filter((relationship -> {return relationship.getOther().getId().equals(member.getId());})).toList();
+            List<Relationship> outgoingRelationships = relationshipList.stream().filter((relationship -> {return relationship.getSelf().getId().equals(member.getId());})).toList();
+
+            memberReport.setConnectionsCount(incomingRelationships.size() + outgoingRelationships.size());
+
+
+            List<Integer> outgoingConnections = new ArrayList<>();
+            long outgoingConnectionsTotal = 0L;
+
+            for(Relationship relationship : outgoingRelationships) {
+                outgoingConnections.add(relationship.getHealth());
+                outgoingConnectionsTotal += relationship.getHealth();
+            }
+
+            memberReport.setOutgoingConnectionsCount(outgoingRelationships.size());
+            memberReport.setOutgoingConnectionsAverage((double) outgoingConnectionsTotal / outgoingRelationships.size());
+
+            double[] outgoingConnectionsArray = outgoingConnections.stream().mapToDouble(value -> (double) value).toArray();
+            //todo: work on outgoing conenctionssd
+
+            memberReports.add(memberReport);
         }
+
 
         return statisticReport;
     }

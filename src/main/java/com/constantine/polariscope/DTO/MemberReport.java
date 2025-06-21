@@ -27,13 +27,21 @@ public class MemberReport {
     private int scoreTotal; // summation of scores
     private double scoreSD;
     private int scoreCount; // amount of scores
+    private double scoreSlope;
 
     // events
     private int eventsIncluded;
 
     // network
     private int connectionsCount;
-    private int connectionsTotal;
-    private int connectionsAverage;
-    private double connectionsSD;
+
+    // network incoming
+    private int incomingConnectionsCount;
+    private double incomingConnectionsSD;
+    private double incomingConnectionsAverage;
+
+    // network outgoing
+    private int outgoingConnectionsCount;
+    private double outgoingConnectionsSD;
+    private double outgoingConnectionsAverage;
 }
