@@ -21,16 +21,16 @@ public class StatisticReport {
     private int events;
     private int newActivityScore; // non-cumulative
     private int activityScore; // cumulative
-    private HashMap<String, Integer> activityTypeScores; // non-cumulative
 
     // cScore
-    private double overallSTD;
+    private double overallSD;
     private double overallScoreAverage;
+    private long overallScoreTotal;
     private long overallScoreCount;
 
     // Network
     private long overallConnectionCount;
-    private long overallConnectionAverage;
+    private double overallConnectionAverage;
     private double overallConnectionSD;
 
 

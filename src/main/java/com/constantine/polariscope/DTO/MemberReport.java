@@ -24,9 +24,9 @@ public class MemberReport {
     private Evaluation startScore;
     private Evaluation endScore;
     private double scoreAverage;
-    private int scoreTotal; // summation of scores
+    private long scoreTotal; // summation of scores
     private double scoreSD;
-    private int scoreCount; // amount of scores
+    private long scoreCount; // amount of scores
     private double scoreSlope;
 
     // events
