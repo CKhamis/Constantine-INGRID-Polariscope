@@ -218,6 +218,106 @@
                 `;
             });
 
+            // Human Metrics
+
+            // Referring to Standard Deviation
+            let mostVolatileRow = "";
+            let leastVolatileRow = "";
+
+            // Referring to evaluation slope
+            let mostStableRow = "";
+            let topGrossingRow = "";
+            let bottomGrossingRow = "";
+
+            for(let report of quarterlyReports){
+                let mostVolatile = null;
+                let leastVolatile = null;
+
+                // Referring to evaluation slope
+                let mostStable = null; // closest to 0
+                let topGrossing = null; // most positive
+                let bottomGrossing = null; // most negative
+
+                for(let m of report.memberReports){
+                    if(m.scoreSD !== "NaN"){
+                        if(mostVolatile == null || m.scoreSD > mostVolatile.scoreSD){
+                            mostVolatile = m
+                        }
+
+                        if(leastVolatile == null || m.scoreSD < leastVolatile.scoreSD){
+                            leastVolatile = m
+                        }
+                    }
+
+                    if(m.scoreSlope !== "NaN"){
+                        if(topGrossing == null || m.scoreSlope > topGrossing.scoreSlope){
+                            topGrossing = m
+                        }
+
+                        if(bottomGrossing == null || m.scoreSlope < bottomGrossing.scoreSlope){
+                            bottomGrossing = m
+                        }
+
+                        if(mostStable == null || Math.abs(m.scoreSlope) < Math.abs(mostStable.scoreSlope)){
+                            mostStable = m
+                        }
+                    }
+                }
+
+                mostVolatileRow += `
+                    <td>
+                        <a class="d-flex flex-column" href="/interpersonal/member/view/${mostVolatile.id}">
+                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=/api/interpersonal/member/profile-image/${mostVolatile.id}>
+                            <p class="p-0">${mostVolatile.firstName} ${mostVolatile.lastName}</p>
+                        </a>
+                    </td>
+                `;
+
+                leastVolatileRow += `
+                    <td>
+                        <a class="d-flex flex-column" href="/interpersonal/member/view/${leastVolatile.id}">
+                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=/api/interpersonal/member/profile-image/${leastVolatile.id}>
+                            <p class="p-0">${leastVolatile.firstName} ${leastVolatile.lastName}</p>
+                        </a>
+                    </td>
+                `;
+
+                topGrossingRow += `
+                    <td>
+                        <a class="d-flex flex-column" href="/interpersonal/member/view/${topGrossing.id}">
+                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=/api/interpersonal/member/profile-image/${topGrossing.id}>
+                            <p class="p-0">${topGrossing.firstName} ${topGrossing.lastName}</p>
+                        </a>
+                    </td>
+                `;
+
+                bottomGrossingRow += `
+                    <td>
+                        <a class="d-flex flex-column" href="/interpersonal/member/view/${bottomGrossing.id}">
+                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=/api/interpersonal/member/profile-image/${bottomGrossing.id}>
+                            <p class="p-0">${bottomGrossing.firstName} ${bottomGrossing.lastName}</p>
+                        </a>
+                    </td>
+                `;
+
+                mostStableRow += `
+                    <td>
+                        <a class="d-flex flex-column" href="/interpersonal/member/view/${mostStableRow.id}">
+                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=/api/interpersonal/member/profile-image/${mostStable.id}>
+                            <p class="p-0">${mostStableRow.firstName} ${mostStableRow.lastName}</p>
+                        </a>
+                    </td>
+                `;
+
+                console.log(mostVolatile);
+                console.log(leastVolatile);
+                console.log(topGrossing);
+                console.log(bottomGrossing);
+                console.log(mostStable);
+                console.log("-----------------");
+            }
+
+
             // // New Members
             // let newMembersRow = ""
             // quarterlyReports.forEach((report, index) => {
@@ -350,6 +450,27 @@
                     <tr>
                         <th>Evaluation Total</th>
                         ${scoreTotalRow}
+                    </tr>
+
+                    <tr>
+                        <th>Most Volatile</th>
+                        ${mostVolatileRow}
+                    </tr>
+                    <tr>
+                        <th>Least Volatile</th>
+                        ${leastVolatileRow}
+                    </tr>
+                    <tr>
+                        <th>Top Grossing</th>
+                        ${topGrossingRow}
+                    </tr>
+                    <tr>
+                        <th>Bottom Grossing</th>
+                        ${bottomGrossingRow}
+                    </tr>
+                    <tr>
+                        <th>Most Stable</th>
+                        ${mostStableRow}
                     </tr>
                 </tbody>
             </table>`;
