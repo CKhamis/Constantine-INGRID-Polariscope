@@ -264,57 +264,15 @@
                     }
                 }
 
-                mostVolatileRow += `
-                    <td>
-                        <a class="d-flex flex-column" href="/interpersonal/member/view/${mostVolatile.id}">
-                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=/api/interpersonal/member/profile-image/${mostVolatile.id}>
-                            <p class="p-0">${mostVolatile.firstName} ${mostVolatile.lastName}</p>
-                        </a>
-                    </td>
-                `;
+                mostVolatileRow += renderMemberCell(mostVolatile);
 
-                leastVolatileRow += `
-                    <td>
-                        <a class="d-flex flex-column" href="/interpersonal/member/view/${leastVolatile.id}">
-                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=/api/interpersonal/member/profile-image/${leastVolatile.id}>
-                            <p class="p-0">${leastVolatile.firstName} ${leastVolatile.lastName}</p>
-                        </a>
-                    </td>
-                `;
+                leastVolatileRow += renderMemberCell(leastVolatile);
 
-                topGrossingRow += `
-                    <td>
-                        <a class="d-flex flex-column" href="/interpersonal/member/view/${topGrossing.id}">
-                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=/api/interpersonal/member/profile-image/${topGrossing.id}>
-                            <p class="p-0">${topGrossing.firstName} ${topGrossing.lastName}</p>
-                        </a>
-                    </td>
-                `;
+                topGrossingRow += renderMemberCell(topGrossing);
 
-                bottomGrossingRow += `
-                    <td>
-                        <a class="d-flex flex-column" href="/interpersonal/member/view/${bottomGrossing.id}">
-                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=/api/interpersonal/member/profile-image/${bottomGrossing.id}>
-                            <p class="p-0">${bottomGrossing.firstName} ${bottomGrossing.lastName}</p>
-                        </a>
-                    </td>
-                `;
+                bottomGrossingRow += renderMemberCell(bottomGrossing);
 
-                mostStableRow += `
-                    <td>
-                        <a class="d-flex flex-column" href="/interpersonal/member/view/${mostStableRow.id}">
-                            <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=/api/interpersonal/member/profile-image/${mostStable.id}>
-                            <p class="p-0">${mostStableRow.firstName} ${mostStableRow.lastName}</p>
-                        </a>
-                    </td>
-                `;
-
-                console.log(mostVolatile);
-                console.log(leastVolatile);
-                console.log(topGrossing);
-                console.log(bottomGrossing);
-                console.log(mostStable);
-                console.log("-----------------");
+                mostStableRow += renderMemberCell(mostStable);
             }
 
 
@@ -403,8 +361,8 @@
             // });
 
             document.querySelector("#overview-stats-table").innerHTML = `
-                <table class="table">
-                <thead>
+                <table class="table table-hover align-middle">
+                <thead class="table-dark">
                     <tr>
                         <th></th>
                         ${header}
@@ -475,6 +433,41 @@
                 </tbody>
             </table>`;
         }
+    }
+
+    function renderMemberCell(member){
+        return `
+            <td>
+                <div class="d-flex flex-row gap-2 justify-content-start align-items-center">
+                    <img class="square-image" style="height: 60px; width: 60px" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
+                    <div>
+                        <p class="p-0 m-0 fw-bold">${member.firstName} ${member.lastName}</p>
+                        <div class="">
+                            <div class="d-flex flex-row gap-3 justify-content-start align-items-center">
+                                <div class="d-flex flex-row gap-2 justify-content-start align-items-center">
+                                    <img class="square-image" style="height: 15px; width: 15px" alt="profile image" src="/icons/Volatility.svg">
+                                    <p class="p-0 m-0">${member.scoreSD !== 'NaN'? member.scoreSD.toFixed(3) : "N/A"}</p>
+                                </div>
+                                <div class="d-flex flex-row gap-2 justify-content-start align-items-center">
+                                    <img class="square-image" style="height: 15px; width: 15px" alt="profile image" src="/icons/SlopeScore.svg">
+                                    <p class="p-0 m-0">${member.scoreSlope !== 'NaN'? member.scoreSlope.toFixed(3) : "N/A"}</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-row gap-3 justify-content-start align-items-center">
+                                <div class="d-flex flex-row gap-2 justify-content-start align-items-center">
+                                    <img class="square-image" style="height: 15px; width: 15px" alt="profile image" src="/icons/ScoreCount.svg">
+                                    <p class="p-0 m-0">${member.scoreCount}</p>
+                                </div>
+                                <div class="d-flex flex-row gap-2 justify-content-start align-items-center">
+                                    <img class="square-image" style="height: 15px; width: 15px" alt="profile image" src="/icons/StartEnd.svg">
+                                    <p class="p-0 m-0">${member.startScore.cscore} → ${member.endScore.cscore}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>`;
     }
 </script>
 </body>

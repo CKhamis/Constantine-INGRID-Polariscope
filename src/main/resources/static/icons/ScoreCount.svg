@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 720 720" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:square;stroke-miterlimit:1.5;">
+    <g transform="matrix(1,0,0,1,-2622,-9710)">
+        <g id="ScoreCount" transform="matrix(1,0,0,1,2622,9710)">
+            <rect x="0" y="0" width="720" height="720" style="fill:none;"/>
+            <clipPath id="_clip1">
+                <rect x="0" y="0" width="720" height="720"/>
+            </clipPath>
+            <g clip-path="url(#_clip1)">
+                <g id="Layer-1" serif:id="Layer 1">
+                </g>
+                <g transform="matrix(1,0,0,1,-2615.82,-9716.9)">
+                    <g transform="matrix(565.399,0,0,565.399,3342.45,10430)">
+                    </g>
+                    <text x="3028px" y="10430px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:565.399px;fill:rgb(9,188,138);">#</text>
+                </g>
+                <g transform="matrix(0.98659,0,0,0.98659,-2586.38,-9579.37)">
+                    <path d="M2986.43,10263L2656,10263L2656,9741L3178,9741L3178,9957.91" style="fill:none;stroke:rgb(9,188,138);stroke-width:68.92px;"/>
+                </g>
+                <g transform="matrix(0.895652,0,0,0.895652,-2398.19,-8426.5)">
+                    <g transform="matrix(565.399,0,0,565.399,3185.12,9932.7)">
+                    </g>
+                    <text x="2808.01px" y="9932.7px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:565.399px;fill:rgb(9,188,138);">E</text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
