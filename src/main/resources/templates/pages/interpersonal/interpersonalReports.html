@@ -51,6 +51,7 @@
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
 <div th:replace="~{components/Network :: network}"></div>
+<div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Network :: data-upload}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
@@ -116,13 +117,16 @@
         }
 
         function renderOverviewTable(){
-            let tableContent = ``;
-
             // Top row
             let header = ""
             quarterlyReports.forEach((report, index) => {
                 header += `
-                    <th>${formatDate(report.startDate)}</th>
+                <th>
+                    <div>
+                        <p class="m-0 p-0">${formatDate(report.startDate)} -</p>
+                        <p class="m-0 p-0">${formatDate(report.endDate)}</p>
+                    </div>
+                </th>
                 `;
             });
 
@@ -206,7 +210,7 @@
             let scoreAverageRow = ""
             quarterlyReports.forEach((report, index) => {
                 scoreAverageRow += `
-                    <td>${report.overallScoreAverage.toFixed(3)}</td>
+                    <td style="color: ${getColorGradient(report.overallScoreAverage !== 'NaN'? report.overallScoreAverage : 0, -100, 100)}">${report.overallScoreAverage !== 'NaN'? report.overallScoreAverage.toFixed(3) : "N/A"}</td>
                 `;
             });
 
@@ -228,6 +232,13 @@
             let mostStableRow = "";
             let topGrossingRow = "";
             let bottomGrossingRow = "";
+
+            // Streak checks
+            let mostVolatileStreak = null;
+            let leastVolatileStreak = null;
+            let topGrossingStreak = null;
+            let bottomGrossingStreak = null;
+            let mostStableStreak = null;
 
             for(let report of quarterlyReports){
                 let mostVolatile = null;
@@ -264,15 +275,32 @@
                     }
                 }
 
-                mostVolatileRow += renderMemberCell(mostVolatile);
+                mostVolatileRow += renderMemberCell(mostVolatile, mostVolatile !== null && mostVolatile.id === mostVolatileStreak);
+                if(mostVolatile !== null){
+                    mostVolatileStreak = mostVolatile.id;
+                }
 
-                leastVolatileRow += renderMemberCell(leastVolatile);
+                console.log(leastVolatile.id + " =? " + leastVolatileStreak);
+                leastVolatileRow += renderMemberCell(leastVolatile, leastVolatile !== null && leastVolatile.id === leastVolatileStreak);
+                if(leastVolatile !== null){
+                    console.log("changed");
+                    leastVolatileStreak = leastVolatile.id;
+                }
 
-                topGrossingRow += renderMemberCell(topGrossing);
+                topGrossingRow += renderMemberCell(topGrossing, topGrossing !== null && topGrossing.id === topGrossingStreak);
+                if(topGrossing !== null){
+                    topGrossingStreak = topGrossing.id;
+                }
 
-                bottomGrossingRow += renderMemberCell(bottomGrossing);
+                bottomGrossingRow += renderMemberCell(bottomGrossing, bottomGrossing !== null && bottomGrossing.id === bottomGrossingStreak);
+                if(topGrossing !== null){
+                    bottomGrossingStreak = bottomGrossing.id;
+                }
 
-                mostStableRow += renderMemberCell(mostStable);
+                mostStableRow += renderMemberCell(mostStable, mostStable !== null && mostStable.id === mostStableStreak);
+                if(mostStable !== null){
+                    mostStableStreak = mostStable.id;
+                }
             }
 
 
@@ -364,7 +392,12 @@
                 <table class="table table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
-                        <th></th>
+                        <th>
+                            <div>
+                                <p class="m-0 p-0">Start Date</p>
+                                <p class="m-0 p-0">End Date</p>
+                            </div>
+                        </th>
                         ${header}
                     </tr>
                 </thead>
@@ -435,22 +468,27 @@
         }
     }
 
-    function renderMemberCell(member){
+    function renderMemberCell(member, isStreak = false){
+        console.log(isStreak)
+        if(member === null || member === undefined){
+            console.log("not a good look...");
+            return `<td class="text-center">N/A</td>`;
+        }
         return `
             <td>
                 <div class="d-flex flex-row gap-2 justify-content-start align-items-center">
                     <img class="square-image" style="height: 60px; width: 60px" alt="profile image" src="/api/interpersonal/member/profile-image/${member.id}">
                     <div>
-                        <p class="p-0 m-0 fw-bold">${member.firstName} ${member.lastName}</p>
+                        <p class="p-0 m-0 fw-bold">${member.firstName} ${member.lastName} ${isStreak? "🔥": ""}</p>
                         <div class="">
                             <div class="d-flex flex-row gap-3 justify-content-start align-items-center">
                                 <div class="d-flex flex-row gap-2 justify-content-start align-items-center">
                                     <img class="square-image" style="height: 15px; width: 15px" alt="profile image" src="/icons/Volatility.svg">
-                                    <p class="p-0 m-0">${member.scoreSD !== 'NaN'? member.scoreSD.toFixed(3) : "N/A"}</p>
+                                    <p class="p-0 m-0 text-nowrap">${member.scoreSD !== 'NaN'? member.scoreSD.toFixed(3) : "N/A"}</p>
                                 </div>
                                 <div class="d-flex flex-row gap-2 justify-content-start align-items-center">
                                     <img class="square-image" style="height: 15px; width: 15px" alt="profile image" src="/icons/SlopeScore.svg">
-                                    <p class="p-0 m-0">${member.scoreSlope !== 'NaN'? member.scoreSlope.toFixed(3) : "N/A"}</p>
+                                    <p class="p-0 m-0 text-nowrap" style="color: ${getColorGradient(member.scoreSlope !== 'NaN'? member.scoreSlope : 0, -0.6, 0.6)}">${member.scoreSlope !== 'NaN'? member.scoreSlope.toFixed(3) : "N/A"}</p>
                                 </div>
                             </div>
 
@@ -461,7 +499,7 @@
                                 </div>
                                 <div class="d-flex flex-row gap-2 justify-content-start align-items-center">
                                     <img class="square-image" style="height: 15px; width: 15px" alt="profile image" src="/icons/StartEnd.svg">
-                                    <p class="p-0 m-0">${member.startScore.cscore} → ${member.endScore.cscore}</p>
+                                    <p class="p-0 m-0 text-nowrap">${member.startScore.cscore} → ${member.endScore.cscore}</p>
                                 </div>
                             </div>
                         </div>
