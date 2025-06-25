@@ -42,6 +42,7 @@
             <div class="pb-2 flex-grow-1 d-flex overflow-x-scroll flex-row gap-3 align-items-center justify-content-start" id="report-selectors"></div>
 
             <!-- Statistics Table -->
+            <h2 class="fw-bold border-bottom mb-2">Quarterly Reports</h2>
             <div id="overview-stats-table" class="table-responsive"></div>
         </div>
         <div class="tab-pane fade" id="details-tab-pane" role="tabpanel" aria-labelledby="details-tab" tabindex="0">...</div>
@@ -123,8 +124,8 @@
                 header += `
                 <th>
                     <div>
-                        <p class="m-0 p-0">${formatDate(report.startDate)} -</p>
-                        <p class="m-0 p-0">${formatDate(report.endDate)}</p>
+                        <p class="m-0 p-0">${formatDate(report.startDate + " PST")} -</p>
+                        <p class="m-0 p-0">${formatDate(report.endDate + " PST")}</p>
                     </div>
                 </th>
                 `;
@@ -280,10 +281,8 @@
                     mostVolatileStreak = mostVolatile.id;
                 }
 
-                console.log(leastVolatile.id + " =? " + leastVolatileStreak);
                 leastVolatileRow += renderMemberCell(leastVolatile, leastVolatile !== null && leastVolatile.id === leastVolatileStreak);
                 if(leastVolatile !== null){
-                    console.log("changed");
                     leastVolatileStreak = leastVolatile.id;
                 }
 
@@ -302,91 +301,6 @@
                     mostStableStreak = mostStable.id;
                 }
             }
-
-
-            // // New Members
-            // let newMembersRow = ""
-            // quarterlyReports.forEach((report, index) => {
-            //     newMembersRow += `
-            //         <td>${report.newMembers}</td>
-            //     `;
-            // });
-            //
-            // // Standard Deviation Row
-            // let SDRow = ""
-            // quarterlyReports.forEach((report, index) => {
-            //     SDRow += `
-            //         <td>${report.overallSTD}</td>
-            //     `;
-            // });
-            //
-            // // Score Av Row
-            // let scoreAverageRow = ""
-            // quarterlyReports.forEach((report, index) => {
-            //     scoreAverageRow += `
-            //         <td>${report.overallScoreAverage}</td>
-            //     `;
-            // });
-            //
-            // // Score Total Row
-            // let scoreTotalRow = ""
-            // quarterlyReports.forEach((report, index) => {
-            //     scoreTotalRow += `
-            //         <td>${report.overallScoreCount}</td>
-            //     `;
-            // });
-            //
-            // // Total Members Row
-            // let totalMembersRow = ""
-            // quarterlyReports.forEach((report, index) => {
-            //     totalMembersRow += `
-            //         <td>${report.totalMembers}</td>
-            //     `;
-            // });
-            //
-            // // Human metrics
-            //
-            // // Most Stable Member
-            // let mostStableRow = ""
-            // quarterlyReports.forEach((report, index) => {
-            //     let imageSrc = report.stable? `/api/interpersonal/member/profile-image/${report.stable}` : "/icons/Error.svg";
-            //     mostStableRow += `
-            //         <td>
-            //             <a class="d-flex flex-column" href="/interpersonal/member/view/${report.stable}">
-            //                 <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=${imageSrc}>
-            //                 <p class="p-0">${report.stableSTD.toFixed(4)}</p>
-            //             </a>
-            //         </td>
-            //     `;
-            // });
-            //
-            // // Top-Grossing Member
-            // let topGrossingRow = ""
-            // quarterlyReports.forEach((report, index) => {
-            //     let imageSrc = report.topGrossing? `/api/interpersonal/member/profile-image/${report.topGrossing}` : "/icons/Error.svg";
-            //     topGrossingRow += `
-            //         <td>
-            //             <a class="d-flex flex-column" href="/interpersonal/member/view/${report.topGrossing}">
-            //                 <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=${imageSrc}>
-            //                 <p class="p-0">${report.topScoreIncrease.toFixed(4)}</p>
-            //             </a>
-            //         </td>
-            //     `;
-            // });
-            //
-            // // Anti-Grossing Member
-            // let antiGrossingRow = ""
-            // quarterlyReports.forEach((report, index) => {
-            //     let imageSrc = report.antiGrossing? `/api/interpersonal/member/profile-image/${report.antiGrossing}` : "/icons/Error.svg";
-            //     antiGrossingRow += `
-            //         <td>
-            //             <a class="d-flex flex-column" href="/interpersonal/member/view/${report.antiGrossing}">
-            //                 <img class="square-image" style="height: 40px; width: 40px" alt="profile image" src=${imageSrc}>
-            //                 <p class="p-0">${report.antiScoreDecrease.toFixed(4)}</p>
-            //             </a>
-            //         </td>
-            //     `;
-            // });
 
             document.querySelector("#overview-stats-table").innerHTML = `
                 <table class="table table-hover align-middle">
@@ -469,9 +383,7 @@
     }
 
     function renderMemberCell(member, isStreak = false){
-        console.log(isStreak)
         if(member === null || member === undefined){
-            console.log("not a good look...");
             return `<td class="text-center">N/A</td>`;
         }
         return `
