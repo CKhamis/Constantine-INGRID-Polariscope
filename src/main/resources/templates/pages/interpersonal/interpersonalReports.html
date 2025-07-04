@@ -45,7 +45,9 @@
             <h2 class="fw-bold border-bottom mb-2">Quarterly Reports</h2>
             <div id="overview-stats-table" class="table-responsive"></div>
         </div>
-        <div class="tab-pane fade" id="details-tab-pane" role="tabpanel" aria-labelledby="details-tab" tabindex="0">...</div>
+        <div class="tab-pane fade p-2" id="details-tab-pane" role="tabpanel" aria-labelledby="details-tab" tabindex="0">
+            <div class="d-flex flex-md-row flex-column align-items-center gap-2" id="details-header"></div>
+        </div>
         <div class="tab-pane fade" id="custom-tab-pane" role="tabpanel" aria-labelledby="custom-tab" tabindex="0">...</div>
     </div>
 </main>
@@ -84,6 +86,7 @@
                     quarterlyReports = data[0];
                 }
                 renderOverviewTab();
+                renderDetailsTab();
             })
             .catch((response) => {
                 errorIcon.classList.add("d-block");
@@ -107,7 +110,33 @@
             renderOverviewTable();
         }
 
+        function renderDetailsTab(){
+            renderOverviewHeader();
+        }
+
         // Helper functions
+
+        function renderOverviewHeader(){
+            // Select first report by default
+            let headerContent = "";
+            if(quarterlyReports.length > 0){
+                let defaultReport = quarterlyReports[0];
+                let reportList = "";
+
+                quarterlyReports.forEach((report, index) => {
+                    reportList += `<option value="${index}">${formatDate(report.startDate)} - ${formatDate(report.endDate)}</option>`
+                });
+
+                headerContent = `
+                    <h3 class="mb-0 me-auto text-nowrap text-md-start text-center">${formatDate(defaultReport.startDate)} - ${formatDate(defaultReport.endDate)}</h3>
+                    <select class="form-select w-auto" aria-label="Default select example">
+                        <option selected>Select Report</option>
+                        ${reportList}
+                    </select>
+                `;
+            }
+            document.getElementById("details-header").innerHTML = headerContent;
+        }
 
         function renderChips(){
             let buttonHTML = "";
@@ -202,9 +231,14 @@
             // Score Standard Deviation
             let scoreSDRow = ""
             quarterlyReports.forEach((report, index) => {
-                scoreSDRow += `
+                if(report.overallScoreSD === "NaN"){
+                    scoreSDRow += `<td>N/A</td>`;
+                }else{
+                    scoreSDRow += `
                     <td>${report.overallScoreSD.toFixed(3)}</td>
                 `;
+                }
+
             });
 
             // Score Average
