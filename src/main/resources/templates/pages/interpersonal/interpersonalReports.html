@@ -3,8 +3,8 @@
 <head th:replace="~{components/Header :: head('Analysis')}"></head>
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
-<main class="bg-2" style="margin-left: 60px; height: 100vh;">
-    <nav class="container-fluid pt-2 position-sticky top-0 border-bottom" style="background: linear-gradient(#222, #2c2c2c);">
+<main class="bg-2 d-flex flex-column flex-fill" style="margin-left: 60px; height: 100vh;">
+    <nav class="container-fluid pt-2 border-bottom" style="background: linear-gradient(#222, #2c2c2c);">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <div class="col-md-10 d-flex flex-row align-items-center justify-content-start">
                 <img class="square-image me-2" style="height: 40px; width: 40px" alt="Analysis image" th:src="@{/icons/Reports.svg}">
@@ -37,16 +37,24 @@
             </div>
         </div>
     </nav>
-    <div class="tab-content container-fluid">
-        <div class="tab-pane fade show active p-2" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
+    <div class="tab-content container-fluid flex-grow-1">
+        <div class="tab-pane fade show active p-2 overflow-y-auto" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
             <div class="pb-2 flex-grow-1 d-flex overflow-x-scroll flex-row gap-3 align-items-center justify-content-start" id="report-selectors"></div>
 
             <!-- Statistics Table -->
             <h2 class="fw-bold border-bottom mb-2">Quarterly Reports</h2>
             <div id="overview-stats-table" class="table-responsive"></div>
         </div>
-        <div class="tab-pane fade p-2" id="details-tab-pane" role="tabpanel" aria-labelledby="details-tab" tabindex="0">
-            <div class="d-flex flex-md-row flex-column align-items-center gap-2" id="details-header"></div>
+        <div class="tab-pane fade h-100" id="details-tab-pane" role="tabpanel" aria-labelledby="details-tab" tabindex="0">
+            <div class="row h-100">
+                <div class="col-md-8 col-12 p-2">
+                    <div class="d-flex flex-md-row flex-column align-items-center gap-2 mb-2" id="details-header"></div>
+                    <div class="row mb-2 gx-2" id="detail-chip-container"></div>
+                </div>
+                <div class="col-md-4 d-none d-md-block border-start p-2">
+                    <h3 class="p-0 m-0 mb-3 fw-bold">Report Statistics</h3>
+                </div>
+            </div>
         </div>
         <div class="tab-pane fade" id="custom-tab-pane" role="tabpanel" aria-labelledby="custom-tab" tabindex="0">...</div>
     </div>
@@ -61,6 +69,7 @@
 
 <script>
     let quarterlyReports = [];
+    let selectedReport = null;
 
     refresh();
 
@@ -112,15 +121,117 @@
 
         function renderDetailsTab(){
             renderOverviewHeader();
+            renderDetailChips();
         }
 
         // Helper functions
+        function renderDetailChips(){
+            // Get min, max, and median of report standard deviations
+            let standardDeviations = quarterlyReports.map(report => report.overallScoreSD).filter(sd => typeof sd === "number");
+            standardDeviations.sort((a,b) => a - b);
+
+            let minSd = Math.min(...standardDeviations);
+            let maxSd = Math.max(...standardDeviations);
+
+            let midSd = Math.floor(standardDeviations.length / 2);
+            let medianSd = standardDeviations.length % 2 === 0? (standardDeviations[midSd - 1] + standardDeviations[midSd])/2 : standardDeviations[midSd];
+
+            let hasSd = true;
+            if(selectedReport.overallScoreSD === "NaN"){
+                hasSd = false;
+            }
+
+            // get min, max, and median of report activity scores
+            let activityScores = quarterlyReports.map(report => report.newActivityScore);
+            activityScores.sort((a,b) => a - b);
+            let minAs = Math.min(...activityScores);
+            let maxAs = Math.max(...activityScores);
+
+            let midAs = Math.floor(activityScores.length / 2);
+            let medianAs = activityScores.length % 2 === 0? (activityScores[midAs - 1] + activityScores[midAs]) / 2 : activityScores[midAs];
+
+            let detailChipHTML = `
+                <div class="col-12 col-lg-8">
+                    <div class="alert alert-secondary">
+                        <div class="d-flex flex-col w-100">
+                            <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                                <h6 class="text-center fw-bold">Score Mean SD</h6>
+                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${hasSd? selectedReport.overallScoreSD.toFixed(3) : "N/A"}</p>
+                            </div>
+                        </div>
+                        <div class="w-100 position-relative">
+                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${hasSd? selectedReport.overallScoreSD/2 + 50 : 0}%" alt="arrow" />
+                        </div>
+                        <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                        <div class="w-100 position-relative">
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minSd.toFixed(1)}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${medianSd.toFixed(1)}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxSd.toFixed(1)}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <div class="alert alert-secondary">
+                        <div class="d-flex flex-col w-100">
+                            <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                                <h6 class="text-center fw-bold">Activity Score</h6>
+                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${selectedReport.newActivityScore}</p>
+                            </div>
+                        </div>
+                        <div class="w-100 position-relative">
+                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${selectedReport.newActivityScore/2 + 50}%" alt="arrow" />
+                        </div>
+                        <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                        <div class="w-100 position-relative">
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minAs}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${medianAs}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxAs}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-3">
+                    <div class="alert alert-secondary">
+                        <h6 class="text-center fw-bold">cScore Entries</h6>
+                        <p class="text-center fs-2 mb-0">${""}</p>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-3">
+                    <div class="alert alert-secondary">
+                        <div class="d-flex flex-col w-100">
+                            <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                                <h6 class="text-center fw-bold">Member Edits</h6>
+                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${""}</p>
+                            </div>
+                        </div>
+                        <div class="w-100 position-relative">
+                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${(0) * 100}%" alt="arrow" />
+                        </div>
+                        <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                        <div class="w-100 position-relative">
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${"lowestEditCount"}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: ${(0) * 100}%">${"medianEditCount"}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${"highestEditCount"}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-3">
+                    <div class="alert alert-secondary">
+                        <h6 class="text-center fw-bold">Record Age</h6>
+                        <p class="text-center fs-2 mb-0">${"timeSince(memberDetails.created)"}</p>
+                    </div>
+                </div>`;
+
+            document.querySelector("#detail-chip-container").innerHTML = detailChipHTML;
+        }
 
         function renderOverviewHeader(){
             // Select first report by default
             let headerContent = "";
             if(quarterlyReports.length > 0){
-                let defaultReport = quarterlyReports[0];
+                if(selectedReport == null){
+                    selectedReport = quarterlyReports[0];
+                }
+
                 let reportList = "";
 
                 quarterlyReports.forEach((report, index) => {
@@ -128,7 +239,7 @@
                 });
 
                 headerContent = `
-                    <h3 class="mb-0 me-auto text-nowrap text-md-start text-center">${formatDate(defaultReport.startDate)} - ${formatDate(defaultReport.endDate)}</h3>
+                    <h3 class="mb-0 me-auto text-nowrap text-md-start text-center w-100 fw-bold">${formatDate(selectedReport.startDate)} - ${formatDate(selectedReport.endDate)}</h3>
                     <select class="form-select w-auto" aria-label="Default select example">
                         <option selected>Select Report</option>
                         ${reportList}
