@@ -50,6 +50,8 @@
                 <div class="col-md-8 col-12 p-2">
                     <div class="d-flex flex-md-row flex-column align-items-center gap-2 mb-2" id="details-header"></div>
                     <div class="row mb-2 gx-2" id="detail-chip-container"></div>
+                    <h3 class="fw-bold border-bottom mb-2">Events Occurred</h3>
+                    <div class="table-responsive" id="detail-event-table"></div>
                 </div>
                 <div class="col-md-4 d-none d-md-block border-start p-2">
                     <h3 class="p-0 m-0 mb-3 fw-bold">Report Statistics</h3>
@@ -70,6 +72,7 @@
 <script>
     let quarterlyReports = [];
     let selectedReport = null;
+    let eventList = [];
 
     refresh();
 
@@ -80,13 +83,14 @@
         spinner.classList.remove("d-none");
 
         const quarterlyFetch = fetch("/api/interpersonal/reports/quarterly", {});
+        const eventFetch = fetch('/api/interpersonal/event/all')
 
-        Promise.all([quarterlyFetch])
+        Promise.all([quarterlyFetch, eventFetch])
             .then(responses => {
                 return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json()]);
+                return Promise.all([data[0].json(), data[1].json()]);
             })
             .then(data => {
                 console.log(data);
@@ -94,6 +98,8 @@
                 if(data[0]){
                     quarterlyReports = data[0];
                 }
+
+                eventList = data[1];
                 renderOverviewTab();
                 renderDetailsTab();
             })
@@ -122,16 +128,21 @@
         function renderDetailsTab(){
             renderOverviewHeader();
             renderDetailChips();
+            renderEventTable();
         }
 
         // Helper functions
         function renderDetailChips(){
+            if(quarterlyReports.length < 2){
+                return;
+            }
+
             // Get min, max, and median of report standard deviations
             let standardDeviations = quarterlyReports.map(report => report.overallScoreSD).filter(sd => typeof sd === "number");
             standardDeviations.sort((a,b) => a - b);
 
-            let minSd = Math.min(...standardDeviations);
-            let maxSd = Math.max(...standardDeviations);
+            let minSd = standardDeviations[0];
+            let maxSd = standardDeviations[standardDeviations.length - 1];
 
             let midSd = Math.floor(standardDeviations.length / 2);
             let medianSd = standardDeviations.length % 2 === 0? (standardDeviations[midSd - 1] + standardDeviations[midSd])/2 : standardDeviations[midSd];
@@ -144,11 +155,31 @@
             // get min, max, and median of report activity scores
             let activityScores = quarterlyReports.map(report => report.newActivityScore);
             activityScores.sort((a,b) => a - b);
-            let minAs = Math.min(...activityScores);
-            let maxAs = Math.max(...activityScores);
+            let minAs = activityScores[0];
+            let maxAs = activityScores[activityScores.length - 1];
 
             let midAs = Math.floor(activityScores.length / 2);
             let medianAs = activityScores.length % 2 === 0? (activityScores[midAs - 1] + activityScores[midAs]) / 2 : activityScores[midAs];
+
+            // get min, max, and median of evaluation averages
+            let evaluations = quarterlyReports.map(report => report.overallScoreAverage).filter(ev => typeof ev === "number");
+            evaluations.sort((a,b) => a - b);
+            let minEv = evaluations[0];
+            let maxEv = evaluations[evaluations.length - 1];
+
+            let midEv = Math.floor(evaluations.length / 2);
+            let medianEv = evaluations.length % 2 === 0? (evaluations[midEv - 1] + evaluations[midEv]) / 2 : evaluations[midEv];
+
+            let hasEv = typeof selectedReport.overallScoreAverage === "number";
+
+            // get min, max, and median of num of events
+            let events = quarterlyReports.map(report => report.events);
+            events.sort((a,b) => a - b);
+            let minEs = events[0];
+            let maxEs = events[events.length - 1];
+
+            let midEs = Math.floor(events.length / 2);
+            let medianEs = events.length % 2 === 0? (events[midEs - 1] + events[midEs]) / 2 : events[midEs];
 
             let detailChipHTML = `
                 <div class="col-12 col-lg-8">
@@ -183,45 +214,61 @@
                         </div>
                         <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
                         <div class="w-100 position-relative">
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minAs}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${medianAs}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxAs}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minAs.toFixed(1)}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${medianAs.toFixed(1)}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxAs.toFixed(1)}</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-lg-3">
-                    <div class="alert alert-secondary">
-                        <h6 class="text-center fw-bold">cScore Entries</h6>
-                        <p class="text-center fs-2 mb-0">${""}</p>
-                    </div>
-                </div>
-                <div class="col-12 col-lg-3">
+                <div class="col-12 col-lg-4">
                     <div class="alert alert-secondary">
                         <div class="d-flex flex-col w-100">
                             <div class="d-flex flex-row align-items-start justify-content-between w-100">
-                                <h6 class="text-center fw-bold">Member Edits</h6>
-                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${""}</p>
+                                <h6 class="text-center fw-bold">Events</h6>
+                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${selectedReport.events}</p>
                             </div>
                         </div>
                         <div class="w-100 position-relative">
-                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${(0) * 100}%" alt="arrow" />
+                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${selectedReport.events/2 + 50}%" alt="arrow" />
                         </div>
                         <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
                         <div class="w-100 position-relative">
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${"lowestEditCount"}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: ${(0) * 100}%">${"medianEditCount"}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${"highestEditCount"}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minEs}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${medianEs}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxEs}</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-lg-3">
+                <div class="col-12 col-lg-8">
                     <div class="alert alert-secondary">
-                        <h6 class="text-center fw-bold">Record Age</h6>
-                        <p class="text-center fs-2 mb-0">${"timeSince(memberDetails.created)"}</p>
+                        <div class="d-flex flex-col w-100">
+                            <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                                <h6 class="text-center fw-bold">Mean Evaluation</h6>
+                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${hasEv? selectedReport.overallScoreAverage : "N/A"}</p>
+                            </div>
+                        </div>
+                        <div class="w-100 position-relative">
+                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${selectedReport.overallScoreAverage/2 + 50}%" alt="arrow" />
+                        </div>
+                        <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                        <div class="w-100 position-relative">
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minEv.toFixed(1)}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${medianEv.toFixed(1)}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxEv.toFixed(1)}</p>
+                        </div>
                     </div>
                 </div>`;
 
             document.querySelector("#detail-chip-container").innerHTML = detailChipHTML;
+        }
+
+        function renderEventTable(){
+            let tableContent = "";
+            eventList.forEach(event => {
+                tableContent += event.title;
+            });
+
+            document.querySelector("#detail-event-table").innerHTML = tableContent;
         }
 
         function renderOverviewHeader(){
