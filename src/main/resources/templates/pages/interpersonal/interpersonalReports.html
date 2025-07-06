@@ -196,19 +196,44 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Handle</th>
+                        <th scope="col"></th>
+                        <th scope="col">Name</th>
+                        <th scope="col">X̄ Eval</th>
+                        <th scope="col">σ Eval</th>
+                        <th scope="col">Start</th>
+                        <th scope="col">End</th>
+                        <th scope="col">Eval Slope</th>
+                        <th scope="col"># Evals</th>
+                        <th scope="col">∑ Evals</th>
+
                     </tr>
                 </thead>
                 <tbody>
             `;
             selectedReport.memberReports.forEach(memberReport => {
+                // Regression Slope
+                let arrow = "";
+                if(memberReport.scoreSlope !== "NaN"){
+                    let angle = Math.atan(memberReport.scoreSlope) * (180 / Math.PI);
+                    let arrowRotation = -90 - angle;
+                    arrow = `<img style="height: 30px; width:30px; transform:rotate(${arrowRotation}deg)" src="/icons/Arrow.svg"/>`;
+                }
+
+
                 tableHTML += `
                 <tr>
+                    <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${memberReport.id}"></th>
                     <th style="vertical-align: middle" scope="col">${memberReport.firstName + " " + memberReport.lastName}</th>
-                    <td style="vertical-align: middle"></td>
+                    <td style="vertical-align: middle">${memberReport.scoreAverage === "NaN"? "N/A" : memberReport.scoreAverage.toFixed(1)}</td>
+                    <td style="vertical-align: middle">${memberReport.scoreSD === "NaN"? "N/A" : memberReport.scoreSD.toFixed(1)}</td>
+                    <td style="vertical-align: middle">${memberReport.startScore !== null? memberReport.startScore.cscore : "N/A"}</td>
+                    <td style="vertical-align: middle">${memberReport.endScore !== null? memberReport.endScore.cscore : "N/A"}</td>
+                    <td style="vertical-align: middle">
+                        ${memberReport.scoreSlope === "NaN"? "N/A" : memberReport.scoreSlope.toFixed(1)}
+                        ${arrow}
+                    </td>
+                    <td style="vertical-align: middle">${memberReport.scoreCount}</td>
+                    <td style="vertical-align: middle">${memberReport.scoreTotal}</td>
                 </tr>`;
             });
 
