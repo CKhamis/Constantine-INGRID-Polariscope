@@ -61,8 +61,65 @@
         <div class="tab-pane fade" id="custom-tab-pane" role="tabpanel" aria-labelledby="custom-tab" tabindex="0">...</div>
     </div>
 </main>
+
+<div class="modal fade" id="saveEventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="saveEventModalTitle">Save Event</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="event-label-form" class="form-label">Label</label>
+                        <input type="text" class="form-control" id="event-label-form" required>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="event-date-form" class="form-label">Date</label>
+                        <input type="datetime-local" class="form-control" id="event-date-form">
+                    </div>
+                    <div class="col-12">
+                        <label for="event-description-form" class="form-label">Description</label>
+                        <textarea class="form-control" id="event-description-form" rows="3"></textarea>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <label for="event-color-preview" class="form-label">Color</label>
+                        <div class="container" style="height:40px" id="event-color-preview"></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="event-red-form">Red</label>
+                            <input type="number" class="form-control" id="event-red-form">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="event-green-form">Green</label>
+                            <input type="number" class="form-control" id="event-green-form">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="event-blue-form">Blue</label>
+                            <input type="number" class="form-control" id="event-blue-form">
+                        </div>
+                    </div>
+                    <input type="hidden" id="event-id-form" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="modalSaveEvent()" data-bs-dismiss="modal">Save Event</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
+<div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Network :: data-upload}"></div>
@@ -118,7 +175,6 @@
                 spinner.classList.remove("d-block");
                 spinner.classList.add("d-none");
             });
-
 
         function renderOverviewTab(){
             renderChips();
@@ -191,12 +247,12 @@
                             </div>
                         </div>
                         <div class="w-100 position-relative">
-                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${hasSd? selectedReport.overallScoreSD/2 + 50 : 0}%" alt="arrow" />
+                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${hasSd? ((selectedReport.overallScoreSD - minSd)/(maxSd - minSd)) * 100 : 0}%" alt="arrow" />
                         </div>
                         <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
                         <div class="w-100 position-relative">
                             <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minSd.toFixed(1)}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${medianSd.toFixed(1)}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianSd.toFixed(1)}</p>
                             <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxSd.toFixed(1)}</p>
                         </div>
                     </div>
@@ -210,12 +266,12 @@
                             </div>
                         </div>
                         <div class="w-100 position-relative">
-                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${selectedReport.newActivityScore/2 + 50}%" alt="arrow" />
+                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((selectedReport.newActivityScore - minAs)/(maxAs - minAs)) * 100}%" alt="arrow" />
                         </div>
                         <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
                         <div class="w-100 position-relative">
                             <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minAs.toFixed(1)}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${medianAs.toFixed(1)}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianAs.toFixed(1)}</p>
                             <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxAs.toFixed(1)}</p>
                         </div>
                     </div>
@@ -224,17 +280,17 @@
                     <div class="alert alert-secondary">
                         <div class="d-flex flex-col w-100">
                             <div class="d-flex flex-row align-items-start justify-content-between w-100">
-                                <h6 class="text-center fw-bold">Events</h6>
+                                <h6 class="text-center fw-bold">Events Added</h6>
                                 <p class="text-end fs-2 mb-0" style="margin-top: -10px">${selectedReport.events}</p>
                             </div>
                         </div>
                         <div class="w-100 position-relative">
-                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${selectedReport.events/2 + 50}%" alt="arrow" />
+                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((selectedReport.events - minEs)/(maxEs - minEs)) * 100}%" alt="arrow" />
                         </div>
                         <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
                         <div class="w-100 position-relative">
                             <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minEs}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${medianEs}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianEs}</p>
                             <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxEs}</p>
                         </div>
                     </div>
@@ -244,16 +300,16 @@
                         <div class="d-flex flex-col w-100">
                             <div class="d-flex flex-row align-items-start justify-content-between w-100">
                                 <h6 class="text-center fw-bold">Mean Evaluation</h6>
-                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${hasEv? selectedReport.overallScoreAverage : "N/A"}</p>
+                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${hasEv? selectedReport.overallScoreAverage.toFixed(3) : "N/A"}</p>
                             </div>
                         </div>
                         <div class="w-100 position-relative">
-                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${selectedReport.overallScoreAverage/2 + 50}%" alt="arrow" />
+                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((selectedReport.overallScoreAverage - minEv)/ (maxEv - minEv)) * 100}%" alt="arrow" />
                         </div>
                         <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
                         <div class="w-100 position-relative">
                             <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minEv.toFixed(1)}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${medianEv.toFixed(1)}</p>
+                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianEv.toFixed(1)}</p>
                             <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxEv.toFixed(1)}</p>
                         </div>
                     </div>
@@ -263,10 +319,43 @@
         }
 
         function renderEventTable(){
-            let tableContent = "";
-            eventList.forEach(event => {
-                tableContent += event.title;
+            // filter out all events that are not under this report
+            let reportEventList = eventList.filter(event => (new Date(event.date) > new Date(selectedReport.startDate + "PST")) && (new Date(event.date) < new Date(selectedReport.endDate + "PST")));
+
+
+            let tableContent = `
+             <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Color</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Edit</th>
+                        <th scope="col">Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            reportEventList.forEach(event => {
+                tableContent += `
+                    <tr>
+                        <th scope="row" style="vertical-align: middle">${event.label}</th>
+                        <td style="vertical-align: middle"><div class="square-image" style="height: 30px; background-color: rgb(${event.color.red}, ${event.color.green}, ${event.color.blue})"></div></td>
+                        <td style="vertical-align: middle">${formatTimestamp(new Date(event.date))}</td>
+                        <td style="vertical-align: middle">${event.description}</td>
+                        <td style="vertical-align: middle"><button class="btn btn-secondary" onclick="updateEventModal('${event.id}')" data-bs-toggle="modal" data-bs-target="#saveEventModal">Edit</button></td>
+                        <td style="vertical-align: middle"><button class="btn btn-danger bevel-sm" onclick="deleteEvent('${event.id}')">Delete</button></td>
+
+                    </tr>
+                `;
             });
+
+            tableContent += "</tbody></table>";
+
+            if(reportEventList.length === 0){
+                tableContent += "<p class='w-100 text-center'>No Events</p>";
+            }
 
             document.querySelector("#detail-event-table").innerHTML = tableContent;
         }
@@ -287,13 +376,19 @@
 
                 headerContent = `
                     <h3 class="mb-0 me-auto text-nowrap text-md-start text-center w-100 fw-bold">${formatDate(selectedReport.startDate)} - ${formatDate(selectedReport.endDate)}</h3>
-                    <select class="form-select w-auto" aria-label="Default select example">
+                    <select class="form-select w-auto" id="report-selector">
                         <option selected>Select Report</option>
                         ${reportList}
                     </select>
                 `;
             }
             document.getElementById("details-header").innerHTML = headerContent;
+
+            const selectElement = document.getElementById("report-selector");
+            selectElement.addEventListener("change", function () {
+                selectedReport = quarterlyReports[this.value];
+                renderDetailsTab();
+            });
         }
 
         function renderChips(){
@@ -611,6 +706,93 @@
                 </div>
             </td>`;
     }
+
+    // Database helper functions
+    function updateEventModal(id){
+        const event = eventList.find(g => g.id === id);
+        console.log(event);
+        document.querySelector("#saveEventModalTitle").textContent = "Edit Event Details";
+        document.querySelector("#event-id-form").value =  event.id;
+        document.querySelector("#event-label-form").value = event.label;
+        document.querySelector("#event-description-form").value = event.description;
+        document.querySelector("#event-date-form").value = event.date;
+        document.querySelector("#event-red-form").value = event.color.red;
+        document.querySelector("#event-green-form").value = event.color.green;
+        document.querySelector("#event-blue-form").value = event.color.blue;
+        updateEventColorPreview();
+    }
+
+    function updateEventColorPreview(){
+        const color = "rgb(" + document.querySelector("#event-red-form").value + "," + document.querySelector("#event-green-form").value + "," + document.querySelector("#event-blue-form").value + ")";
+        console.log(color);
+        document.querySelector("#event-color-preview").style.backgroundColor = color;
+    }
+
+    function modalSaveEvent(){
+        const formData = {
+            id: document.querySelector("#event-id-form").value,
+            label: document.querySelector("#event-label-form").value,
+            description: document.querySelector("#event-description-form").value,
+            date: document.querySelector("#event-date-form").value,
+            red: document.querySelector("#event-red-form").value,
+            green: document.querySelector("#event-green-form").value,
+            blue: document.querySelector("#event-blue-form").value
+        };
+
+        let toastId = createToast("Saving Event");
+        postData("/api/interpersonal/event/save", formData)
+            .then((message) => {
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-title`).innerText =  message.title;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
+            })
+            .finally(() => refresh());
+    }
+
+    function deleteEvent(id){
+        let toastId = createToast("Deleting Event");
+        postData("/api/interpersonal/event/delete", id)
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+            })
+            .catch((response) => {
+                response.json()
+                document.getElementById(`${toastId}-body`).innerText = getIcon(
+                    errorData.severity) + errorData.message;
+                document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                document.getElementById(`${toastId}-loading`).style.color = "red";
+            })
+            .finally(() => {refresh()});
+    }
+
+    // Event Listeners
+    document.querySelector("#event-red-form").addEventListener('input', function() {
+        updateEventColorPreview();
+    });
+    document.querySelector("#event-green-form").addEventListener('input', function() {
+        updateEventColorPreview();
+    });
+    document.querySelector("#event-blue-form").addEventListener('input', function() {
+        updateEventColorPreview();
+    });
 </script>
 </body>
 </html>
