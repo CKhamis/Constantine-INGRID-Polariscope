@@ -52,6 +52,8 @@
                     <div class="row mb-2 gx-2" id="detail-chip-container"></div>
                     <h3 class="fw-bold border-bottom mb-2">Events Occurred</h3>
                     <div class="table-responsive" id="detail-event-table"></div>
+                    <h3 class="fw-bold border-bottom mb-2">Member Statistics</h3>
+                    <div class="table-responsive" id="detail-member-table"></div>
                 </div>
                 <div class="col-md-4 d-none d-md-block border-start p-2">
                     <h3 class="p-0 m-0 mb-3 fw-bold">Report Statistics</h3>
@@ -185,9 +187,35 @@
             renderOverviewHeader();
             renderDetailChips();
             renderEventTable();
+            renderMemberTable();
         }
 
         // Helper functions
+        function renderMemberTable(){
+            let tableHTML = `
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">First</th>
+                        <th scope="col">Last</th>
+                        <th scope="col">Handle</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            selectedReport.memberReports.forEach(memberReport => {
+                tableHTML += `
+                <tr>
+                    <th style="vertical-align: middle" scope="col">${memberReport.firstName + " " + memberReport.lastName}</th>
+                    <td style="vertical-align: middle"></td>
+                </tr>`;
+            });
+
+            tableHTML += `</tbody></table>`;
+            document.querySelector("#detail-member-table").innerHTML = tableHTML;
+        }
+
         function renderDetailChips(){
             if(quarterlyReports.length < 2){
                 return;
