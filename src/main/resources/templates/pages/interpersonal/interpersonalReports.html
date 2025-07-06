@@ -193,7 +193,7 @@
         // Helper functions
         function renderMemberTable(){
             let tableHTML = `
-            <table class="table">
+            <table class="table table-hover align-middle">
                 <thead>
                     <tr>
                         <th scope="col"></th>
@@ -205,7 +205,14 @@
                         <th scope="col">Eval Slope</th>
                         <th scope="col"># Evals</th>
                         <th scope="col">∑ Evals</th>
-
+                        <th scope="col">Events</th>
+                        <th scope="col"># Net</th>
+                        <th scope="col"># In Net</th>
+                        <th scope="col">X̄ In Net</th>
+                        <th scope="col">σ In Net</th>
+                        <th scope="col"># Out Net</th>
+                        <th scope="col">X̄ Out Net</th>
+                        <th scope="col">σ Out Net</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -216,7 +223,7 @@
                 if(memberReport.scoreSlope !== "NaN"){
                     let angle = Math.atan(memberReport.scoreSlope) * (180 / Math.PI);
                     let arrowRotation = -90 - angle;
-                    arrow = `<img style="height: 30px; width:30px; transform:rotate(${arrowRotation}deg)" src="/icons/Arrow.svg"/>`;
+                    arrow = `<img style="height: 20px; width:20px; transform:rotate(${arrowRotation}deg)" src="/icons/Arrow.svg"/>`;
                 }
 
 
@@ -224,16 +231,25 @@
                 <tr>
                     <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${memberReport.id}"></th>
                     <th style="vertical-align: middle" scope="col">${memberReport.firstName + " " + memberReport.lastName}</th>
-                    <td style="vertical-align: middle">${memberReport.scoreAverage === "NaN"? "N/A" : memberReport.scoreAverage.toFixed(1)}</td>
-                    <td style="vertical-align: middle">${memberReport.scoreSD === "NaN"? "N/A" : memberReport.scoreSD.toFixed(1)}</td>
-                    <td style="vertical-align: middle">${memberReport.startScore !== null? memberReport.startScore.cscore : "N/A"}</td>
-                    <td style="vertical-align: middle">${memberReport.endScore !== null? memberReport.endScore.cscore : "N/A"}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreAverage === "NaN"? "N/A" : memberReport.scoreAverage.toFixed(1)}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreSD === "NaN"? "N/A" : memberReport.scoreSD.toFixed(1)}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.startScore !== null? memberReport.startScore.cscore : "N/A"}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.endScore !== null? memberReport.endScore.cscore : "N/A"}</td>
                     <td style="vertical-align: middle">
                         ${memberReport.scoreSlope === "NaN"? "N/A" : memberReport.scoreSlope.toFixed(1)}
                         ${arrow}
                     </td>
-                    <td style="vertical-align: middle">${memberReport.scoreCount}</td>
-                    <td style="vertical-align: middle">${memberReport.scoreTotal}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreCount}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreTotal}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.eventsIncluded}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.connectionsCount}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.incomingConnectionsCount}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.incomingConnectionsAverage === "NaN"? "N/A" : memberReport.incomingConnectionsAverage.toFixed(1)}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.incomingConnectionsSD === "NaN"? "N/A" : memberReport.incomingConnectionsSD.toFixed(1)}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.outgoingConnectionsCount}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.outgoingConnectionsAverage === "NaN"? "N/A" : memberReport.outgoingConnectionsAverage.toFixed(1)}</td>
+                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.outgoingConnectionsSD === "NaN"? "N/A" : memberReport.outgoingConnectionsSD.toFixed(1)}</td>
+                    <td style="vertical-align: middle"><a target="_blanks" href="/interpersonal/members/view/${memberReport.id}"><button class="btn btn-secondary" data-bs-toggle="modal">View</button></a></td>
                 </tr>`;
             });
 
