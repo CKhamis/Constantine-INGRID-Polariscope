@@ -37,7 +37,7 @@
             </div>
         </div>
     </nav>
-    <div class="tab-content container-fluid flex-grow-1">
+    <div class="tab-content container-fluid flex-grow-1 overflow-hidden d-flex flex-column">
         <div class="tab-pane fade show active p-2 overflow-y-auto" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
             <div class="pb-2 flex-grow-1 d-flex overflow-x-scroll flex-row gap-3 align-items-center justify-content-start" id="report-selectors"></div>
 
@@ -47,16 +47,17 @@
         </div>
         <div class="tab-pane fade h-100" id="details-tab-pane" role="tabpanel" aria-labelledby="details-tab" tabindex="0">
             <div class="row h-100">
-                <div class="col-md-8 col-12 p-2">
+                <div class="col-md-8 col-12 p-2 overflow-y-auto h-100">
                     <div class="d-flex flex-md-row flex-column align-items-center gap-2 mb-2" id="details-header"></div>
                     <div class="row mb-2 gx-2" id="detail-chip-container"></div>
                     <h3 class="fw-bold border-bottom mb-2">Events Occurred</h3>
-                    <div class="table-responsive" id="detail-event-table"></div>
+                    <div class="" id="detail-event-table"></div>
                     <h3 class="fw-bold border-bottom mb-2">Member Statistics</h3>
-                    <div class="table-responsive" id="detail-member-table"></div>
+                    <div class="" id="detail-member-table"></div>
                 </div>
                 <div class="col-md-4 d-none d-md-block border-start p-2">
-                    <h3 class="p-0 m-0 mb-3 fw-bold">Report Statistics</h3>
+                    <h3 class="fw-bold border-bottom mb-2">Report Statistics</h3>
+                    <div class="container-fluid" id="detail-stats-container"></div>
                 </div>
             </div>
         </div>
@@ -188,9 +189,71 @@
             renderDetailChips();
             renderEventTable();
             renderMemberTable();
+            renderReportStatistics();
         }
 
         // Helper functions
+        function renderReportStatistics(){
+            let statContent = `
+                <div class="row">
+                    <div class="col-6">
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Activity Score</p>
+                            <p>${selectedReport.activityScore}</p>
+                        </div>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Added Activity Score</p>
+                            <p>${selectedReport.newActivityScore}</p>
+                        </div>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Events Added</p>
+                            <p>${selectedReport.events}</p>
+                        </div>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Total Members</p>
+                            <p>${selectedReport.memberCount}</p>
+                        </div>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Added Members</p>
+                            <p>${selectedReport.newMemberCount}</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Connection Average</p>
+                            <p>${selectedReport.overallConnectionAverage === "NaN"? "N/A" : selectedReport.overallConnectionAverage.toFixed(3)}</p>
+                        </div>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Connection Count</p>
+                            <p>${selectedReport.overallConnectionCount}</p>
+                        </div>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Connection SD</p>
+                            <p>${selectedReport.overallConnectionSD === "NaN"? "N/A" : selectedReport.overallConnectionSD.toFixed(3)}</p>
+                        </div>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Score Average</p>
+                            <p>${selectedReport.overallScoreAverage === "NaN"? "N/A" : selectedReport.overallScoreAverage.toFixed(3)}</p>
+                        </div>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Score Count</p>
+                            <p>${selectedReport.overallScoreCount}</p>
+                        </div>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Score SD</p>
+                            <p>${selectedReport.overallScoreSD === "NaN"? "N/A" : selectedReport.overallScoreSD.toFixed(3)}</p>
+                        </div>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="fw-bold">Score Total</p>
+                            <p>${selectedReport.overallScoreTotal}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.querySelector("#detail-stats-container").innerHTML = statContent;
+        }
+
         function renderMemberTable(){
             let tableHTML = `
             <table class="table table-hover align-middle">
@@ -213,11 +276,13 @@
                         <th scope="col"># Out Net</th>
                         <th scope="col">X̄ Out Net</th>
                         <th scope="col">σ Out Net</th>
+                        <th scope="col">View</th>
                     </tr>
                 </thead>
                 <tbody>
             `;
-            selectedReport.memberReports.forEach(memberReport => {
+
+            selectedReport.memberReports.sort((a, b) => b.scoreCount - a.scoreCount).forEach(memberReport => {
                 // Regression Slope
                 let arrow = "";
                 if(memberReport.scoreSlope !== "NaN"){
@@ -231,11 +296,11 @@
                 <tr>
                     <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${memberReport.id}"></th>
                     <th style="vertical-align: middle" scope="col">${memberReport.firstName + " " + memberReport.lastName}</th>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreAverage === "NaN"? "N/A" : memberReport.scoreAverage.toFixed(1)}</td>
+                    <td style="vertical-align: middle; color: ${getColorGradient(memberReport.scoreAverage !== 'NaN'? memberReport.scoreAverage : 0, -100, 100)}" class="text-nowrap">${memberReport.scoreAverage === "NaN"? "N/A" : memberReport.scoreAverage.toFixed(1)}</td>
                     <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreSD === "NaN"? "N/A" : memberReport.scoreSD.toFixed(1)}</td>
                     <td style="vertical-align: middle" class="text-nowrap">${memberReport.startScore !== null? memberReport.startScore.cscore : "N/A"}</td>
                     <td style="vertical-align: middle" class="text-nowrap">${memberReport.endScore !== null? memberReport.endScore.cscore : "N/A"}</td>
-                    <td style="vertical-align: middle">
+                    <td style="vertical-align: middle; color: ${getColorGradient(memberReport.scoreSlope !== 'NaN'? memberReport.scoreSlope : 0, -0.6, 0.6)}">
                         ${memberReport.scoreSlope === "NaN"? "N/A" : memberReport.scoreSlope.toFixed(1)}
                         ${arrow}
                     </td>
@@ -244,12 +309,12 @@
                     <td style="vertical-align: middle" class="text-nowrap">${memberReport.eventsIncluded}</td>
                     <td style="vertical-align: middle" class="text-nowrap">${memberReport.connectionsCount}</td>
                     <td style="vertical-align: middle" class="text-nowrap">${memberReport.incomingConnectionsCount}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.incomingConnectionsAverage === "NaN"? "N/A" : memberReport.incomingConnectionsAverage.toFixed(1)}</td>
+                    <td style="vertical-align: middle; color: ${getColorGradient(memberReport.incomingConnectionsAverage !== 'NaN'? memberReport.incomingConnectionsAverage : 0, -100, 100)}" class="text-nowrap">${memberReport.incomingConnectionsAverage === "NaN"? "N/A" : memberReport.incomingConnectionsAverage.toFixed(1)}</td>
                     <td style="vertical-align: middle" class="text-nowrap">${memberReport.incomingConnectionsSD === "NaN"? "N/A" : memberReport.incomingConnectionsSD.toFixed(1)}</td>
                     <td style="vertical-align: middle" class="text-nowrap">${memberReport.outgoingConnectionsCount}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.outgoingConnectionsAverage === "NaN"? "N/A" : memberReport.outgoingConnectionsAverage.toFixed(1)}</td>
+                    <td style="vertical-align: middle; color: ${getColorGradient(memberReport.outgoingConnectionsAverage !== 'NaN'? memberReport.outgoingConnectionsAverage : 0, -100, 100)}" class="text-nowrap">${memberReport.outgoingConnectionsAverage === "NaN"? "N/A" : memberReport.outgoingConnectionsAverage.toFixed(1)}</td>
                     <td style="vertical-align: middle" class="text-nowrap">${memberReport.outgoingConnectionsSD === "NaN"? "N/A" : memberReport.outgoingConnectionsSD.toFixed(1)}</td>
-                    <td style="vertical-align: middle"><a target="_blanks" href="/interpersonal/members/view/${memberReport.id}"><button class="btn btn-secondary" data-bs-toggle="modal">View</button></a></td>
+                    <td style="vertical-align: middle"><a target="_blanks" href="/interpersonal/member/view/${memberReport.id}"><button class="btn btn-secondary" data-bs-toggle="modal">View</button></a></td>
                 </tr>`;
             });
 
