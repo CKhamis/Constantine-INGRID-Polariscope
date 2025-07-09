@@ -57,7 +57,10 @@
                 </div>
                 <div class="col-md-4 d-none d-md-block border-start p-2">
                     <h3 class="fw-bold border-bottom mb-2">Report Statistics</h3>
-                    <div class="container-fluid" id="detail-stats-container"></div>
+                    <div class="container-fluid mb-4" id="detail-stats-container"></div>
+
+                    <h3 class="fw-bold border-bottom mb-2">Timeline</h3>
+                    <div class="container-fluid mb-4" id="detail-timeline-container"></div>
                 </div>
             </div>
         </div>
@@ -132,11 +135,12 @@
 <script>
     let quarterlyReports = [];
     let selectedReport = null;
+    let selectedReportIndex = -1;
     let eventList = [];
 
     refresh();
 
-    function refresh(){
+    function refresh() {
         let spinner = document.querySelector("#loading-spinner");
         let errorIcon = document.querySelector("#error-icon");
         spinner.classList.add("d-block");
@@ -155,7 +159,7 @@
             .then(data => {
                 console.log(data);
 
-                if(data[0]){
+                if (data[0]) {
                     quarterlyReports = data[0];
                 }
 
@@ -178,354 +182,382 @@
                 spinner.classList.remove("d-block");
                 spinner.classList.add("d-none");
             });
+    }
 
-        function renderOverviewTab(){
-            renderChips();
-            renderOverviewTable();
+    function renderOverviewTab(){
+        renderChips();
+        renderOverviewTable();
+    }
+
+    function renderDetailsTab(){
+        renderOverviewHeader();
+        renderDetailChips();
+        renderEventTable();
+        renderMemberTable();
+        renderReportStatistics();
+        renderReportTimeline();
+    }
+
+    // Helper functions
+    function renderReportTimeline(){
+        if(quarterlyReports.length <= 2) {
+            return;
         }
 
-        function renderDetailsTab(){
-            renderOverviewHeader();
-            renderDetailChips();
-            renderEventTable();
-            renderMemberTable();
-            renderReportStatistics();
-        }
+        let timelineContent = `
+            <div class="w-100 position-relative">
+                <div class="bg-primary position-absolute" style="height: 10px; width: ${100 * (1 / quarterlyReports.length)}%; margin-left: ${ 100 * (selectedReportIndex / quarterlyReports.length)}%"></div>
+            </div>
+            <div class="bg-light-subtle w-100 mt-4" style="height: 10px;"></div>
+            <div class="w-100 position-relative">
+                <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(0%, 0%); left: 0">${formatDate(quarterlyReports[0].startDate + "PST")}</p>
+                <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-100%, 0%); left: 100%">${formatDate(quarterlyReports[quarterlyReports.length - 1].endDate + "PST")}</p>
+            </div>
+        `;
 
-        // Helper functions
-        function renderReportStatistics(){
-            let statContent = `
-                <div class="row">
-                    <div class="col-6">
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Activity Score</p>
-                            <p>${selectedReport.activityScore}</p>
-                        </div>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Added Activity Score</p>
-                            <p>${selectedReport.newActivityScore}</p>
-                        </div>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Events Added</p>
-                            <p>${selectedReport.events}</p>
-                        </div>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Total Members</p>
-                            <p>${selectedReport.memberCount}</p>
-                        </div>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Added Members</p>
-                            <p>${selectedReport.newMemberCount}</p>
-                        </div>
+        document.querySelector("#detail-timeline-container").innerHTML = timelineContent;
+    }
+
+    function renderReportStatistics(){
+        let statContent = `
+            <div class="row">
+                <div class="col-6">
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Activity Score</p>
+                        <p>${selectedReport.activityScore}</p>
                     </div>
-                    <div class="col-6">
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Connection Average</p>
-                            <p>${selectedReport.overallConnectionAverage === "NaN"? "N/A" : selectedReport.overallConnectionAverage.toFixed(3)}</p>
-                        </div>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Connection Count</p>
-                            <p>${selectedReport.overallConnectionCount}</p>
-                        </div>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Connection SD</p>
-                            <p>${selectedReport.overallConnectionSD === "NaN"? "N/A" : selectedReport.overallConnectionSD.toFixed(3)}</p>
-                        </div>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Score Average</p>
-                            <p>${selectedReport.overallScoreAverage === "NaN"? "N/A" : selectedReport.overallScoreAverage.toFixed(3)}</p>
-                        </div>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Score Count</p>
-                            <p>${selectedReport.overallScoreCount}</p>
-                        </div>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Score SD</p>
-                            <p>${selectedReport.overallScoreSD === "NaN"? "N/A" : selectedReport.overallScoreSD.toFixed(3)}</p>
-                        </div>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <p class="fw-bold">Score Total</p>
-                            <p>${selectedReport.overallScoreTotal}</p>
-                        </div>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Added Activity Score</p>
+                        <p>${selectedReport.newActivityScore}</p>
+                    </div>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Events Added</p>
+                        <p>${selectedReport.events}</p>
+                    </div>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Total Members</p>
+                        <p>${selectedReport.memberCount}</p>
+                    </div>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Added Members</p>
+                        <p>${selectedReport.newMemberCount}</p>
                     </div>
                 </div>
-            `;
+                <div class="col-6">
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Connection Average</p>
+                        <p>${selectedReport.overallConnectionAverage === "NaN"? "N/A" : selectedReport.overallConnectionAverage.toFixed(3)}</p>
+                    </div>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Connection Count</p>
+                        <p>${selectedReport.overallConnectionCount}</p>
+                    </div>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Connection SD</p>
+                        <p>${selectedReport.overallConnectionSD === "NaN"? "N/A" : selectedReport.overallConnectionSD.toFixed(3)}</p>
+                    </div>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Score Average</p>
+                        <p>${selectedReport.overallScoreAverage === "NaN"? "N/A" : selectedReport.overallScoreAverage.toFixed(3)}</p>
+                    </div>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Score Count</p>
+                        <p>${selectedReport.overallScoreCount}</p>
+                    </div>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Score SD</p>
+                        <p>${selectedReport.overallScoreSD === "NaN"? "N/A" : selectedReport.overallScoreSD.toFixed(3)}</p>
+                    </div>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <p class="fw-bold">Score Total</p>
+                        <p>${selectedReport.overallScoreTotal}</p>
+                    </div>
+                </div>
+            </div>
+        `;
 
-            document.querySelector("#detail-stats-container").innerHTML = statContent;
-        }
+        document.querySelector("#detail-stats-container").innerHTML = statContent;
+    }
 
-        function renderMemberTable(){
-            let tableHTML = `
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th scope="col"></th>
-                        <th scope="col">Name</th>
-                        <th scope="col">X̄ Eval</th>
-                        <th scope="col">σ Eval</th>
-                        <th scope="col">Start</th>
-                        <th scope="col">End</th>
-                        <th scope="col">Eval Slope</th>
-                        <th scope="col"># Evals</th>
-                        <th scope="col">∑ Evals</th>
-                        <th scope="col">Events</th>
-                        <th scope="col"># Net</th>
-                        <th scope="col"># In Net</th>
-                        <th scope="col">X̄ In Net</th>
-                        <th scope="col">σ In Net</th>
-                        <th scope="col"># Out Net</th>
-                        <th scope="col">X̄ Out Net</th>
-                        <th scope="col">σ Out Net</th>
-                        <th scope="col">View</th>
-                    </tr>
-                </thead>
-                <tbody>
-            `;
-
-            selectedReport.memberReports.sort((a, b) => b.scoreCount - a.scoreCount).forEach(memberReport => {
-                // Regression Slope
-                let arrow = "";
-                if(memberReport.scoreSlope !== "NaN"){
-                    let angle = Math.atan(memberReport.scoreSlope) * (180 / Math.PI);
-                    let arrowRotation = -90 - angle;
-                    arrow = `<img style="height: 20px; width:20px; transform:rotate(${arrowRotation}deg)" src="/icons/Arrow.svg"/>`;
-                }
-
-
-                tableHTML += `
+    function renderMemberTable(){
+        let tableHTML = `
+        <table class="table table-hover align-middle">
+            <thead>
                 <tr>
-                    <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${memberReport.id}"></th>
-                    <th style="vertical-align: middle" scope="col">${memberReport.firstName + " " + memberReport.lastName}</th>
-                    <td style="vertical-align: middle; color: ${getColorGradient(memberReport.scoreAverage !== 'NaN'? memberReport.scoreAverage : 0, -100, 100)}" class="text-nowrap">${memberReport.scoreAverage === "NaN"? "N/A" : memberReport.scoreAverage.toFixed(1)}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreSD === "NaN"? "N/A" : memberReport.scoreSD.toFixed(1)}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.startScore !== null? memberReport.startScore.cscore : "N/A"}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.endScore !== null? memberReport.endScore.cscore : "N/A"}</td>
-                    <td style="vertical-align: middle; color: ${getColorGradient(memberReport.scoreSlope !== 'NaN'? memberReport.scoreSlope : 0, -0.6, 0.6)}">
-                        ${memberReport.scoreSlope === "NaN"? "N/A" : memberReport.scoreSlope.toFixed(1)}
-                        ${arrow}
-                    </td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreCount}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreTotal}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.eventsIncluded}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.connectionsCount}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.incomingConnectionsCount}</td>
-                    <td style="vertical-align: middle; color: ${getColorGradient(memberReport.incomingConnectionsAverage !== 'NaN'? memberReport.incomingConnectionsAverage : 0, -100, 100)}" class="text-nowrap">${memberReport.incomingConnectionsAverage === "NaN"? "N/A" : memberReport.incomingConnectionsAverage.toFixed(1)}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.incomingConnectionsSD === "NaN"? "N/A" : memberReport.incomingConnectionsSD.toFixed(1)}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.outgoingConnectionsCount}</td>
-                    <td style="vertical-align: middle; color: ${getColorGradient(memberReport.outgoingConnectionsAverage !== 'NaN'? memberReport.outgoingConnectionsAverage : 0, -100, 100)}" class="text-nowrap">${memberReport.outgoingConnectionsAverage === "NaN"? "N/A" : memberReport.outgoingConnectionsAverage.toFixed(1)}</td>
-                    <td style="vertical-align: middle" class="text-nowrap">${memberReport.outgoingConnectionsSD === "NaN"? "N/A" : memberReport.outgoingConnectionsSD.toFixed(1)}</td>
-                    <td style="vertical-align: middle"><a target="_blanks" href="/interpersonal/member/view/${memberReport.id}"><button class="btn btn-secondary" data-bs-toggle="modal">View</button></a></td>
-                </tr>`;
-            });
+                    <th scope="col"></th>
+                    <th scope="col">Name</th>
+                    <th scope="col">X̄ Eval</th>
+                    <th scope="col">σ Eval</th>
+                    <th scope="col">Start</th>
+                    <th scope="col">End</th>
+                    <th scope="col">Eval Slope</th>
+                    <th scope="col"># Evals</th>
+                    <th scope="col">∑ Evals</th>
+                    <th scope="col">Events</th>
+                    <th scope="col"># Net</th>
+                    <th scope="col"># In Net</th>
+                    <th scope="col">X̄ In Net</th>
+                    <th scope="col">σ In Net</th>
+                    <th scope="col"># Out Net</th>
+                    <th scope="col">X̄ Out Net</th>
+                    <th scope="col">σ Out Net</th>
+                    <th scope="col">View</th>
+                </tr>
+            </thead>
+            <tbody>
+        `;
 
-            tableHTML += `</tbody></table>`;
-            document.querySelector("#detail-member-table").innerHTML = tableHTML;
-        }
-
-        function renderDetailChips(){
-            if(quarterlyReports.length < 2){
-                return;
+        selectedReport.memberReports.sort((a, b) => b.scoreCount - a.scoreCount).forEach(memberReport => {
+            // Regression Slope
+            let arrow = "";
+            if(memberReport.scoreSlope !== "NaN"){
+                let angle = Math.atan(memberReport.scoreSlope) * (180 / Math.PI);
+                let arrowRotation = -90 - angle;
+                arrow = `<img style="height: 20px; width:20px; transform:rotate(${arrowRotation}deg)" src="/icons/Arrow.svg"/>`;
             }
 
-            // Get min, max, and median of report standard deviations
-            let standardDeviations = quarterlyReports.map(report => report.overallScoreSD).filter(sd => typeof sd === "number");
-            standardDeviations.sort((a,b) => a - b);
 
-            let minSd = standardDeviations[0];
-            let maxSd = standardDeviations[standardDeviations.length - 1];
+            tableHTML += `
+            <tr>
+                <th scope="row"><img class="square-image" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/member/profile-image/${memberReport.id}"></th>
+                <th style="vertical-align: middle" scope="col">${memberReport.firstName + " " + memberReport.lastName}</th>
+                <td style="vertical-align: middle; color: ${getColorGradient(memberReport.scoreAverage !== 'NaN'? memberReport.scoreAverage : 0, -100, 100)}" class="text-nowrap">${memberReport.scoreAverage === "NaN"? "N/A" : memberReport.scoreAverage.toFixed(1)}</td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreSD === "NaN"? "N/A" : memberReport.scoreSD.toFixed(1)}</td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.startScore !== null? memberReport.startScore.cscore : "N/A"}</td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.endScore !== null? memberReport.endScore.cscore : "N/A"}</td>
+                <td style="vertical-align: middle; color: ${getColorGradient(memberReport.scoreSlope !== 'NaN'? memberReport.scoreSlope : 0, -0.6, 0.6)}">
+                    ${memberReport.scoreSlope === "NaN"? "N/A" : memberReport.scoreSlope.toFixed(1)}
+                    ${arrow}
+                </td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreCount}</td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.scoreTotal}</td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.eventsIncluded}</td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.connectionsCount}</td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.incomingConnectionsCount}</td>
+                <td style="vertical-align: middle; color: ${getColorGradient(memberReport.incomingConnectionsAverage !== 'NaN'? memberReport.incomingConnectionsAverage : 0, -100, 100)}" class="text-nowrap">${memberReport.incomingConnectionsAverage === "NaN"? "N/A" : memberReport.incomingConnectionsAverage.toFixed(1)}</td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.incomingConnectionsSD === "NaN"? "N/A" : memberReport.incomingConnectionsSD.toFixed(1)}</td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.outgoingConnectionsCount}</td>
+                <td style="vertical-align: middle; color: ${getColorGradient(memberReport.outgoingConnectionsAverage !== 'NaN'? memberReport.outgoingConnectionsAverage : 0, -100, 100)}" class="text-nowrap">${memberReport.outgoingConnectionsAverage === "NaN"? "N/A" : memberReport.outgoingConnectionsAverage.toFixed(1)}</td>
+                <td style="vertical-align: middle" class="text-nowrap">${memberReport.outgoingConnectionsSD === "NaN"? "N/A" : memberReport.outgoingConnectionsSD.toFixed(1)}</td>
+                <td style="vertical-align: middle"><a target="_blanks" href="/interpersonal/member/view/${memberReport.id}"><button class="btn btn-secondary" data-bs-toggle="modal">View</button></a></td>
+            </tr>`;
+        });
 
-            let midSd = Math.floor(standardDeviations.length / 2);
-            let medianSd = standardDeviations.length % 2 === 0? (standardDeviations[midSd - 1] + standardDeviations[midSd])/2 : standardDeviations[midSd];
+        tableHTML += `</tbody></table>`;
+        document.querySelector("#detail-member-table").innerHTML = tableHTML;
+    }
 
-            let hasSd = true;
-            if(selectedReport.overallScoreSD === "NaN"){
-                hasSd = false;
-            }
-
-            // get min, max, and median of report activity scores
-            let activityScores = quarterlyReports.map(report => report.newActivityScore);
-            activityScores.sort((a,b) => a - b);
-            let minAs = activityScores[0];
-            let maxAs = activityScores[activityScores.length - 1];
-
-            let midAs = Math.floor(activityScores.length / 2);
-            let medianAs = activityScores.length % 2 === 0? (activityScores[midAs - 1] + activityScores[midAs]) / 2 : activityScores[midAs];
-
-            // get min, max, and median of evaluation averages
-            let evaluations = quarterlyReports.map(report => report.overallScoreAverage).filter(ev => typeof ev === "number");
-            evaluations.sort((a,b) => a - b);
-            let minEv = evaluations[0];
-            let maxEv = evaluations[evaluations.length - 1];
-
-            let midEv = Math.floor(evaluations.length / 2);
-            let medianEv = evaluations.length % 2 === 0? (evaluations[midEv - 1] + evaluations[midEv]) / 2 : evaluations[midEv];
-
-            let hasEv = typeof selectedReport.overallScoreAverage === "number";
-
-            // get min, max, and median of num of events
-            let events = quarterlyReports.map(report => report.events);
-            events.sort((a,b) => a - b);
-            let minEs = events[0];
-            let maxEs = events[events.length - 1];
-
-            let midEs = Math.floor(events.length / 2);
-            let medianEs = events.length % 2 === 0? (events[midEs - 1] + events[midEs]) / 2 : events[midEs];
-
-            let detailChipHTML = `
-                <div class="col-12 col-lg-8">
-                    <div class="alert alert-secondary">
-                        <div class="d-flex flex-col w-100">
-                            <div class="d-flex flex-row align-items-start justify-content-between w-100">
-                                <h6 class="text-center fw-bold">Score Mean SD</h6>
-                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${hasSd? selectedReport.overallScoreSD.toFixed(3) : "N/A"}</p>
-                            </div>
-                        </div>
-                        <div class="w-100 position-relative">
-                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${hasSd? ((selectedReport.overallScoreSD - minSd)/(maxSd - minSd)) * 100 : 0}%" alt="arrow" />
-                        </div>
-                        <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
-                        <div class="w-100 position-relative">
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minSd.toFixed(1)}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianSd.toFixed(1)}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxSd.toFixed(1)}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-lg-4">
-                    <div class="alert alert-secondary">
-                        <div class="d-flex flex-col w-100">
-                            <div class="d-flex flex-row align-items-start justify-content-between w-100">
-                                <h6 class="text-center fw-bold">Activity Score</h6>
-                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${selectedReport.newActivityScore}</p>
-                            </div>
-                        </div>
-                        <div class="w-100 position-relative">
-                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((selectedReport.newActivityScore - minAs)/(maxAs - minAs)) * 100}%" alt="arrow" />
-                        </div>
-                        <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
-                        <div class="w-100 position-relative">
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minAs.toFixed(1)}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianAs.toFixed(1)}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxAs.toFixed(1)}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-lg-4">
-                    <div class="alert alert-secondary">
-                        <div class="d-flex flex-col w-100">
-                            <div class="d-flex flex-row align-items-start justify-content-between w-100">
-                                <h6 class="text-center fw-bold">Events Added</h6>
-                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${selectedReport.events}</p>
-                            </div>
-                        </div>
-                        <div class="w-100 position-relative">
-                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((selectedReport.events - minEs)/(maxEs - minEs)) * 100}%" alt="arrow" />
-                        </div>
-                        <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
-                        <div class="w-100 position-relative">
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minEs}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianEs}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxEs}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-lg-8">
-                    <div class="alert alert-secondary">
-                        <div class="d-flex flex-col w-100">
-                            <div class="d-flex flex-row align-items-start justify-content-between w-100">
-                                <h6 class="text-center fw-bold">Mean Evaluation</h6>
-                                <p class="text-end fs-2 mb-0" style="margin-top: -10px">${hasEv? selectedReport.overallScoreAverage.toFixed(3) : "N/A"}</p>
-                            </div>
-                        </div>
-                        <div class="w-100 position-relative">
-                            <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((selectedReport.overallScoreAverage - minEv)/ (maxEv - minEv)) * 100}%" alt="arrow" />
-                        </div>
-                        <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
-                        <div class="w-100 position-relative">
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minEv.toFixed(1)}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianEv.toFixed(1)}</p>
-                            <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxEv.toFixed(1)}</p>
-                        </div>
-                    </div>
-                </div>`;
-
-            document.querySelector("#detail-chip-container").innerHTML = detailChipHTML;
+    function renderDetailChips(){
+        if(quarterlyReports.length < 2){
+            return;
         }
 
-        function renderEventTable(){
-            // filter out all events that are not under this report
-            let reportEventList = eventList.filter(event => (new Date(event.date) > new Date(selectedReport.startDate + "PST")) && (new Date(event.date) < new Date(selectedReport.endDate + "PST")));
+        // Get min, max, and median of report standard deviations
+        let standardDeviations = quarterlyReports.map(report => report.overallScoreSD).filter(sd => typeof sd === "number");
+        standardDeviations.sort((a,b) => a - b);
+
+        let minSd = standardDeviations[0];
+        let maxSd = standardDeviations[standardDeviations.length - 1];
+
+        let midSd = Math.floor(standardDeviations.length / 2);
+        let medianSd = standardDeviations.length % 2 === 0? (standardDeviations[midSd - 1] + standardDeviations[midSd])/2 : standardDeviations[midSd];
+
+        let hasSd = true;
+        if(selectedReport.overallScoreSD === "NaN"){
+            hasSd = false;
+        }
+
+        // get min, max, and median of report activity scores
+        let activityScores = quarterlyReports.map(report => report.newActivityScore);
+        activityScores.sort((a,b) => a - b);
+        let minAs = activityScores[0];
+        let maxAs = activityScores[activityScores.length - 1];
+
+        let midAs = Math.floor(activityScores.length / 2);
+        let medianAs = activityScores.length % 2 === 0? (activityScores[midAs - 1] + activityScores[midAs]) / 2 : activityScores[midAs];
+
+        // get min, max, and median of evaluation averages
+        let evaluations = quarterlyReports.map(report => report.overallScoreAverage).filter(ev => typeof ev === "number");
+        evaluations.sort((a,b) => a - b);
+        let minEv = evaluations[0];
+        let maxEv = evaluations[evaluations.length - 1];
+
+        let midEv = Math.floor(evaluations.length / 2);
+        let medianEv = evaluations.length % 2 === 0? (evaluations[midEv - 1] + evaluations[midEv]) / 2 : evaluations[midEv];
+
+        let hasEv = typeof selectedReport.overallScoreAverage === "number";
+
+        // get min, max, and median of num of events
+        let events = quarterlyReports.map(report => report.events);
+        events.sort((a,b) => a - b);
+        let minEs = events[0];
+        let maxEs = events[events.length - 1];
+
+        let midEs = Math.floor(events.length / 2);
+        let medianEs = events.length % 2 === 0? (events[midEs - 1] + events[midEs]) / 2 : events[midEs];
+
+        let detailChipHTML = `
+            <div class="col-12 col-lg-8">
+                <div class="alert alert-secondary">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Score Mean SD</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${hasSd? selectedReport.overallScoreSD.toFixed(3) : "N/A"}</p>
+                        </div>
+                    </div>
+                    <div class="w-100 position-relative">
+                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${hasSd? ((selectedReport.overallScoreSD - minSd)/(maxSd - minSd)) * 100 : 0}%" alt="arrow" />
+                    </div>
+                    <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                    <div class="w-100 position-relative">
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minSd.toFixed(1)}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianSd.toFixed(1)}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxSd.toFixed(1)}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="alert alert-secondary">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Activity Score</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${selectedReport.newActivityScore}</p>
+                        </div>
+                    </div>
+                    <div class="w-100 position-relative">
+                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((selectedReport.newActivityScore - minAs)/(maxAs - minAs)) * 100}%" alt="arrow" />
+                    </div>
+                    <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                    <div class="w-100 position-relative">
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minAs.toFixed(1)}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianAs.toFixed(1)}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxAs.toFixed(1)}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="alert alert-secondary">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Events Added</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${selectedReport.events}</p>
+                        </div>
+                    </div>
+                    <div class="w-100 position-relative">
+                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((selectedReport.events - minEs)/(maxEs - minEs)) * 100}%" alt="arrow" />
+                    </div>
+                    <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                    <div class="w-100 position-relative">
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minEs}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianEs}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxEs}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-8">
+                <div class="alert alert-secondary">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Mean Evaluation</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${hasEv? selectedReport.overallScoreAverage.toFixed(3) : "N/A"}</p>
+                        </div>
+                    </div>
+                    <div class="w-100 position-relative">
+                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((selectedReport.overallScoreAverage - minEv)/ (maxEv - minEv)) * 100}%" alt="arrow" />
+                    </div>
+                    <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                    <div class="w-100 position-relative">
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${minEv.toFixed(1)}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${medianEv.toFixed(1)}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${maxEv.toFixed(1)}</p>
+                    </div>
+                </div>
+            </div>`;
+
+        document.querySelector("#detail-chip-container").innerHTML = detailChipHTML;
+    }
+
+    function renderEventTable(){
+        // filter out all events that are not under this report
+        let reportEventList = eventList.filter(event => (new Date(event.date) > new Date(selectedReport.startDate + "PST")) && (new Date(event.date) < new Date(selectedReport.endDate + "PST")));
 
 
-            let tableContent = `
-             <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Title</th>
-                        <th scope="col">Color</th>
-                        <th scope="col">Date</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Edit</th>
-                        <th scope="col">Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
+        let tableContent = `
+         <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Color</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Edit</th>
+                    <th scope="col">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+        `;
+        reportEventList.forEach(event => {
+            tableContent += `
+                <tr>
+                    <th scope="row" style="vertical-align: middle">${event.label}</th>
+                    <td style="vertical-align: middle"><div class="square-image" style="height: 30px; background-color: rgb(${event.color.red}, ${event.color.green}, ${event.color.blue})"></div></td>
+                    <td style="vertical-align: middle">${formatTimestamp(new Date(event.date))}</td>
+                    <td style="vertical-align: middle">${event.description}</td>
+                    <td style="vertical-align: middle"><button class="btn btn-secondary" onclick="updateEventModal('${event.id}')" data-bs-toggle="modal" data-bs-target="#saveEventModal">Edit</button></td>
+                    <td style="vertical-align: middle"><button class="btn btn-danger bevel-sm" onclick="deleteEvent('${event.id}')">Delete</button></td>
+
+                </tr>
             `;
-            reportEventList.forEach(event => {
-                tableContent += `
-                    <tr>
-                        <th scope="row" style="vertical-align: middle">${event.label}</th>
-                        <td style="vertical-align: middle"><div class="square-image" style="height: 30px; background-color: rgb(${event.color.red}, ${event.color.green}, ${event.color.blue})"></div></td>
-                        <td style="vertical-align: middle">${formatTimestamp(new Date(event.date))}</td>
-                        <td style="vertical-align: middle">${event.description}</td>
-                        <td style="vertical-align: middle"><button class="btn btn-secondary" onclick="updateEventModal('${event.id}')" data-bs-toggle="modal" data-bs-target="#saveEventModal">Edit</button></td>
-                        <td style="vertical-align: middle"><button class="btn btn-danger bevel-sm" onclick="deleteEvent('${event.id}')">Delete</button></td>
+        });
 
-                    </tr>
-                `;
-            });
+        tableContent += "</tbody></table>";
 
-            tableContent += "</tbody></table>";
-
-            if(reportEventList.length === 0){
-                tableContent += "<p class='w-100 text-center'>No Events</p>";
-            }
-
-            document.querySelector("#detail-event-table").innerHTML = tableContent;
+        if(reportEventList.length === 0){
+            tableContent += "<p class='w-100 text-center'>No Events</p>";
         }
 
-        function renderOverviewHeader(){
-            // Select first report by default
-            let headerContent = "";
-            if(quarterlyReports.length > 0){
-                if(selectedReport == null){
-                    selectedReport = quarterlyReports[0];
-                }
+        document.querySelector("#detail-event-table").innerHTML = tableContent;
+    }
 
-                let reportList = "";
+    function renderOverviewHeader(){
+        // Select first report by default
+        let headerContent = "";
+        if(quarterlyReports.length > 0){
+            if(selectedReport == null){
+                selectedReport = quarterlyReports[quarterlyReports.length - 1];
+                selectedReportIndex = quarterlyReports.length - 1;
+            }
 
-                quarterlyReports.forEach((report, index) => {
-                    reportList += `<option value="${index}">${formatDate(report.startDate)} - ${formatDate(report.endDate)}</option>`
-                });
+            let reportList = "";
 
-                headerContent = `
-                    <h3 class="mb-0 me-auto text-nowrap text-md-start text-center w-100 fw-bold">${formatDate(selectedReport.startDate)} - ${formatDate(selectedReport.endDate)}</h3>
+            quarterlyReports.forEach((report, index) => {
+                reportList += `<option value="${index}">${formatDate(report.startDate + "PST")} - ${formatDate(report.endDate + "PST")}</option>`
+            });
+
+            headerContent = `
+                <h3 class="mb-0 me-auto text-nowrap text-md-start text-center w-100 fw-bold">${formatDate(selectedReport.startDate + "PST")} - ${formatDate(selectedReport.endDate + "PST")}</h3>
+                <div class="d-flex justify-content-end align-items-center gap-2">
                     <select class="form-select w-auto" id="report-selector">
                         <option selected>Select Report</option>
                         ${reportList}
                     </select>
-                `;
-            }
-            document.getElementById("details-header").innerHTML = headerContent;
+                    <button type="button" class="btn btn-secondary" onclick="incrementIndex(); renderDetailsTab()"><</button>
+                    <button type="button" class="btn btn-secondary" onclick="decrementIndex(); renderDetailsTab()">></button>
+                </div>
 
-            const selectElement = document.getElementById("report-selector");
-            selectElement.addEventListener("change", function () {
-                selectedReport = quarterlyReports[this.value];
-                renderDetailsTab();
-            });
+            `;
         }
+        document.getElementById("details-header").innerHTML = headerContent;
 
-        function renderChips(){
+        const selectElement = document.getElementById("report-selector");
+        selectElement.addEventListener("change", function () {
+            selectedReport = quarterlyReports[this.value];
+            selectedReportIndex = this.value;
+            renderDetailsTab();
+        });
+    }
+
+    function renderChips(){
             let buttonHTML = "";
             quarterlyReports.forEach((report, index) => {
                 buttonHTML += `<button type="button" class="btn btn-secondary text-nowrap" id="report-button-${index}">${formatDate(report.startDate)} - ${formatDate(report.endDate)}</button>`;
@@ -533,274 +565,273 @@
             document.querySelector("#report-selectors").innerHTML = buttonHTML;
         }
 
-        function renderOverviewTable(){
-            // Top row
-            let header = ""
-            quarterlyReports.forEach((report, index) => {
-                header += `
-                <th>
-                    <div>
-                        <p class="m-0 p-0">${formatDate(report.startDate + " PST")} -</p>
-                        <p class="m-0 p-0">${formatDate(report.endDate + " PST")}</p>
-                    </div>
-                </th>
+    function renderOverviewTable(){
+        // Top row
+        let header = ""
+        quarterlyReports.forEach((report, index) => {
+            header += `
+            <th>
+                <div>
+                    <p class="m-0 p-0">${formatDate(report.startDate + " PST")} -</p>
+                    <p class="m-0 p-0">${formatDate(report.endDate + " PST")}</p>
+                </div>
+            </th>
+            `;
+        });
+
+        // New Activity Score
+        let newActivityScoreRow = ""
+        quarterlyReports.forEach((report, index) => {
+            newActivityScoreRow += `
+                <td>${report.newActivityScore}</td>
+            `;
+        });
+
+        // Total Activity Score
+        let activityScoreRow = ""
+        quarterlyReports.forEach((report, index) => {
+            activityScoreRow += `
+                <td>${report.activityScore}</td>
+            `;
+        });
+
+        // New Members
+        let newMemberCountRow = ""
+        quarterlyReports.forEach((report, index) => {
+            newMemberCountRow += `
+                <td>${report.newMemberCount}</td>
+            `;
+        });
+
+        // Member Total
+        let memberCountRow = ""
+        quarterlyReports.forEach((report, index) => {
+            memberCountRow += `
+                <td>${report.memberCount}</td>
+            `;
+        });
+
+        // Connection Average
+        let connectionAverageRow = ""
+        quarterlyReports.forEach((report, index) => {
+            if(report.overallConnectionCount === 0){
+                connectionAverageRow += `
+                    <td>N/A</td>
                 `;
-            });
+            }else{
+                connectionAverageRow += `
+                <td>${report.overallConnectionAverage.toFixed(3)}</td>
+            `;
+            }
+        });
 
-            // New Activity Score
-            let newActivityScoreRow = ""
-            quarterlyReports.forEach((report, index) => {
-                newActivityScoreRow += `
-                    <td>${report.newActivityScore}</td>
+        // Connection Standard Deviation
+        let connectionSDRow = ""
+        quarterlyReports.forEach((report, index) => {
+            if(report.overallConnectionSD === "NaN"){
+                connectionSDRow += `
+                    <td>N/A</td>
                 `;
-            });
-
-            // Total Activity Score
-            let activityScoreRow = ""
-            quarterlyReports.forEach((report, index) => {
-                activityScoreRow += `
-                    <td>${report.activityScore}</td>
+            }else{
+                connectionSDRow += `
+                    <td>${report.overallConnectionSD.toFixed(3)}</td>
                 `;
-            });
+            }
+        });
 
-            // New Members
-            let newMemberCountRow = ""
-            quarterlyReports.forEach((report, index) => {
-                newMemberCountRow += `
-                    <td>${report.newMemberCount}</td>
-                `;
-            });
+        // Connection Total
+        let connectionTotalRow = ""
+        quarterlyReports.forEach((report, index) => {
+            connectionTotalRow += `
+                <td>${report.overallConnectionCount}</td>
+            `;
+        });
 
-            // Member Total
-            let memberCountRow = ""
-            quarterlyReports.forEach((report, index) => {
-                memberCountRow += `
-                    <td>${report.memberCount}</td>
-                `;
-            });
+        // Score Standard Deviation
+        let scoreSDRow = ""
+        quarterlyReports.forEach((report, index) => {
+            if(report.overallScoreSD === "NaN"){
+                scoreSDRow += `<td>N/A</td>`;
+            }else{
+                scoreSDRow += `
+                <td>${report.overallScoreSD.toFixed(3)}</td>
+            `;
+            }
 
-            // Connection Average
-            let connectionAverageRow = ""
-            quarterlyReports.forEach((report, index) => {
-                if(report.overallConnectionCount === 0){
-                    connectionAverageRow += `
-                        <td>N/A</td>
-                    `;
-                }else{
-                    connectionAverageRow += `
-                    <td>${report.overallConnectionAverage.toFixed(3)}</td>
-                `;
-                }
-            });
+        });
 
-            // Connection Standard Deviation
-            let connectionSDRow = ""
-            quarterlyReports.forEach((report, index) => {
-                if(report.overallConnectionSD === "NaN"){
-                    connectionSDRow += `
-                        <td>N/A</td>
-                    `;
-                }else{
-                    connectionSDRow += `
-                        <td>${report.overallConnectionSD.toFixed(3)}</td>
-                    `;
-                }
-            });
+        // Score Average
+        let scoreAverageRow = ""
+        quarterlyReports.forEach((report, index) => {
+            scoreAverageRow += `
+                <td style="color: ${getColorGradient(report.overallScoreAverage !== 'NaN'? report.overallScoreAverage : 0, -100, 100)}">${report.overallScoreAverage !== 'NaN'? report.overallScoreAverage.toFixed(3) : "N/A"}</td>
+            `;
+        });
 
-            // Connection Total
-            let connectionTotalRow = ""
-            quarterlyReports.forEach((report, index) => {
-                connectionTotalRow += `
-                    <td>${report.overallConnectionCount}</td>
-                `;
-            });
+        // Score Total
+        let scoreTotalRow = ""
+        quarterlyReports.forEach((report, index) => {
+            scoreTotalRow += `
+                <td>${report.overallScoreTotal}</td>
+            `;
+        });
 
-            // Score Standard Deviation
-            let scoreSDRow = ""
-            quarterlyReports.forEach((report, index) => {
-                if(report.overallScoreSD === "NaN"){
-                    scoreSDRow += `<td>N/A</td>`;
-                }else{
-                    scoreSDRow += `
-                    <td>${report.overallScoreSD.toFixed(3)}</td>
-                `;
-                }
+        // Human Metrics
 
-            });
+        // Referring to Standard Deviation
+        let mostVolatileRow = "";
+        let leastVolatileRow = "";
 
-            // Score Average
-            let scoreAverageRow = ""
-            quarterlyReports.forEach((report, index) => {
-                scoreAverageRow += `
-                    <td style="color: ${getColorGradient(report.overallScoreAverage !== 'NaN'? report.overallScoreAverage : 0, -100, 100)}">${report.overallScoreAverage !== 'NaN'? report.overallScoreAverage.toFixed(3) : "N/A"}</td>
-                `;
-            });
+        // Referring to evaluation slope
+        let mostStableRow = "";
+        let topGrossingRow = "";
+        let bottomGrossingRow = "";
 
-            // Score Total
-            let scoreTotalRow = ""
-            quarterlyReports.forEach((report, index) => {
-                scoreTotalRow += `
-                    <td>${report.overallScoreTotal}</td>
-                `;
-            });
+        // Streak checks
+        let mostVolatileStreak = null;
+        let leastVolatileStreak = null;
+        let topGrossingStreak = null;
+        let bottomGrossingStreak = null;
+        let mostStableStreak = null;
 
-            // Human Metrics
-
-            // Referring to Standard Deviation
-            let mostVolatileRow = "";
-            let leastVolatileRow = "";
+        for(let report of quarterlyReports){
+            let mostVolatile = null;
+            let leastVolatile = null;
 
             // Referring to evaluation slope
-            let mostStableRow = "";
-            let topGrossingRow = "";
-            let bottomGrossingRow = "";
+            let mostStable = null; // closest to 0
+            let topGrossing = null; // most positive
+            let bottomGrossing = null; // most negative
 
-            // Streak checks
-            let mostVolatileStreak = null;
-            let leastVolatileStreak = null;
-            let topGrossingStreak = null;
-            let bottomGrossingStreak = null;
-            let mostStableStreak = null;
-
-            for(let report of quarterlyReports){
-                let mostVolatile = null;
-                let leastVolatile = null;
-
-                // Referring to evaluation slope
-                let mostStable = null; // closest to 0
-                let topGrossing = null; // most positive
-                let bottomGrossing = null; // most negative
-
-                for(let m of report.memberReports){
-                    if(m.scoreSD !== "NaN"){
-                        if(mostVolatile == null || m.scoreSD > mostVolatile.scoreSD){
-                            mostVolatile = m
-                        }
-
-                        if(leastVolatile == null || m.scoreSD < leastVolatile.scoreSD){
-                            leastVolatile = m
-                        }
+            for(let m of report.memberReports){
+                if(m.scoreSD !== "NaN"){
+                    if(mostVolatile == null || m.scoreSD > mostVolatile.scoreSD){
+                        mostVolatile = m
                     }
 
-                    if(m.scoreSlope !== "NaN"){
-                        if(topGrossing == null || m.scoreSlope > topGrossing.scoreSlope){
-                            topGrossing = m
-                        }
-
-                        if(bottomGrossing == null || m.scoreSlope < bottomGrossing.scoreSlope){
-                            bottomGrossing = m
-                        }
-
-                        if(mostStable == null || Math.abs(m.scoreSlope) < Math.abs(mostStable.scoreSlope)){
-                            mostStable = m
-                        }
+                    if(leastVolatile == null || m.scoreSD < leastVolatile.scoreSD){
+                        leastVolatile = m
                     }
                 }
 
-                mostVolatileRow += renderMemberCell(mostVolatile, mostVolatile !== null && mostVolatile.id === mostVolatileStreak);
-                if(mostVolatile !== null){
-                    mostVolatileStreak = mostVolatile.id;
-                }
+                if(m.scoreSlope !== "NaN"){
+                    if(topGrossing == null || m.scoreSlope > topGrossing.scoreSlope){
+                        topGrossing = m
+                    }
 
-                leastVolatileRow += renderMemberCell(leastVolatile, leastVolatile !== null && leastVolatile.id === leastVolatileStreak);
-                if(leastVolatile !== null){
-                    leastVolatileStreak = leastVolatile.id;
-                }
+                    if(bottomGrossing == null || m.scoreSlope < bottomGrossing.scoreSlope){
+                        bottomGrossing = m
+                    }
 
-                topGrossingRow += renderMemberCell(topGrossing, topGrossing !== null && topGrossing.id === topGrossingStreak);
-                if(topGrossing !== null){
-                    topGrossingStreak = topGrossing.id;
-                }
-
-                bottomGrossingRow += renderMemberCell(bottomGrossing, bottomGrossing !== null && bottomGrossing.id === bottomGrossingStreak);
-                if(topGrossing !== null){
-                    bottomGrossingStreak = bottomGrossing.id;
-                }
-
-                mostStableRow += renderMemberCell(mostStable, mostStable !== null && mostStable.id === mostStableStreak);
-                if(mostStable !== null){
-                    mostStableStreak = mostStable.id;
+                    if(mostStable == null || Math.abs(m.scoreSlope) < Math.abs(mostStable.scoreSlope)){
+                        mostStable = m
+                    }
                 }
             }
 
-            document.querySelector("#overview-stats-table").innerHTML = `
-                <table class="table table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th>
-                            <div>
-                                <p class="m-0 p-0">Start Date</p>
-                                <p class="m-0 p-0">End Date</p>
-                            </div>
-                        </th>
-                        ${header}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th class="text-nowrap">Activity Score</th>
-                        ${newActivityScoreRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Activity Total</th>
-                        ${activityScoreRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Added Members</th>
-                        ${newMemberCountRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Member Total</th>
-                        ${memberCountRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Connection Average</th>
-                        ${connectionAverageRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Connection Volatility</th>
-                        ${connectionSDRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Added Connections</th>
-                        ${connectionTotalRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Evaluation Average</th>
-                        ${scoreAverageRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Evaluation SD</th>
-                        ${scoreSDRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Evaluation Total</th>
-                        ${scoreTotalRow}
-                    </tr>
+            mostVolatileRow += renderMemberCell(mostVolatile, mostVolatile !== null && mostVolatile.id === mostVolatileStreak);
+            if(mostVolatile !== null){
+                mostVolatileStreak = mostVolatile.id;
+            }
 
-                    <tr>
-                        <th class="text-nowrap">Most Volatile</th>
-                        ${mostVolatileRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Least Volatile</th>
-                        ${leastVolatileRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Top Grossing</th>
-                        ${topGrossingRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Bottom Grossing</th>
-                        ${bottomGrossingRow}
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap">Most Stagnant</th>
-                        ${mostStableRow}
-                    </tr>
-                </tbody>
-            </table>`;
+            leastVolatileRow += renderMemberCell(leastVolatile, leastVolatile !== null && leastVolatile.id === leastVolatileStreak);
+            if(leastVolatile !== null){
+                leastVolatileStreak = leastVolatile.id;
+            }
+
+            topGrossingRow += renderMemberCell(topGrossing, topGrossing !== null && topGrossing.id === topGrossingStreak);
+            if(topGrossing !== null){
+                topGrossingStreak = topGrossing.id;
+            }
+
+            bottomGrossingRow += renderMemberCell(bottomGrossing, bottomGrossing !== null && bottomGrossing.id === bottomGrossingStreak);
+            if(topGrossing !== null){
+                bottomGrossingStreak = bottomGrossing.id;
+            }
+
+            mostStableRow += renderMemberCell(mostStable, mostStable !== null && mostStable.id === mostStableStreak);
+            if(mostStable !== null){
+                mostStableStreak = mostStable.id;
+            }
         }
+
+        document.querySelector("#overview-stats-table").innerHTML = `
+            <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>
+                        <div>
+                            <p class="m-0 p-0">Start Date</p>
+                            <p class="m-0 p-0">End Date</p>
+                        </div>
+                    </th>
+                    ${header}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th class="text-nowrap">Activity Score</th>
+                    ${newActivityScoreRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Activity Total</th>
+                    ${activityScoreRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Added Members</th>
+                    ${newMemberCountRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Member Total</th>
+                    ${memberCountRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Connection Average</th>
+                    ${connectionAverageRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Connection Volatility</th>
+                    ${connectionSDRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Added Connections</th>
+                    ${connectionTotalRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Evaluation Average</th>
+                    ${scoreAverageRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Evaluation SD</th>
+                    ${scoreSDRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Evaluation Total</th>
+                    ${scoreTotalRow}
+                </tr>
+
+                <tr>
+                    <th class="text-nowrap">Most Volatile</th>
+                    ${mostVolatileRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Least Volatile</th>
+                    ${leastVolatileRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Top Grossing</th>
+                    ${topGrossingRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Bottom Grossing</th>
+                    ${bottomGrossingRow}
+                </tr>
+                <tr>
+                    <th class="text-nowrap">Most Stagnant</th>
+                    ${mostStableRow}
+                </tr>
+            </tbody>
+        </table>`;
     }
 
     function renderMemberCell(member, isStreak = false){
@@ -927,6 +958,43 @@
     document.querySelector("#event-blue-form").addEventListener('input', function() {
         updateEventColorPreview();
     });
+
+    document.addEventListener('keydown', (event) => {
+
+        switch (event.key) {
+            case "ArrowLeft":
+                decrementIndex();
+                // Left pressed
+                break;
+            case "ArrowRight":
+                // Right pressed
+                incrementIndex();
+                break;
+            case "ArrowUp":
+                // Up pressed
+                incrementIndex();
+                break;
+            case "ArrowDown":
+                // Down pressed
+                incrementIndex();
+                break;
+        }
+        renderDetailsTab();
+    });
+
+    function incrementIndex(){
+        selectedReportIndex = (selectedReportIndex + 1) % quarterlyReports.length;
+        selectedReport = quarterlyReports[selectedReportIndex];
+    }
+
+    function decrementIndex(){
+        selectedReportIndex -= 1;
+        if(selectedReportIndex < 0){
+            selectedReport = quarterlyReports.length - 1;
+        }
+        selectedReport = quarterlyReports[selectedReportIndex];
+    }
+
 </script>
 </body>
 </html>
