@@ -40,7 +40,7 @@
     <div class="tab-content container-fluid flex-grow-1 overflow-hidden d-flex flex-column">
         <div class="tab-pane fade show active p-2 overflow-y-auto" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
             <div class="pb-2 flex-grow-1 d-flex overflow-x-scroll flex-row gap-3 align-items-center justify-content-start" id="report-selectors"></div>
-
+            <div class="row mb-2 gx-2" id="overview-chip-container"></div>
             <!-- Statistics Table -->
             <h2 class="fw-bold border-bottom mb-2">Quarterly Reports</h2>
             <div id="overview-stats-table" class="table-responsive"></div>
@@ -187,6 +187,7 @@
     function renderOverviewTab(){
         renderChips();
         renderOverviewTable();
+        renderOverviewStats();
     }
 
     function renderDetailsTab(){
@@ -541,8 +542,8 @@
                         <option selected>Select Report</option>
                         ${reportList}
                     </select>
-                    <button type="button" class="btn btn-secondary" onclick="incrementIndex(); renderDetailsTab()"><</button>
-                    <button type="button" class="btn btn-secondary" onclick="decrementIndex(); renderDetailsTab()">></button>
+                    <button type="button" class="btn btn-secondary" onclick="decrementIndex(); renderDetailsTab()"><</button>
+                    <button type="button" class="btn btn-secondary" onclick="incrementIndex(); renderDetailsTab()">></button>
                 </div>
 
             `;
@@ -558,12 +559,87 @@
     }
 
     function renderChips(){
-            let buttonHTML = "";
-            quarterlyReports.forEach((report, index) => {
-                buttonHTML += `<button type="button" class="btn btn-secondary text-nowrap" id="report-button-${index}">${formatDate(report.startDate)} - ${formatDate(report.endDate)}</button>`;
-            });
-            document.querySelector("#report-selectors").innerHTML = buttonHTML;
+        let buttonHTML = "";
+        quarterlyReports.forEach((report, index) => {
+            buttonHTML += `<button type="button" class="btn btn-secondary text-nowrap" id="report-button-${index}">${formatDate(report.startDate)} - ${formatDate(report.endDate)}</button>`;
+        });
+        document.querySelector("#report-selectors").innerHTML = buttonHTML;
+    }
+
+    function renderOverviewStats(){
+        if(quarterlyReports.length < 2){
+            return;
         }
+
+        let scoreTotal = 0, sdTotal = 0;
+        let scoreCount = 0, sdCount = 0;
+        let sdMax = null;
+        quarterlyReports.forEach((report, index) => {
+            if(report.overallScoreAverage !== "NaN"){
+                scoreTotal += report.overallScoreAverage;
+                scoreCount ++;
+
+            }
+
+            if(report.overallScoreSD !== "NaN"){
+                sdTotal += report.overallScoreSD;
+                sdCount ++;
+            }
+
+            if(sdMax === null || report.overallScoreSD > sdMax){
+                sdMax = report.overallScoreSD;
+            }
+        });
+
+        let overallScoreAverage = scoreTotal / scoreCount;
+        let overallScoreSd = sdTotal / sdCount
+        ;
+
+        let lastReport = quarterlyReports[quarterlyReports.length - 1];
+        let reportEventList = eventList.filter(event => (new Date(event.date) > new Date(lastReport.startDate + "PST")) && (new Date(event.date) < new Date(lastReport.endDate + "PST")));
+
+        let overviewChipHTML = `
+            <div class="col-12 col-lg-3">
+                <div class="alert alert-secondary">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Total Mean Score</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${overallScoreAverage.toFixed(3)}</p>
+                        </div>
+                    </div>
+                    <div class="w-100 position-relative">
+                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${overallScoreAverage}%" alt="arrow" />
+                    </div>
+                    <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                    <div class="w-100 position-relative">
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${0}</p>
+                        <!--<p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${50}</p>-->
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${100}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-3">
+                <div class="alert alert-secondary">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Total SD</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${overallScoreSd.toFixed(3)}</p>
+                        </div>
+                    </div>
+                    <div class="w-100 position-relative">
+                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((overallScoreSd)/(sdMax)) * 100}%" alt="arrow" />
+                    </div>
+                    <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                    <div class="w-100 position-relative">
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${0}</p>
+                        <!--<p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: </p>-->
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${sdMax.toFixed(1)}</p>
+                    </div>
+                </div>
+            </div>`;
+
+        document.querySelector("#overview-chip-container").innerHTML = overviewChipHTML;
+    }
 
     function renderOverviewTable(){
         // Top row
