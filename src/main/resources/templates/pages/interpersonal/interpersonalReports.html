@@ -574,6 +574,7 @@
         let scoreTotal = 0, sdTotal = 0;
         let scoreCount = 0, sdCount = 0;
         let sdMax = null;
+        let eventMax = 0;
         quarterlyReports.forEach((report, index) => {
             if(report.overallScoreAverage !== "NaN"){
                 scoreTotal += report.overallScoreAverage;
@@ -588,6 +589,11 @@
 
             if(sdMax === null || report.overallScoreSD > sdMax){
                 sdMax = report.overallScoreSD;
+            }
+
+            let events = eventList.filter(event => (new Date(event.date) > new Date(report.startDate + "PST")) && (new Date(event.date) < new Date(report.endDate + "PST"))).length;
+            if(events > eventMax){
+                eventMax = events;
             }
         });
 
@@ -636,7 +642,27 @@
                         <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${sdMax.toFixed(1)}</p>
                     </div>
                 </div>
-            </div>`;
+            </div>
+            <div class="col-12 col-lg-3">
+                <div class="alert alert-secondary">
+                    <div class="d-flex flex-col w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">Current Quarter Events</h6>
+                            <p class="text-end fs-2 mb-0" style="margin-top: -10px">${reportEventList.length}</p>
+                        </div>
+                    </div>
+                    <div class="w-100 position-relative">
+                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${((reportEventList)/(eventMax)) * 100}%" alt="arrow" />
+                    </div>
+                    <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
+                    <div class="w-100 position-relative">
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${0}</p>
+                        <!--<p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: </p>-->
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${eventMax}</p>
+                    </div>
+                </div>
+            </div>
+        `;
 
         document.querySelector("#overview-chip-container").innerHTML = overviewChipHTML;
     }
