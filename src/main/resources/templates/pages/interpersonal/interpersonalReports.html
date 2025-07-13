@@ -40,7 +40,11 @@
     <div class="tab-content container-fluid flex-grow-1 overflow-hidden d-flex flex-column">
         <div class="tab-pane fade show active p-2 overflow-y-auto" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
             <div class="pb-2 flex-grow-1 d-flex overflow-x-scroll flex-row gap-3 align-items-center justify-content-start" id="report-selectors"></div>
-            <div class="row mb-2 gx-2" id="overview-chip-container"></div>
+            <div class="row mb-2 gx-2 align-items-stretch" id="overview-chip-container"></div>
+
+            <h3 class="fw-bold border-bottom mb-2">Average Evaluation Scores</h3>
+            <canvas id="evaluation-history-chart-overview"></canvas>
+
             <!-- Statistics Table -->
             <h2 class="fw-bold border-bottom mb-2">Quarterly Reports</h2>
             <div id="overview-stats-table" class="table-responsive"></div>
@@ -139,6 +143,7 @@
     let eventList = [];
 
     refresh();
+    initializeCharts();
 
     function refresh() {
         let spinner = document.querySelector("#loading-spinner");
@@ -185,7 +190,6 @@
     }
 
     function renderOverviewTab(){
-        renderChips();
         renderOverviewTable();
         renderOverviewStats();
     }
@@ -558,14 +562,6 @@
         });
     }
 
-    function renderChips(){
-        let buttonHTML = "";
-        quarterlyReports.forEach((report, index) => {
-            buttonHTML += `<button type="button" class="btn btn-secondary text-nowrap" id="report-button-${index}">${formatDate(report.startDate)} - ${formatDate(report.endDate)}</button>`;
-        });
-        document.querySelector("#report-selectors").innerHTML = buttonHTML;
-    }
-
     function renderOverviewStats(){
         if(quarterlyReports.length < 2){
             return;
@@ -598,15 +594,14 @@
         });
 
         let overallScoreAverage = scoreTotal / scoreCount;
-        let overallScoreSd = sdTotal / sdCount
-        ;
+        let overallScoreSd = sdTotal / sdCount;
 
         let lastReport = quarterlyReports[quarterlyReports.length - 1];
         let reportEventList = eventList.filter(event => (new Date(event.date) > new Date(lastReport.startDate + "PST")) && (new Date(event.date) < new Date(lastReport.endDate + "PST")));
 
         let overviewChipHTML = `
             <div class="col-12 col-lg-3">
-                <div class="alert alert-secondary">
+                <div class="alert alert-secondary h-100">
                     <div class="d-flex flex-col w-100">
                         <div class="d-flex flex-row align-items-start justify-content-between w-100">
                             <h6 class="text-center fw-bold">Total Mean Score</h6>
@@ -614,18 +609,18 @@
                         </div>
                     </div>
                     <div class="w-100 position-relative">
-                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${overallScoreAverage}%" alt="arrow" />
+                        <img src="/icons/Arrow.svg" class="square-image position-absolute" style="width: 15px; transform: translate(-50%, 0%); left: ${(overallScoreAverage / 2) + 50}%" alt="arrow" />
                     </div>
                     <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
                     <div class="w-100 position-relative">
-                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${0}</p>
-                        <!--<p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: ${50}</p>-->
-                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${100}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(0%, 0%); left: 0">${-100}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">${0}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-100%, 0%); left: 100%">${100}</p>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-lg-3">
-                <div class="alert alert-secondary">
+                <div class="alert alert-secondary h-100">
                     <div class="d-flex flex-col w-100">
                         <div class="d-flex flex-row align-items-start justify-content-between w-100">
                             <h6 class="text-center fw-bold">Total SD</h6>
@@ -637,14 +632,24 @@
                     </div>
                     <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
                     <div class="w-100 position-relative">
-                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${0}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(0%, 0%); left: 0">${0}</p>
                         <!--<p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: </p>-->
-                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${sdMax.toFixed(1)}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-100%, 0%); left: 100%">${sdMax.toFixed(1)}</p>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-lg-3">
-                <div class="alert alert-secondary">
+                <div class="alert alert-secondary h-100">
+                    <div class="w-100">
+                        <div class="d-flex flex-row align-items-start justify-content-between w-100">
+                            <h6 class="text-center fw-bold">All Members</h6>
+                        </div>
+                        <p class="text-center fs-1 mb-0" style="margin-top: -10px">${lastReport.overallScoreCount}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-3">
+                <div class="alert alert-secondary h-100">
                     <div class="d-flex flex-col w-100">
                         <div class="d-flex flex-row align-items-start justify-content-between w-100">
                             <h6 class="text-center fw-bold">Current Quarter Events</h6>
@@ -656,9 +661,9 @@
                     </div>
                     <div class="bg-secondary w-100 mt-4" style="height: 10px;"></div>
                     <div class="w-100 position-relative">
-                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 0">${0}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(0%, 0%); left: 0">${0}</p>
                         <!--<p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 50%">x̃: </p>-->
-                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-50%, 0%); left: 100%">${eventMax}</p>
+                        <p class="text-muted position-absolute m-0" style="font-size: 10px; transform: translate(-100%, 0%); left: 100%">${eventMax}</p>
                     </div>
                 </div>
             </div>
@@ -972,6 +977,39 @@
                     </div>
                 </div>
             </td>`;
+    }
+
+    function initializeCharts(){
+        let scores = {
+            datasets: [{ data: [] }]
+        };
+
+        let canvas1 = document.querySelector("#evaluation-history-chart-overview");
+        evalChartEvalHome = new Chart(canvas1, {
+            type: 'line',
+            data: scores,
+            options: {
+                aspectRatio: 4,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                            tooltipFormat: 'MM/dd/yyyy',
+                            displayFormats: {
+                                day: 'MM/dd/yyyy'
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     // Database helper functions
