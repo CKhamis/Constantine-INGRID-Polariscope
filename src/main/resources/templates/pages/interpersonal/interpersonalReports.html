@@ -23,16 +23,16 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link fs-3 p-0" id="details-tab" data-bs-toggle="tab" data-bs-target="#details-tab-pane" type="button" role="tab" aria-controls="details-tab-pane" aria-selected="false">Details</button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link fs-3 p-0" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom-tab-pane" type="button" role="tab" aria-controls="custom-tab-pane" aria-selected="false">Custom</button>
-                </li>
+<!--                <li class="nav-item" role="presentation">-->
+<!--                    <button class="nav-link fs-3 p-0" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom-tab-pane" type="button" role="tab" aria-controls="custom-tab-pane" aria-selected="false">Custom</button>-->
+<!--                </li>-->
             </ul>
             <div class="d-flex flex-row align-content-center justify-content-end pb-2 gap-3">
+<!--                <div class="mb-2 bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="refresh()">-->
+<!--                    <img class="square-image" src="/icons/Plus.svg" alt="New Report" style="width: 20px;">-->
+<!--                </div>-->
                 <div class="mb-2 bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="refresh()">
-                    <img class="square-image" src="/icons/Plus.svg" alt="New Report" style="width: 20px;">
-                </div>
-                <div class="mb-2 bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="refresh()">
-                    <img class="square-image" src="/icons/Refresh.svg" alt="New Report" style="width: 20px;">
+                    <img class="square-image" src="/icons/Refresh.svg" alt="Refresh" style="width: 20px;">
                 </div>
             </div>
         </div>
@@ -44,6 +44,9 @@
 
             <h3 class="fw-bold border-bottom mb-2">Average Evaluation Scores</h3>
             <canvas id="evaluation-history-chart-overview"></canvas>
+
+            <h3 class="fw-bold border-bottom mb-2">Quarterly Volatility</h3>
+            <canvas id="volatility-history-chart-overview"></canvas>
 
             <!-- Statistics Table -->
             <h2 class="fw-bold border-bottom mb-2">Quarterly Reports</h2>
@@ -142,6 +145,9 @@
     let selectedReportIndex = -1;
     let eventList = [];
 
+    let quarterlyAverageChart;
+    let volatilityChart;
+
     refresh();
     initializeCharts();
 
@@ -192,6 +198,7 @@
     function renderOverviewTab(){
         renderOverviewTable();
         renderOverviewStats();
+        renderEvaluationScoreGraph();
     }
 
     function renderDetailsTab(){
@@ -204,6 +211,32 @@
     }
 
     // Helper functions
+    function renderEvaluationScoreGraph(){
+        let scoreData = { data: [] };
+        let volData = { data: [] };
+
+        if (quarterlyReports.length === 0) {
+            return;
+        }
+
+        // Update chart data
+        quarterlyReports.forEach((quarter) => {
+            scoreData.data.push({ x: quarter.endDate, y: quarter.overallScoreAverage });
+            volData.data.push({ x: quarter.endDate, y: quarter.overallScoreSD });
+        });
+
+        // Update datasets
+        quarterlyAverageChart.data.datasets.pop();
+        quarterlyAverageChart.data.datasets.push(scoreData);
+
+        volatilityChart.data.datasets.pop();
+        volatilityChart.data.datasets.push(volData);
+
+        // Update both charts
+        quarterlyAverageChart.update();
+        volatilityChart.update();
+    }
+
     function renderReportTimeline(){
         if(quarterlyReports.length <= 2) {
             return;
@@ -644,7 +677,7 @@
                         <div class="d-flex flex-row align-items-start justify-content-between w-100">
                             <h6 class="text-center fw-bold">All Members</h6>
                         </div>
-                        <p class="text-center fs-1 mb-0" style="margin-top: -10px">${lastReport.overallScoreCount}</p>
+                        <p class="text-center fs-1 mb-0" style="margin-top: -10px">${lastReport.memberCount}</p>
                     </div>
                 </div>
             </div>
@@ -984,10 +1017,41 @@
             datasets: [{ data: [] }]
         };
 
+        let scores2 = {
+            datasets: [{ data: [] }]
+        };
+
         let canvas1 = document.querySelector("#evaluation-history-chart-overview");
-        evalChartEvalHome = new Chart(canvas1, {
+        quarterlyAverageChart = new Chart(canvas1, {
             type: 'line',
             data: scores,
+            options: {
+                aspectRatio: 4,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                            tooltipFormat: 'MM/dd/yyyy',
+                            displayFormats: {
+                                day: 'MM/dd/yyyy'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        let canvas2 = document.querySelector("#volatility-history-chart-overview");
+        volatilityChart = new Chart(canvas2, {
+            type: 'line',
+            data: scores2,
             options: {
                 aspectRatio: 4,
                 responsive: true,
