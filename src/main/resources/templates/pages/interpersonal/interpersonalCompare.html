@@ -54,7 +54,14 @@
                 <div class="tab-content h-100" id="myTabContent">
                     <div class="tab-pane fade show active" id="notes-tab-pane" role="tabpanel" aria-labelledby="notes-tab" tabindex="0">
                         <h3 class="fw-bold mt-5 mb-3 ms-3">Evaluation History</h3>
-                        <canvas id="evaluation-history-chart"></canvas>
+                        <div class="position-relative">
+                            <div class="position-absolute p-2" style="top: 0; right: 0;">
+                                <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="evalChart.resetZoom()">
+                                    <img class="square-image" src="/icons/Reset Zoom.svg" alt="Reset" style="width: 20px;">
+                                </div>
+                            </div>
+                            <canvas id="evaluation-history-chart"></canvas>
+                        </div>
                         <h3 class="fw-bold mb-2 ms-3 mt-5">Notes</h3>
                         <div class="table-responsive">
                             <table class="table">
@@ -562,6 +569,20 @@
                     legend: {
                         display: true,
                         position: 'bottom'
+                    },
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            drag: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'x'
+                        }
                     }
                 },
                 scales: {

@@ -22,7 +22,14 @@
                     <button type="button" class="btn btn-secondary" onclick="dequeue()">Dequeue</button>
                 </div>
             </div>
-            <canvas id="score-canvas" class="mb-5"></canvas>
+            <div class="position-relative">
+                <div class="position-absolute p-2" style="top: 0; right: 0;">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="evalChartEval.resetZoom()">
+                        <img class="square-image" src="/icons/Reset Zoom.svg" alt="Reset" style="width: 20px;">
+                    </div>
+                </div>
+                <canvas id="score-canvas" class="mb-5"></canvas>
+            </div>
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
                     <h4 class="fw-bold mb-2" id="member-name">Batch Evaluation</h4>
@@ -290,6 +297,20 @@
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            drag: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'x'
+                        }
                     }
                 },
                 scales: {

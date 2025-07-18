@@ -221,7 +221,7 @@
                     <td>${member.firstName} ${member.lastName}</td>
                     <td style="vertical-align: middle">${member.group == null ? "" : '<img class="square-image float-start me-2" style="height: 40px; width: 40px" alt="profile image" src="/api/interpersonal/group/image/' + member.group.id + '">'}</td>
                     <td style="vertical-align: middle">${member.group == null ? "" : '<p class="mb-0">' + member.group.name + '</p>'}</td>
-                    <td style="vertical-align: middle; color: ${getColorGradient(member.lastEvaluation.cscore, -100, 100)}" class="fw-bold">${member.lastEvaluation? member.lastEvaluation.cscore : "N/A"}</td>
+                    <td style="vertical-align: middle; color: ${member.lastEvaluation == null? "white" : getColorGradient(member.lastEvaluation.cscore, -100, 100)}" class="fw-bold">${member.lastEvaluation? member.lastEvaluation.cscore : "N/A"}</td>
                     <td class="text-center">${member.archive? "A" : ""}</td>
                     <td class="text-center">${member.scoreHold? "H" : ""}</td>
                     <td>${member.relationship}</td>
