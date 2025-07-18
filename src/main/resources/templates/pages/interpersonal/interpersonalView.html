@@ -67,7 +67,14 @@
                     <p id="overview-description" class="fs-5 mx-3">Member Description</p>
                     <div class="row mt-4 mb-3 w-100 mx-0" id="member-chips"></div>
                     <h2 class="fw-bold border-bottom mb-2">Evaluation Scores</h2>
-                    <canvas id="evaluation-history-chart-home"></canvas>
+                    <div class="position-relative">
+                        <div class="position-absolute bg-body-tertiary p-2" style="top: 0; right: 0;">
+                            <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="evalChartEvalHome.resetZoom()">
+                                <img class="square-image" src="/icons/Reset Zoom.svg" alt="Refresh" style="width: 20px;">
+                            </div>
+                        </div>
+                        <canvas id="evaluation-history-chart-home"></canvas>
+                    </div>
                     <div id="event-info-1" class="alert alert-secondary mt-2">Hover over event to see additional info</div>
                     <h3 class="fw-bold border-bottom mb-2 mt-4">Note History</h3>
                     <div id="note-list-home"></div>
@@ -151,7 +158,12 @@
                 </div>
                 <div class="tab-pane fade" id="nav-evaluation" role="tabpanel" aria-labelledby="nav-evaluation-tab" tabindex="0">
                     <h3 class="fw-bold border-bottom mb-4 p-2">Evaluation Records</h3>
-                    <div class="px-2">
+                    <div class="px-2 position-relative">
+                        <div class="position-absolute bg-body-tertiary p-2" style="top: 0; right: 0;">
+                            <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="evalChartEval.resetZoom()">
+                                <img class="square-image" src="/icons/Reset Zoom.svg" alt="Refresh" style="width: 20px;">
+                            </div>
+                        </div>
                         <canvas id="evaluation-history-chart"></canvas>
                     </div>
                     <div>
@@ -176,12 +188,12 @@
                 <div class="tab-pane fade" id="nav-network" role="tabpanel" aria-labelledby="nav-network-tab" tabindex="0">
                     <h3 class="fw-bold border-bottom p-2 mb-4">Member Relationships</h3>
                     <div class="" id="graph-container" style="height: calc(100vh - 13rem)"></div>
-                    <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-3 m-3 d-flex flex-row gap-2">
+                    <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-2 m-3 d-flex flex-row gap-2">
                         <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
-                            <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 30px;">
+                            <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 20px;">
                         </button>
                         <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="modal" data-bs-target="#graph-modal">
-                            <img class="square-image" src="/icons/Settings.svg" alt="refresh" style="width: 30px;">
+                            <img class="square-image" src="/icons/Settings.svg" alt="refresh" style="width: 20px;">
                         </button>
                     </div>
                 </div>
@@ -1349,6 +1361,20 @@
                     legend: {
                         display: false
                     },
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            drag: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'x'
+                        }
+                    }
                 },
                 scales: {
                     x: {
@@ -1374,6 +1400,20 @@
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            drag: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'x'
+                        }
                     }
                 },
                 scales: {
