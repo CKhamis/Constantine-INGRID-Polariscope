@@ -43,10 +43,25 @@
             <div class="row mb-2 gx-2 align-items-stretch" id="overview-chip-container"></div>
 
             <h3 class="fw-bold border-bottom mb-2">Average Evaluation Scores</h3>
-            <canvas id="evaluation-history-chart-overview"></canvas>
+            <div class="position-relative">
+                <div class="position-absolute p-2" style="top: 0; right: 0;">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="quarterlyAverageChart.resetZoom()">
+                        <img class="square-image" src="/icons/Reset Zoom.svg" alt="Reset" style="width: 20px;">
+                    </div>
+                </div>
+                <canvas id="evaluation-history-chart-overview"></canvas>
+            </div>
 
             <h3 class="fw-bold border-bottom mb-2">Quarterly Volatility</h3>
-            <canvas id="volatility-history-chart-overview"></canvas>
+            <div class="position-relative">
+                <div class="position-absolute p-2" style="top: 0; right: 0;">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="volatilityChart.resetZoom()">
+                        <img class="square-image" src="/icons/Reset Zoom.svg" alt="Reset" style="width: 20px;">
+                    </div>
+                </div>
+                <canvas id="volatility-history-chart-overview"></canvas>
+            </div>
+
 
             <!-- Statistics Table -->
             <h2 class="fw-bold border-bottom mb-2">Quarterly Reports</h2>
@@ -1031,6 +1046,20 @@
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: false,
+                            },
+                            drag: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'x'
+                        }
                     }
                 },
                 scales: {
@@ -1058,6 +1087,20 @@
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: false,
+                            },
+                            drag: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'x'
+                        }
                     }
                 },
                 scales: {
