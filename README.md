@@ -26,3 +26,7 @@ This feature allows you to add evaluations to all members in a queue. This makes
 This feature allows you to select as many or little members as you want and display their evaluation scores in a graph to compare with each-other. Below this graph, a comprehensive timeline is displayed with all notes that have ever been written about the members you selected in chronological order.
 ### Add Members
 This feature allows you to add new members to your account. It is a very simple feature and only requires basic information to complete.
+### Interpersonal Network
+Using the Polariscope Interpersonal Network, you can track, update, and examine the relationships between your added members. You can also combine this information with the Groups feature to provide a more in-depth, complete view of your circles.
+### Reports
+Get quarterly reports updated every time you log in that show you ongoing trends in your relationships as a whole or individually. This feature provides you with a comprehensive summary of each quarter and relationships over time.
