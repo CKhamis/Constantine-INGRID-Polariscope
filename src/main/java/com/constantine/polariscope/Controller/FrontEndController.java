@@ -20,7 +20,7 @@ import static com.constantine.polariscope.Intercept.WebSpyInterceptor.spying;
 public class FrontEndController {
     private final UserService userService;
     private final MemberGroupService memberGroupService;
-    private static final String VERSION = "3.0.0";
+    private static final String VERSION = "3.0.1";
 
     private User getCurrentUser(Principal principal){
         if(principal == null){

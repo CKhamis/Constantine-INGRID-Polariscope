@@ -666,7 +666,7 @@
     function updateEventsTab(){
         let content = "";
 
-        memberDetails.events.forEach((event) => {
+        memberDetails.events.sort((a, b) => {return new Date(b.date) - new Date(a.date)}).forEach((event) => {
             content += `
             <div class="alert alert-secondary mt-2" style="background: linear-gradient(to top right, rgb(${event.color.red}, ${event.color.green}, ${event.color.blue},.03), rgb(${event.color.red}, ${event.color.green}, ${event.color.blue},.15))">
                 <div class="d-flex flex-row justify-content-between align-items-center">
