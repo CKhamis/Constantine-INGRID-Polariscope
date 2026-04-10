@@ -40,7 +40,7 @@ public class WebSpyInterceptor implements HandlerInterceptor {
         RestTemplate restTemplate = new RestTemplate();
         String url = System.getenv("WEBSPY_URL");
 
-        if(url != null){
+        if(url != null || !url.isEmpty()){
             try {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);

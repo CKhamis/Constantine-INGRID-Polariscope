@@ -1,37 +1,4 @@
 <!DOCTYPE html>
-<div th:fragment="navigation" class="position-sticky" style="z-index:99; width:100%;top:0;opacity:95%">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">
-                <img th:src="${spying} ? @{/icons/Logo.svg}: @{/icons/Logo Grey.svg}"  alt="Logo" width="30" class="d-inline-block align-text-top"/>
-                <strong>Polariscope</strong>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                    <li class="nav-item mx-2">
-                        <a class="nav-link active" aria-current="page" href="/">Home</a>
-                    </li>
-                    <li class="nav-item mx-2">
-                        <a class="nav-link active" aria-current="page" href="/interpersonal">Interpersonal</a>
-                    </li>
-<!--                    <li class="nav-item dropdown mx-2">-->
-<!--                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--                            Dropdown link-->
-<!--                        </a>-->
-<!--                        <ul class="dropdown-menu mx-2">-->
-<!--                            <li><a class="dropdown-item" href="#">Action</a></li>-->
-<!--                            <li><a class="dropdown-item" href="#">Another action</a></li>-->
-<!--                            <li><a class="dropdown-item" href="#">Something else here</a></li>-->
-<!--                        </ul>-->
-<!--                    </li>-->
-                </ul>
-            </div>
-        </div>
-    </nav>
-</div>
 
 <div th:fragment="vertical" class="position-fixed d-flex flex-column flex-shrink-0 bg-body-tertiary border-end" style="height:100vh; z-index: 99; box-sizing: border-box; top:0;">
     <a href="/interpersonal" class="d-block p-2 link-body-emphasis text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Polariscope">
@@ -100,3 +67,38 @@
     </div>
     <div th:replace="~{components/FakeError :: dark}"></div>
 </div>
+
+<!--<div th:fragment="navigation" class="position-sticky" style="z-index:99; width:100%;top:0;opacity:95%">-->
+<!--    <nav class="navbar navbar-expand-lg bg-body-tertiary">-->
+<!--        <div class="container-fluid">-->
+<!--            <a class="navbar-brand" href="/">-->
+<!--                <img th:src="${spying} ? @{/icons/Logo.svg}: @{/icons/Logo Grey.svg}"  alt="Logo" width="30" class="d-inline-block align-text-top"/>-->
+<!--                <strong>Polariscope</strong>-->
+<!--            </a>-->
+<!--            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">-->
+<!--                <span class="navbar-toggler-icon"></span>-->
+<!--            </button>-->
+<!--            <div class="collapse navbar-collapse" id="navbarNavDropdown">-->
+<!--                <ul class="navbar-nav">-->
+<!--                    <li class="nav-item mx-2">-->
+<!--                        <a class="nav-link active" aria-current="page" href="/">Home</a>-->
+<!--                    </li>-->
+<!--                    <li class="nav-item mx-2">-->
+<!--                        <a class="nav-link active" aria-current="page" href="/interpersonal">Interpersonal</a>-->
+<!--                    </li>-->
+<!--&lt;!&ndash;                    <li class="nav-item dropdown mx-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">&ndash;&gt;-->
+<!--&lt;!&ndash;                            Dropdown link&ndash;&gt;-->
+<!--&lt;!&ndash;                        </a>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <ul class="dropdown-menu mx-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <li><a class="dropdown-item" href="#">Action</a></li>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <li><a class="dropdown-item" href="#">Another action</a></li>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <li><a class="dropdown-item" href="#">Something else here</a></li>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </ul>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </li>&ndash;&gt;-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </nav>-->
+<!--</div>-->
+

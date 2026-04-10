@@ -10,6 +10,9 @@ services:
     environment:
       - POLARI_USERNAME=costi
       - POLARI_PASSWORD=1234
+      - DB_URL=jdbc:mysql://localhost:3306/polariscope?useSSL=false&serverTimezone=America/Los_Angeles&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
+      - DB_USER=root
+      - DB_PASSWORD=1234
   db:
     image: mysql:latest
     command: --default-authentication-plugin=mysql_native_password

@@ -39,8 +39,9 @@
     justify-items: stretch;
 }
 
-.calendar-cell{
-    aspect-ratio: 1 / 1;
-    padding: 1rem;
-    text-align: center;
+.calendar-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
