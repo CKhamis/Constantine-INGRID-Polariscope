@@ -45,3 +45,13 @@
     align-items: center;
     justify-content: center;
 }
+
+.hide-scrollbar {
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
