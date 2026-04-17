@@ -4,7 +4,7 @@
 <body class="bg-2 text-1" data-bs-theme="dark">
 <div th:replace="~{components/Navigation :: vertical}"></div>
 
-<main class="d-flex flex-column" style="height: 100vh; margin-left: 60px">
+<main class="d-flex flex-column" style="height: 100vh; margin-left: 62px">
     <nav class="py-2 px-2" style="background: linear-gradient(#222, #333); border-bottom: 1px #495057 solid;">
         <div class="row m-0">
             <div class="col-md-12 d-flex flex-row align-items-center justify-content-between">
@@ -14,27 +14,76 @@
                     <h1 class="fw-bold m-0">Batch Evaluate</h1>
                 </div>
 
-                <div class="col-md-2 d-flex flex-md-row m-0 flex-column align-items-center justify-content-end gap-3">
+                <div class="col-md-2 d-flex flex-row m-0 align-items-center justify-content-end gap-3">
                     <div>
-                        <div class="spinner-border d-none" role="status" id="loading-spinner">
+                        <div class="spinner-border dnone" role="status" id="loading-spinner"><!-- todo: make invisible -->
                             <span class="visually-hidden">Loading...</span>
                         </div>
                         <img src="/icons/Error.svg" id="error-icon" alt="error" class="profile-image d-none" height="32px"/>
                     </div>
+                    <label for="evaluation-date">Evaluation Date</label>
                     <input type="datetime-local" class="form-control" id="evaluation-date" name="evaluation date">
                 </div>
             </div>
         </div>
     </nav>
-    <div class="row m-0 flex-grow-1">
-        <div class="col-md-2 col-12 border-end flex-grow-1 d-flex flex-column p-0">
-            <div class="flex-grow-1 d-flex flex-column border-bottom p-2">
-                <p>asdf</p>
-                <p>asdf</p>
-                <p>asdf</p>
-                <p>asdf</p>
+
+    <div class="d-flex flex-row flex-grow-1 overflow-hidden">
+        <div class="border-end d-none d-lg-flex flex-column p-0" style="width: 20%;">
+            <div class="flex-grow-1 d-flex flex-column border-bottom p-0 overflow-y-auto">
+
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+                <div class="border-bottom d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                    <p class="fw-bold fs-4 m-0">Person Name</p>
+                </div>
+
+
             </div>
-            <div class="bottom-0 d-flex flex-row align-items-center justify-content-between p-2">
+            <div class="d-flex flex-row align-items-center justify-content-between p-2">
                 <p class="fw-bold m-0 p-0">1/2/4</p>
                 <div class="d-flex flex-row align-items-center justify-content-between gap-2">
                     <button type="button" class="btn btn-secondary" data-bs-toggle="button">A</button>
@@ -42,10 +91,85 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-12 border-end flex-grow-1">b</div>
-        <div class="col-md-4 col-12 flex-grow-1 d-flex flex-column p-0">
-            <div class="flex-grow-1 d-flex flex-column border-bottom p-2">
 
+        <!-- Context Panel -->
+        <div class="border-end d-flex flex-column p-0" style="flex: 1;">
+            <div class="w-100 d-flex flex-row align-items-center justify-content-between border-bottom p-2" style="background-image: linear-gradient(to right, rgba(9, 188, 138, .5) 0%, rgba(9, 188, 138, 0))">
+                <div class="d-flex flex-row align-items-center justify-content-start gap-3">
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 60px; width: 60px;" alt="profile image" />
+                    <p class="fw-bold fs-2 m-0">Person Name</p>
+                </div>
+                <a target="_blank"><button type="button" class="btn btn-secondary">View Profile</button></a>
+            </div>
+
+            <div class="position-relative">
+                <div class="position-absolute p-2" style="top: 0; right: 0;">
+                    <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="evalChartEval.resetZoom()">
+                        <img class="square-image" src="/icons/Reset Zoom.svg" alt="Reset" style="width: 20px;">
+                    </div>
+                </div>
+                <canvas id="score-canvas" class="mb-5"></canvas>
+            </div>
+
+            <div class="d-flex flex-row-reverse overflow-x-auto" id="score-container">
+
+                <div class="mx-2 d-flex flex-column gap-1 mt-2" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="${eval.note}">
+                    <div class="position-relative p-0 m-0">
+                        <div class="d-flex justify-content-center align-items-center border" style="aspect-ratio: 1/1; width: 60px">
+                            <p class="fs-2 fw-bold m-0 text-center">3</p>
+                        </div>
+                        <span class="position-absolute translate-middle p-2 bg-info border rounded-circle" style="top:8%; left:92%">
+                            <span class="visually-hidden">New alerts</span>
+                        </span>
+                    </div>
+
+                    <p class="text-center mb-0 fs-6">asdf</p>
+                    <p class="text-center mb-0">asdsfdf</p>
+                </div>
+
+                <div class="mx-2 d-flex flex-column gap-1 mt-2" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="${eval.note}">
+                    <div class="position-relative p-0 m-0">
+                        <div class="d-flex justify-content-center align-items-center border" style="aspect-ratio: 1/1; width: 60px">
+                            <p class="fs-2 fw-bold m-0 text-center">3</p>
+                        </div>
+                        <span class="position-absolute translate-middle p-2 bg-info border rounded-circle" style="top:8%; left:92%">
+                            <span class="visually-hidden">New alerts</span>
+                        </span>
+                    </div>
+
+                    <p class="text-center mb-0 fs-6">asdf</p>
+                    <p class="text-center mb-0">asdsfdf</p>
+                </div>
+
+                <div class="mx-2 d-flex flex-column gap-1 mt-2" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="${eval.note}">
+                    <div class="position-relative p-0 m-0">
+                        <div class="d-flex justify-content-center align-items-center border" style="aspect-ratio: 1/1; width: 60px">
+                            <p class="fs-2 fw-bold m-0 text-center">3</p>
+                        </div>
+                        <span class="position-absolute translate-middle p-2 bg-info border rounded-circle" style="top:8%; left:92%">
+                            <span class="visually-hidden">New alerts</span>
+                        </span>
+                    </div>
+
+                    <p class="text-center mb-0 fs-6">asdf</p>
+                    <p class="text-center mb-0">asdsfdf</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Evaluation Panel -->
+        <div class="d-flex flex-column p-0" style="width: 25%">
+            <div class="flex-grow-1 d-flex flex-column gap-2 border-bottom p-2 overflow-y-auto">
+                <h3 class="fw-bold m-0">New Evaluation</h3>
+                <div class="">
+                    <label for="score-input" class="form-label mt-3">Score</label>
+                    <input type="text" class="form-control" id="score-input" placeholder="0" required>
+                </div>
+                <div class="">
+                    <label for="note-input" class="form-label mt-3">Note</label>
+                    <textarea class="form-control" id="note-input" rows="3"></textarea>
+                </div>
             </div>
             <div class="bottom-0 d-flex flex-row align-items-center justify-content-between p-2">
                 <button type="button" class="btn btn-secondary" onclick="dequeue()">Dequeue</button>

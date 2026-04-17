@@ -1,7 +1,8 @@
-version: "3.9"
 services:
   web:
     restart: always
+    build:
+      context: ./
     image: polariscope
     ports:
       - "84:80"
