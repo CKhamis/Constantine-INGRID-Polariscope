@@ -29,23 +29,17 @@
     </nav>
 
     <div class="d-flex flex-row flex-grow-1 overflow-hidden" style="min-height: 0;">
-        <div class="border-end d-none d-lg-flex flex-column p-0" style="width: 20%;">
-            <div class="flex-grow-1 d-flex flex-column border-bottom p-0 overflow-y-auto">
+        <div class="border-end d-none d-lg-flex flex-column p-0" style="width: 25%;">
+            <div class="flex-grow-1 d-flex flex-column border-bottom p-0 overflow-y-auto" id="member-list">
 
-                <div class="border-bottom d-flex justify-content-between align-items-center p-0 m-0">
-                    <div class="d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
-                        <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
-                        <p class="fw-bold fs-4 m-0">Person Name</p>
-                    </div>
-                    <button type="button" class="btn-close pe-4"></button>
-                </div>
+
 
             </div>
             <div class="d-flex flex-row align-items-center justify-content-between p-2">
                 <p class="fw-bold m-0 p-0">1/2/4</p>
                 <div class="d-flex flex-row align-items-center justify-content-between gap-2">
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="button">A</button>
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="button">H</button>
+                    <button type="button" id="btn-archive" class="btn btn-secondary" data-bs-toggle="button">A</button>
+                    <button type="button" id="btn-hold" class="btn btn-secondary" data-bs-toggle="button">H</button>
                 </div>
             </div>
         </div>
@@ -228,6 +222,108 @@
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <script>
+    // UI components
+    let spinner = document.querySelector("#loading-spinner");
+    let errorIcon = document.querySelector("#error-icon");
+
+    // Containers
+    let memberListContainer = document.querySelector("#member-list");
+
+    // Vars
+    let memberList = [];
+    let memberQueue = [];
+    let showArchive = false;
+    let showHold = false;
+
+    refresh();
+    function refresh(){
+        spinner.classList.add("d-block");
+        spinner.classList.remove("d-none");
+
+        const memberListFetch = fetch("/api/interpersonal/member/all", {});
+        Promise.all([memberListFetch])
+            .then(responses => {
+                return Promise.all([responses[0]]);
+            })
+            .then(data => {
+                return Promise.all([data[0].json()]);
+            })
+            .then(data => {
+                memberList = data[0];
+                memberQueue = data[0];
+                renderMemberList();
+                // if(memberList.length > 0){
+                //     selectMember(memberList[0].id);
+                // }
+            })
+            .catch((response) => {
+                errorIcon.classList.add("d-block");
+                errorIcon.classList.remove("d-none");
+                console.log(response);
+                response.json()
+                    .then(errorData => {
+                        console.log(errorData.message);
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                    });
+            })
+            .finally(() => {
+                spinner.classList.remove("d-block");
+                spinner.classList.add("d-none");
+            });
+    }
+
+    function renderMemberList(){
+        let content = ``;
+        memberQueue.forEach(member => {
+            // Filter out members
+            if(!isVisible(member)) {
+                return;
+            }
+
+            content += `
+                <div class="border-bottom d-flex justify-content-between align-items-center p-0 m-0">
+                    <div class="d-flex flex-row gap-2 p-2 align-items-center justify-content-start">
+                        <img src="/api/interpersonal/member/profile-image/${member.id}" class="square-image img-fluid" style="height: 40px; width: 40px;" alt="profile image" />
+                        <p class="fw-bold fs-5 m-0">${member.firstName} ${member.lastName}</p>
+                    </div>
+                    <button type="button" class="btn-close pe-4" onclick="removeFromQueue('${member.id}')"></button>
+                </div>
+            `
+        });
+        memberListContainer.innerHTML = content;
+    }
+
+
+
+    // Button Actions
+    function removeFromQueue(id){
+        memberQueue.splice(getMemberIndex(id), 1);
+        renderMemberList();
+    }
+
+    document.querySelector('#btn-archive').addEventListener('click', function() {
+        showArchive = this.classList.contains('active');
+        renderMemberList();
+    });
+
+    document.querySelector('#btn-hold').addEventListener('click', function() {
+        showHold = this.classList.contains('active');
+        renderMemberList()
+    });
+
+    // Helper Functions
+    function getMemberIndex(id){
+        return memberList.findIndex((m) => m.id === id)
+    }
+
+    function isVisible(member) {
+        if (!member.archive && !member.scoreHold) return true; // always show normal members
+        if (showArchive && member.archive) return true;
+        if (showHold && member.scoreHold) return true;
+        return false;
+    }
 
 </script>
 </body>
