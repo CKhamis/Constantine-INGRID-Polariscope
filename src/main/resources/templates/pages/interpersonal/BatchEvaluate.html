@@ -36,7 +36,7 @@
 
             </div>
             <div class="d-flex flex-row align-items-center justify-content-between p-2">
-                <p class="fw-bold m-0 p-0">1/2/4</p>
+                <p class="fw-bold m-0 p-0" id="counts">loading</p>
                 <div class="d-flex flex-row align-items-center justify-content-between gap-2">
                     <button type="button" id="btn-archive" class="btn btn-secondary" data-bs-toggle="button">A</button>
                     <button type="button" id="btn-hold" class="btn btn-secondary" data-bs-toggle="button">H</button>
@@ -48,10 +48,10 @@
         <div class="border-end d-flex flex-column p-0 overflow-hidden" style="flex: 1; min-height: 0;">
             <div class="w-100 d-flex flex-row align-items-center justify-content-between border-bottom p-2" style="background-image: linear-gradient(to right, rgba(9, 188, 138, .5) 0%, rgba(9, 188, 138, 0))">
                 <div class="d-flex flex-row align-items-center justify-content-start gap-3">
-                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 60px; width: 60px;" alt="profile image" />
-                    <p class="fw-bold fs-2 m-0">Person Name</p>
+                    <img src="https://eventstar.costionline.com/icons/Logo.svg" class="square-image img-fluid" style="height: 60px; width: 60px;" alt="profile image" id="context-profile-image" />
+                    <p class="fw-bold fs-2 m-0" id="context-title">Loading...</p>
                 </div>
-                <a target="_blank"><button type="button" class="btn btn-secondary">View Profile</button></a>
+                <a target="_blank" id="context-view-profile"><button type="button" class="btn btn-secondary">View Profile</button></a>
             </div>
 
             <div class="flex-grow-1 overflow-y-auto" style="min-height: 0;">
@@ -225,6 +225,11 @@
     // UI components
     let spinner = document.querySelector("#loading-spinner");
     let errorIcon = document.querySelector("#error-icon");
+    let countText = document.querySelector("#counts");
+    let contextText = document.querySelector("#context-title");
+    let contextViewProfile = document.querySelector("#context-view-profile");
+    let contextProfileImage = document.querySelector("#context-profile-image");
+
 
     // Containers
     let memberListContainer = document.querySelector("#member-list");
@@ -232,6 +237,7 @@
     // Vars
     let memberList = [];
     let memberQueue = [];
+    let selectedMember = null;
     let showArchive = false;
     let showHold = false;
 
@@ -250,11 +256,12 @@
             })
             .then(data => {
                 memberList = data[0];
-                memberQueue = data[0];
+                memberQueue = [...data[0]];
                 renderMemberList();
-                // if(memberList.length > 0){
-                //     selectMember(memberList[0].id);
-                // }
+                if(memberList.length > 0){
+                    chooseNext();
+                    renderContextPanel();
+                }
             })
             .catch((response) => {
                 errorIcon.classList.add("d-block");
@@ -274,6 +281,7 @@
             });
     }
 
+    // Rendering functions
     function renderMemberList(){
         let content = ``;
         memberQueue.forEach(member => {
@@ -293,8 +301,14 @@
             `
         });
         memberListContainer.innerHTML = content;
+        countText.innerHTML = `${memberQueue.filter((m) => isVisible(m)).length} / ${memberList.length}`;
     }
 
+    function renderContextPanel(){
+        contextText.textContent = `${selectedMember.firstName} ${selectedMember.lastName}`;
+        contextViewProfile.href = `/interpersonal/member/view/${selectedMember.id}`;
+        contextProfileImage.src = `/api/interpersonal/member/profile-image/${selectedMember.id}/`;
+    }
 
 
     // Button Actions
@@ -319,10 +333,14 @@
     }
 
     function isVisible(member) {
-        if (!member.archive && !member.scoreHold) return true; // always show normal members
+        if (!member.archive && !member.scoreHold) return true;
         if (showArchive && member.archive) return true;
         if (showHold && member.scoreHold) return true;
         return false;
+    }
+
+    function chooseNext(){
+        selectedMember = memberQueue.shift();
     }
 
 </script>
