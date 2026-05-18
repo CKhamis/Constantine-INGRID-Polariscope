@@ -22,7 +22,7 @@
                         <img src="/icons/Error.svg" id="error-icon" alt="error" class="profile-image d-none" height="32px"/>
                     </div>
                     <label for="evaluation-date" class="text-nowrap">Evaluation Date</label>
-                    <input type="datetime-local" class="form-control" id="evaluation-date" name="evaluation date">
+                    <input type="datetime-local" class="form-control is-invalid" id="evaluation-date" name="evaluation date">
                 </div>
             </div>
         </div>
@@ -80,48 +80,7 @@
                         <div class="tab-pane fade show active" id="timeline" role="tabpanel" aria-labelledby="timeline-tab">
                             <h3 class="fw-bold border-bottom p-2 mb-4">Evaluations & Events</h3>
 
-                            <div class="px-4 d-flex flex-column">
-
-                                <div class="border-start ps-4 position-relative">
-                                    <div class="my-4">
-                                        <div class="border d-flex flex-column my-1 p-3 gap-3">
-                                            <div class="d-flex flex-row align-items-center justify-content-between">
-                                                <h5 class="fw-bold p-0 m-0">Event Name</h5>
-                                                <p class="m-0 p-0">1/1/2022</p>
-                                            </div>
-                                            <p class="p-0 m-0">Terence</p>
-                                        </div>
-                                    </div>
-                                    <div class="rounded-5 position-absolute bg-light" style="width: 10px;aspect-ratio: 1/1;left: 0;top: 50%;transform: translate(-50%, -50%);"></div>
-                                </div>
-
-                                <div class="border-start ps-4 position-relative">
-                                    <div class="my-4">
-                                        <div class="border d-flex flex-column my-1 p-3 gap-3">
-                                            <div class="d-flex flex-row align-items-center justify-content-between">
-                                                <h5 class="fw-bold p-0 m-0">Event Name</h5>
-                                                <p class="m-0 p-0">1/1/2022</p>
-                                            </div>
-                                            <p class="p-0 m-0">Terence</p>
-                                        </div>
-                                    </div>
-                                    <div class="rounded-5 position-absolute bg-light" style="width: 10px;aspect-ratio: 1/1;left: 0;top: 50%;transform: translate(-50%, -50%);"></div>
-                                </div>
-
-                                <div class="border-start ps-4 position-relative">
-                                    <div class="my-4">
-                                        <div class="border d-flex flex-column my-1 p-3 gap-3">
-                                            <div class="d-flex flex-row align-items-center justify-content-between">
-                                                <h5 class="fw-bold p-0 m-0">Event Name</h5>
-                                                <p class="m-0 p-0">1/1/2022</p>
-                                            </div>
-                                            <p class="p-0 m-0">Terence</p>
-                                        </div>
-                                    </div>
-                                    <div class="rounded-5 position-absolute bg-light" style="width: 10px;aspect-ratio: 1/1;left: 0;top: 50%;transform: translate(-50%, -50%);"></div>
-                                </div>
-
-                            </div>
+                            <div class="px-4 d-flex flex-column" id="event-score-timeline"></div>
 
                         </div>
                         <div class="tab-pane fade" id="network" role="tabpanel" aria-labelledby="network-tab">
@@ -151,7 +110,7 @@
                 <h3 class="fw-bold m-0">New Evaluation</h3>
                 <div class="">
                     <label for="score-input" class="form-label mt-3">Score</label>
-                    <input type="text" class="form-control" id="score-input" placeholder="0" required>
+                    <input type="number" class="form-control" id="score-input" placeholder="0" required>
                 </div>
                 <div class="">
                     <label for="note-input" class="form-label mt-3">Note</label>
@@ -159,10 +118,10 @@
                 </div>
             </div>
             <div class="bottom-0 d-flex flex-row align-items-center justify-content-between p-2">
-                <button type="button" class="btn btn-secondary" onclick="dequeue()">Dequeue</button>
+                <button type="button" class="btn btn-secondary" onclick="removeFromQueue()">Dequeue</button>
                 <div class="d-flex flex-row align-items-center justify-content-between gap-2">
-                    <button type="button" class="btn btn-primary" onclick="saveEvaluation()">Save</button>
-                    <button type="button" class="btn btn-primary" onclick="chooseNext()">Save & Dequeue</button>
+                    <button type="button" class="btn btn-primary" id="save-button" onclick="saveEvaluation(false)" disabled>Save</button>
+                    <button type="button" class="btn btn-primary" id="save-dequeue-button" onclick="saveEvaluation(true)" disabled>Save & Dequeue</button>
                 </div>
             </div>
         </div>
@@ -190,6 +149,14 @@
     // Containers
     let memberListContainer = document.querySelector("#member-list");
     let timelineContainer = document.querySelector("#score-container");
+    let eventScoreTimelineContainer = document.querySelector("#event-score-timeline");
+
+    // Form Elements
+    let timestampInput = document.querySelector("#evaluation-date");
+    let scoreInput = document.querySelector("#score-input");
+    let noteInput = document.querySelector("#note-input");
+    let saveButton = document.querySelector("#save-button");
+    let saveDequeueButton = document.querySelector("#save-dequeue-button");
 
     // Vars
     let memberList = [];
@@ -199,6 +166,8 @@
     let showHold = false;
 
     refresh();
+
+    // API Communication
     function refresh(){
         spinner.classList.add("d-block");
         spinner.classList.remove("d-none");
@@ -244,21 +213,19 @@
         spinner.classList.add("d-block");
         spinner.classList.remove("d-none");
 
-        const evaluationFetch = fetch("/api/interpersonal/evaluation/all/" + id, {});
+        //const evaluationFetch = fetch("/api/interpersonal/evaluation/all/" + id, {});
         const memberFetch = fetch("/api/interpersonal/member/view/" + id, {});
-        Promise.all([evaluationFetch, memberFetch])
+        Promise.all([memberFetch])
             .then(responses => {
                 return Promise.all(responses);
             })
             .then(data => {
-                return Promise.all([data[0].json(), data[1].json()]);
+                return Promise.all([data[0].json()]);
             })
             .then(data => {
                 // combine data sources into one
-                let user = data[1];
-                user.timeline = data[0];
 
-                selectedMember = user;
+                selectedMember = data[0]? data[0] : [];
             })
             .then(() => {
                 renderContextPanel();
@@ -278,6 +245,45 @@
             .finally(() => {
                 spinner.classList.remove("d-block");
                 spinner.classList.add("d-none");
+            });
+    }
+
+    function saveEvaluation(dq=false){
+        let data = {
+            "id": null,
+            "timestamp": timestampInput.value,
+            "cscore": scoreInput.value,
+            "note": noteInput.value,
+            "memberId": selectedMember.id,
+        };
+
+        let toastId = createToast("Saving Evaluation");
+        postData("/api/interpersonal/evaluation/save", data)
+            .then((message) => {
+                console.log(message);
+                document.getElementById(`${toastId}-title`).innerText = message.title;
+                document.getElementById(`${toastId}-body`).innerText = getIcon(message.severity) + message.message;
+                document.getElementById(`${toastId}-loading`).style.color = "green";
+
+                if(dq){
+                    chooseNext();
+                }else{
+                    chooseCurrent();
+                }
+            })
+            .catch((response) => {
+                response.json()
+                    .then(errorData => {
+                        document.getElementById(`${toastId}-body`).innerText = getIcon(errorData.severity) + errorData.message;
+                        document.getElementById(`${toastId}-title`).innerText = errorData.title;
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    })
+                    .catch(error => {
+                        console.error("Error parsing error response:", error);
+                        document.getElementById(`${toastId}-body`).innerText = "Unable to connect to Polariscope Online Services";
+                        document.getElementById(`${toastId}-title`).innerText = "Error";
+                        document.getElementById(`${toastId}-loading`).style.color = "red";
+                    });
             });
     }
 
@@ -310,7 +316,7 @@
         contextProfileImage.src = `/api/interpersonal/member/profile-image/${selectedMember.id}`;
 
         let content = ``;
-        selectedMember.timeline.forEach((e) => {
+        (selectedMember.fullTimeline ?? []).forEach((e) => {
             content += cScoreBox(e);
         });
         timelineContainer.innerHTML = content;
@@ -318,6 +324,17 @@
         tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
+        content = ``;
+        let eventsAndScores = [...(selectedMember.fullTimeline ?? []), ...(selectedMember.events ?? [])];
+
+        eventsAndScores.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(event => {
+            if(event.cscore !== undefined) {
+                content += timelineScore(event);
+            }else{
+                content += timelineEvent(event);
+            }
+        });
+        eventScoreTimelineContainer.innerHTML = content;
     }
 
 
@@ -337,6 +354,27 @@
         renderMemberList()
     });
 
+    timestampInput.addEventListener('blur', e => {
+        if(e.target.value !== ""){
+            e.target.classList.add('is-valid');
+            e.target.classList.remove('is-invalid');
+        }
+
+        isFormValid();
+    });
+
+    scoreInput.addEventListener('blur', e => {
+        isFormValid();
+    });
+
+    function isFormValid(){
+        let status = timestampInput.value !== "" && scoreInput.value !== "";
+
+        saveButton.disabled = !status;
+        saveDequeueButton.disabled = !status;
+        return status;
+    }
+
     // Helper Functions
     function getMemberIndex(id){
         return memberList.findIndex((m) => m.id === id)
@@ -355,7 +393,13 @@
         renderMemberList();
     }
 
+    function chooseCurrent(){
+        getMember(selectedMember.id);
+        renderMemberList();
+    }
+
     // Re-usable components
+    //todo: Issue: quotations can escape the template string!
     function cScoreBox(eval){
         return `
             <div class="mx-2 d-flex flex-column gap-1 mt-2 align-items-center" data-bs-toggle="tooltip" ${eval.note ? `data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="${eval.note}"` : ''}>
@@ -370,6 +414,28 @@
                 <p class="text-center mb-0 mt-1">${formatDate(eval.timestamp)}</p>
                 <p class="text-center mb-0">${formatTimeOnly(eval.timestamp)}</p>
             </div>
+        `;
+    }
+
+    function timelineEvent(event){
+        return "";
+    }
+
+    function timelineScore(eval){
+        return `
+            <div class="border-start ps-4 position-relative">
+                <div class="my-4">
+                    <div class="border d-flex flex-column my-1 p-3 gap-3">
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <h5 class="fw-bold p-0 m-0">Eval Score: ${eval.cscore}</h5>
+                            <p class="m-0 p-0">${formatDate(eval.timestamp)}</p>
+                        </div>
+                        <p class="p-0 m-0">${eval.note}</p>
+                    </div>
+                </div>
+                <div class="rounded-5 position-absolute bg-light" style="width: 10px;aspect-ratio: 1/1;left: 0;top: 50%;transform: translate(-50%, -50%);"></div>
+            </div>
+
         `;
     }
 
