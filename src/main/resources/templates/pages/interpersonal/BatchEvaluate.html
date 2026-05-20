@@ -128,6 +128,113 @@
     </div>
 </main>
 
+<div class="modal fade" id="relationship-modal" tabindex="-1" aria-labelledby="relationship-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="relationship-modal-label">Create / Edit Relationship</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to edit the one-way relationship between two Polariscope members. Please review carefully and proceed</p>
+                <div class="d-flex flex-row gap-3 align-items-center justify-content-center py-3 my-2" style="background: linear-gradient(#222, #333); border-bottom: 1px #495057 solid; border-top: 1px #495057 solid;">
+                    <div class="d-flex flex-column align-items-center">
+                        <img id="modal-person-1-img" class="profile-image" alt="person 1" src="/icons/Default%20User.svg" width="100px" />
+                        <p id="modal-person-1-name" class="mb-0 fw-bold">Person 1</p>
+                    </div>
+                    <img src="/icons/Arrow.svg" class="mx-3" style="transform: rotate(-90deg)" width="70px" alt="Arrow pointing right" />
+                    <div class="d-flex flex-column align-items-center">
+                        <img id="modal-person-2-img" class="profile-image" alt="person 2" src="/icons/Default%20User.svg" width="100px" />
+                        <p id="modal-person-2-name" class="mb-0 fw-bold">Person 2</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-row justify-content-between">
+                    <p id="modal-relationship-health"></p>
+                    <p id="modal-relationship-type"></p>
+                </div>
+                <div class="mt-2">
+                    <p class="fs-4 fw-bold">Relationship Details</p>
+                    <div class="mb-3">
+                        <label for="modal-relationship-type-form">Relationship Type</label>
+                        <select class="form-select" id="modal-relationship-type-form" name="relationship" required>
+                            <option value="" disabled>Select Relationship Type</option>
+                            <th:block th:each="relationshipType : ${relationshipTypes}">
+                                <option th:value="${relationshipType}" th:text="${relationshipType.toString().toLowerCase()}"></option>
+                            </th:block>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modal-relationship-health-form" class="form-label">Relationship Health</label>
+                        <input type="number" class="form-control" id="modal-relationship-health-form" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modal-relationship-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="modal-relationship-description" style="height:100px"></textarea>
+                    </div>
+
+                    <input type="hidden" id="modal-self" />
+                    <input type="hidden" id="modal-other" />
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" data-bs-dismiss="modal" onclick="saveRelationship()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="graph-modal" tabindex="-1" aria-labelledby="graph-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="graph-modal-label">Graph Settings</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column gap-2">
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Show Profile Images</h4>
+                    <p>Shows profile images on top of each node representing a member if applicable.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="graph-checkbox-img">
+                        <label class="form-check-label" for="graph-checkbox-img">
+                            Show profile images
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Show Names</h4>
+                    <p>Display member names as labels on each node.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="graph-checkbox-labels" checked>
+                        <label class="form-check-label" for="graph-checkbox-labels">
+                            Show names
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-body-tertiary p-3">
+                    <h4 class="fw-bold">Relationship Strength</h4>
+                    <p>Displays edges that have an absolute value of above the given amount.</p>
+                    <div class="d-flex flex-row justify-content-start align-items-center">
+                        <p id="tolerance-indicator" style="width: 40px" class="text-center">0</p>
+                        <div class="form-check p-0 flex-grow-1">
+                            <label for="graph-range-show" class="form-label">Tolerance level</label>
+                            <input type="range" class="form-range" min="0" max="100" id="graph-range-show" onchange="updateToleranceIndicator()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" onclick="renderNetwork()" data-bs-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
@@ -137,6 +244,9 @@
 <div th:replace="~{components/Toast :: toast}"></div>
 <div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Network :: network}"></div>
+<script src="/external/cytoscape.min.js"></script>
+
+
 <script>
     // UI components
     let spinner = document.querySelector("#loading-spinner");
@@ -160,10 +270,46 @@
 
     // Graphs
     let evalChartEval;
+    let memberRelationships;
+
+    let cy = cytoscape({
+
+        container: document.getElementById('graph-container'),
+
+        style: [ // the stylesheet for the graph
+            {
+                selector: 'node',
+                style: {
+                    'background-color': 'data(color)',
+                    'label': 'data(name)',
+                    'color': 'white',
+                    'text-wrap': 'ellipsis',
+                    'background-opacity': 'data(opacity)',
+                    'shape': 'data(shape)',
+                    'background-image': 'data(img)',
+                    'background-image-opacity': 'data(imgOpacity)',
+                    'background-fit': 'contain'
+                }
+            },
+
+            {
+                selector: 'edge',
+                style: {
+                    'width': 3,
+                    'line-color': 'data(color)',
+                    'target-arrow-color': 'data(color)',
+                    'target-arrow-shape': 'chevron',
+                    'curve-style': 'bezier',
+                    'opacity': 'data(opacity)'
+                }
+            }
+        ],
+    });
 
     // Vars
     let memberList = [];
     let memberQueue = [];
+    let relationships = [];
     let selectedMember = null;
     let showArchive = false;
     let showHold = false;
@@ -176,15 +322,17 @@
         spinner.classList.remove("d-none");
 
         const memberListFetch = fetch("/api/interpersonal/member/all", {});
-        Promise.all([memberListFetch])
+        const relFetch = fetch("/api/interpersonal/relationship/all", {});
+        Promise.all([memberListFetch, relFetch])
             .then(responses => {
-                return Promise.all([responses[0]]);
+                return Promise.all([responses[0], responses[1]]);
             })
             .then(data => {
-                return Promise.all([data[0].json()]);
+                return Promise.all([data[0].json(), data[1].json()]);
             })
             .then(data => {
                 memberList = data[0];
+                relationships = data[1];
                 memberQueue = [...data[0]];
 
                 if(memberList.length > 0){
@@ -227,8 +375,11 @@
             })
             .then(data => {
                 // combine data sources into one
+                selectedMember = data[0];
 
-                selectedMember = data[0]? data[0] : [];
+                if(selectedMember.fullTimeline === undefined || selectedMember.fullTimeline == null){
+                    selectedMember.fullTimeline = [];
+                }
             })
             .then(() => {
                 renderContextPanel();
@@ -414,7 +565,7 @@
         // Clear existing annotations
         evalChartEval.options.plugins.annotation.annotations = [];
 
-        // Add new annotations based on memberDetails.events
+        // Add new annotations based on events
         if (selectedMember.events) {
             const newAnnotations = selectedMember.events.map((event, index) => ({
                 type: 'line',
@@ -438,6 +589,82 @@
         }
 
         evalChartEval.update();
+    }
+
+
+    function renderNetwork(){
+        cy.nodes().remove();
+        let memberId = selectedMember.id;
+
+        // User
+        cy.add({
+            group: 'nodes',
+            data: {
+                id: selectedMember.id,
+                name: document.querySelector("#graph-checkbox-labels").checked? selectedMember.firstName + " " + selectedMember.lastName : "",
+                img: `/api/interpersonal/member/profile-image/${selectedMember.id}`,
+                imgOpacity: document.querySelector("#graph-checkbox-img").checked? "1" : "0",
+                opacity: 1,
+                shape: shapeMap(selectedMember.sex),
+                color: getColorGradient((selectedMember.mostRecentEval === undefined ||  selectedMember.mostRecentEval.cscore === null? "#333" : selectedMember.mostRecentEval.cscore), -100, 100)
+            }
+        });
+
+        // All Connections
+        relationships.filter((r) => r.self.id === memberId).forEach((r) => {
+            let member = memberList.find((m) => m.id === r.other.id);
+            cy.add({
+                group: 'nodes',
+                data: {
+                    id: r.other.id,
+                    name: document.querySelector("#graph-checkbox-labels").checked? member.firstName + " " + member.lastName : "",
+                    img: `/api/interpersonal/member/profile-image/${member.id}`,
+                    imgOpacity: document.querySelector("#graph-checkbox-img").checked? "1" : "0",
+                    opacity: 1,
+                    shape: shapeMap(member.sex),
+                    color: '#6d6d6d'
+                }
+            });
+        });
+
+        // Connections
+        memberRelationships.filter((r) => Math.abs(r.health) >= document.querySelector("#graph-range-show").value).filter((r) => r.self.id === memberId || r.other.id === memberId).forEach((relationship) => {
+            let person1 = cy.filter('node[id = "' + relationship.self.id + '"]');
+            let person2 = cy.filter('node[id = "' + relationship.other.id + '"]');
+            if(person1.length > 0 && person2.length > 0){
+                cy.add({
+                    group: 'edges',
+                    data: {
+                        id: relationship.id,
+                        source: relationship.self.id,
+                        target: relationship.other.id,
+                        color: getColorGradient(relationship.health, -100, 100),
+                        opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)
+                    }
+                });
+            }
+        });
+
+        // Layout
+        setTimeout(()=>{
+            let main_layout = cy.nodes().layout({
+                name: 'random',
+                fit: true,
+                animation: false
+            });
+
+            main_layout.run();
+        }, 500);
+
+        function shapeMap(sex){
+            if(sex === "MALE"){
+                return "rectangle";
+            }else if(sex === "FEMALE"){
+                return "ellipse";
+            }else{
+                return "triangle";
+            }
+        }
     }
 
     // Button Actions
