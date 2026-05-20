@@ -61,7 +61,7 @@
                             <img class="square-image" src="/icons/Reset Zoom.svg" alt="Reset" style="width: 20px;">
                         </div>
                     </div>
-                    <canvas id="score-canvas" class="mb-5"></canvas>
+                    <canvas id="score-canvas" class="mb-3"></canvas>
                 </div>
 
                 <div class="d-flex flex-row-reverse overflow-x-auto pb-3" id="score-container"></div>
@@ -135,6 +135,7 @@
 <div th:replace="~{components/Formatting :: time-formatting}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Toast :: toast}"></div>
+<div th:replace="~{components/Gradient :: gradient}"></div>
 <div th:replace="~{components/Network :: network}"></div>
 <script>
     // UI components
@@ -144,7 +145,6 @@
     let contextText = document.querySelector("#context-title");
     let contextViewProfile = document.querySelector("#context-view-profile");
     let contextProfileImage = document.querySelector("#context-profile-image");
-
 
     // Containers
     let memberListContainer = document.querySelector("#member-list");
@@ -157,6 +157,9 @@
     let noteInput = document.querySelector("#note-input");
     let saveButton = document.querySelector("#save-button");
     let saveDequeueButton = document.querySelector("#save-dequeue-button");
+
+    // Graphs
+    let evalChartEval;
 
     // Vars
     let memberList = [];
@@ -229,6 +232,7 @@
             })
             .then(() => {
                 renderContextPanel();
+                renderEvaluations();
             })
             .catch((response) => {
                 errorIcon.classList.add("d-block");
@@ -289,6 +293,15 @@
 
     // Rendering functions
     function renderMemberList(){
+        countText.innerHTML = `${memberQueue.filter((m) => isVisible(m)).length} / ${memberList.length} members`;
+
+        if(memberQueue.length === 0){
+            memberListContainer.innerHTML = `
+            <h2 class="text-center">Completed Queue</h2>
+            `;
+            return;
+        }
+
         let content = ``;
         memberQueue.forEach(member => {
             // Filter out members
@@ -307,7 +320,6 @@
             `
         });
         memberListContainer.innerHTML = content;
-        countText.innerHTML = `${memberQueue.filter((m) => isVisible(m)).length} / ${memberList.length} members`;
     }
 
     function renderContextPanel(){
@@ -326,8 +338,10 @@
 
         content = ``;
         let eventsAndScores = [...(selectedMember.fullTimeline ?? []), ...(selectedMember.events ?? [])];
+        console.log(selectedMember.events ?? [])
+        console.log(eventsAndScores);
 
-        eventsAndScores.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(event => {
+        eventsAndScores.sort((a, b) => unifyTimestamp(b) - unifyTimestamp(a)).forEach(event => {
             if(event.cscore !== undefined) {
                 content += timelineScore(event);
             }else{
@@ -335,12 +349,100 @@
             }
         });
         eventScoreTimelineContainer.innerHTML = content;
+
+        function unifyTimestamp(object){
+            if(object.cscore !== undefined){
+                return new Date(object.timestamp);
+            }else{
+                return new Date(object.date)
+            }
+        }
     }
 
+    // Canvas Graphs
+    createEvalChart();
+    function createEvalChart(){
+        let canvas = document.querySelector("#score-canvas");
+        let scores = {datasets: [{data:[]}]};
+        evalChartEval = new Chart(canvas, {
+            type: 'line',
+            data:scores,
+            options: {
+                aspectRatio: 2,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            drag: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'x'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                        }
+                    },
+                },
+            }
+        });
+    }
+
+    function renderEvaluations(){
+        let newScores = {data:[]};
+
+        selectedMember.fullTimeline.forEach((eval) =>{
+            newScores.data.push({x: new Date(eval.timestamp), y: eval.cscore});
+        });
+
+        evalChartEval.data.datasets.pop();
+        evalChartEval.data.datasets.push(newScores);
+
+        // Clear existing annotations
+        evalChartEval.options.plugins.annotation.annotations = [];
+
+        // Add new annotations based on memberDetails.events
+        if (selectedMember.events) {
+            const newAnnotations = selectedMember.events.map((event, index) => ({
+                type: 'line',
+                xScaleID: 'x',
+                xMin: event.date,
+                xMax: event.date,
+                borderColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 1)`,
+                borderWidth: 2,
+                label: {
+                    content: event.label,
+                    display: true,
+                    position: 'start',
+                    backgroundColor: `rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, 0.8)`,
+                    color: 'white',
+                    yAdjust: -10
+                }
+            }));
+
+            // Apply annotations to both charts
+            evalChartEval.options.plugins.annotation.annotations = newAnnotations;
+        }
+
+        evalChartEval.update();
+    }
 
     // Button Actions
     function removeFromQueue(id){
-        memberQueue.splice(getMemberIndex(id), 1);
+        memberQueue = memberQueue.filter(m => m.id !== id);
         renderMemberList();
     }
 
@@ -388,6 +490,12 @@
     }
 
     function chooseNext(){
+        if (memberQueue.length === 0) {
+            selectedMember = null;
+            renderMemberList();
+            return;
+        }
+
         let member = memberQueue.shift();
         getMember(member.id);
         renderMemberList();
@@ -418,7 +526,21 @@
     }
 
     function timelineEvent(event){
-        return "";
+        return `
+            <div class="border-start ps-4 position-relative">
+                <div class="my-4">
+                    <div class="border d-flex flex-column my-1 p-3 gap-3" style="background: linear-gradient(to top right, rgba(${event.color.red}, ${event.color.green}, ${event.color.blue},.03), rgba(${event.color.red}, ${event.color.green}, ${event.color.blue}, .15));">
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <h5 class="fw-bold p-0 m-0">${event.label}</h5>
+                            <p class="m-0 p-0">${formatDate(event.date)}</p>
+                        </div>
+                        <p class="p-0 m-0">${event.description}</p>
+                    </div>
+                </div>
+                <div class="rounded-5 position-absolute" style="width: 10px;aspect-ratio: 1/1;left: 0;top: 50%;transform: translate(-50%, -50%); background: rgb(${event.color.red}, ${event.color.green}, ${event.color.blue})"></div>
+            </div>
+
+        `;
     }
 
     function timelineScore(eval){
@@ -433,7 +555,7 @@
                         <p class="p-0 m-0">${eval.note}</p>
                     </div>
                 </div>
-                <div class="rounded-5 position-absolute bg-light" style="width: 10px;aspect-ratio: 1/1;left: 0;top: 50%;transform: translate(-50%, -50%);"></div>
+                <div class="rounded-5 position-absolute" style="width: 10px;aspect-ratio: 1/1;left: 0;top: 50%;transform: translate(-50%, -50%); background: ${getColorGradient(eval.cscore, -100, 100)}"></div>
             </div>
 
         `;
