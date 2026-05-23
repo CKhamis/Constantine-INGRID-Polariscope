@@ -723,6 +723,9 @@
             selectedMember = null;
             renderMemberList();
             cy.nodes().remove();
+            timelineContainer.innerHTML=``;
+            eventScoreTimelineContainer.innerHTML=``;
+            contextText.textContent=`Batch Evaluation Complete`;
             return;
         }
 
