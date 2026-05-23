@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<script th:fragment="escape-protection">
+    function escapeHtml(str) {
+        if (str == null) return '';
+
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+</script>
 <script th:fragment="date-formatting">
     function formatDate(inputDate) {
         const date = new Date(inputDate);
