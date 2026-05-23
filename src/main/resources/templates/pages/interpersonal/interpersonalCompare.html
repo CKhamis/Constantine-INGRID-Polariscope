@@ -33,7 +33,6 @@
                         </div>
                     </div>
                 </div>
-                <p class="fs-5 mb-2">Select individual members and events to view a chronological timeline, cScores, notes, and interpersonal network.</p>
 
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-end">
                     <ul class="nav nav-underline" id="myTab" role="tablist">
@@ -41,7 +40,7 @@
                             <button class="nav-link active fs-4" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes-tab-pane" type="button" role="tab" aria-controls="notes-tab-pane" aria-selected="true">Overview</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fs-4" id="network-tab" data-bs-toggle="tab" data-bs-target="#network-tab-pane" type="button" role="tab" aria-controls="network-tab-pane" aria-selected="false">Network</button>
+                            <button class="nav-link fs-4" id="network-tab" data-bs-toggle="tab" data-bs-target="#network-tab-pane" type="button" role="tab" aria-controls="network-tab-pane" aria-selected="false" onclick="renderNetwork()">Network</button>
                         </li>
                     </ul>
                     <div class="d-flex flex-row justify-content-end align-items-center mb-2">
@@ -53,7 +52,7 @@
             <div class="bg-dark flex-grow-1">
                 <div class="tab-content h-100" id="myTabContent">
                     <div class="tab-pane fade show active" id="notes-tab-pane" role="tabpanel" aria-labelledby="notes-tab" tabindex="0">
-                        <h3 class="fw-bold mt-5 mb-3 ms-3">Evaluation History</h3>
+                        <h3 class="fw-bold mt-3 mb-3 ms-3">Evaluation History</h3>
                         <div class="position-relative">
                             <div class="position-absolute p-2" style="top: 0; right: 0;">
                                 <div class="bg-light-subtle d-flex justify-content-center align-items-center p-2" role="button" onclick="evalChart.resetZoom()">
@@ -79,12 +78,12 @@
                     </div>
                     <div class="tab-pane fade h-100" id="network-tab-pane" role="tabpanel" aria-labelledby="network-tab" tabindex="0">
                         <div class="w-100 h-100" id="network-container"></div>
-                        <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-3 m-3 d-flex flex-row gap-2">
+                        <div class="position-absolute bottom-0 end-0 bg-body-tertiary p-2 m-2 d-flex flex-row gap-2">
                             <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="tooltip" data-bs-title="Reset View" onclick="cy.reset()">
-                                <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 30px;">
+                                <img class="square-image" src="/icons/Reset%20Zoom.svg" alt="refresh" style="width: 20px;">
                             </button>
                             <button type="button" class="btn bg-light-subtle d-flex justify-content-center align-items-center p-2" data-bs-toggle="modal" data-bs-target="#graph-modal">
-                                <img class="square-image" src="/icons/Settings.svg" alt="refresh" style="width: 30px;">
+                                <img class="square-image" src="/icons/Settings.svg" alt="refresh" style="width: 20px;">
                             </button>
                         </div>
                     </div>
@@ -573,7 +572,7 @@
                     zoom: {
                         zoom: {
                             wheel: {
-                                enabled: true,
+                                enabled: false,
                             },
                             drag: {
                                 enabled: true

@@ -182,6 +182,7 @@
 
 <div th:replace="~{components/External :: external}"></div>
 <div th:replace="~{components/Formatting :: date-formatting}"></div>
+<div th:replace="~{components/Formatting :: escape-protection}"></div>
 <div th:replace="~{components/External :: tooltips}"></div>
 <div th:replace="~{components/Formatting :: timestamp-formatting}"></div>
 <div th:replace="~{components/Network :: data-upload}"></div>
@@ -754,10 +755,10 @@
                     console.log(event);
                     tableContent += `
                     <tr>
-                        <td style="vertical-align: middle" class="fw-bold">${event.label}</td>
+                        <td style="vertical-align: middle" class="fw-bold">${escapeHtml(event.label)}</td>
                         <td style="vertical-align: middle"><div class="square-image" style="height: 30px; background-color: rgb(${event.color.red}, ${event.color.green}, ${event.color.blue})"></div></td>
                         <td style="vertical-align: middle">${formatTimestamp(new Date(event.date))}</td>
-                        <td style="vertical-align: middle">${event.description}</td>
+                        <td style="vertical-align: middle">${escapeHtml(event.description)}</td>
                         <td style="vertical-align: middle"><button class="btn btn-secondary" onclick="updateEventModal('${event.id}')" data-bs-toggle="modal" data-bs-target="#saveEventModal">Edit</button></td>
                         <td style="vertical-align: middle"><button class="btn btn-danger bevel-sm" onclick="deleteEvent('${event.id}')">Delete</button></td>
                     </tr>
