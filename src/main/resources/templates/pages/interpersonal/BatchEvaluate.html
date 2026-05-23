@@ -255,6 +255,7 @@
     let contextText = document.querySelector("#context-title");
     let contextViewProfile = document.querySelector("#context-view-profile");
     let contextProfileImage = document.querySelector("#context-profile-image");
+    document.querySelector("#graph-range-show").value = 0;
 
     // Containers
     let memberListContainer = document.querySelector("#member-list");
@@ -595,8 +596,6 @@
 
     function renderNetwork(){
         cy.nodes().remove();
-        cy.elements().remove();
-
         let memberId = selectedMember.id;
 
         // User
@@ -614,28 +613,21 @@
         });
 
         // All Connections
-        relationships
-            .filter((r) => Math.abs(r.health) >= document.querySelector("#graph-range-show").value)
-            .filter((r) => r.self.id === memberId || r.other.id === memberId)
-            .forEach((relationship) => {
-                let person1 = cy.getElementById(relationship.self.id);
-                let person2 = cy.getElementById(relationship.other.id);
-
-                // Guard against duplicate edges too
-                if (person1.length === 0 || person2.length === 0) return;
-                if (cy.getElementById(relationship.id).length > 0) return;
-
-                cy.add({
-                    group: 'edges',
-                    data: {
-                        id: relationship.id,
-                        source: relationship.self.id,
-                        target: relationship.other.id,
-                        color: getColorGradient(relationship.health, -100, 100),
-                        opacity: Math.min(Math.max((Math.abs(relationship.health) / 100), .05), .9)
-                    }
-                });
+        relationships.filter((r) => r.self.id === memberId).forEach((r) => {
+            let member = memberList.find((m) => m.id === r.other.id);
+            cy.add({
+                group: 'nodes',
+                data: {
+                    id: r.other.id,
+                    name: document.querySelector("#graph-checkbox-labels").checked? member.firstName + " " + member.lastName : "",
+                    img: `/api/interpersonal/member/profile-image/${member.id}`,
+                    imgOpacity: document.querySelector("#graph-checkbox-img").checked? "1" : "0",
+                    opacity: 1,
+                    shape: shapeMap(member.sex),
+                    color: '#6d6d6d'
+                }
             });
+        });
 
         // Connections
         relationships.filter((r) => Math.abs(r.health) >= document.querySelector("#graph-range-show").value).filter((r) => r.self.id === memberId || r.other.id === memberId).forEach((relationship) => {
@@ -742,6 +734,13 @@
     function chooseCurrent(){
         getMember(selectedMember.id);
         renderMemberList();
+    }
+
+    updateToleranceIndicator();
+
+    function updateToleranceIndicator(){
+        document.querySelector('#tolerance-indicator').textContent =
+            document.querySelector('#graph-range-show').value;
     }
 
     // Re-usable components
